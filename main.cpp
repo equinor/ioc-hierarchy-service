@@ -63,11 +63,11 @@ int main ()
         // Convert the message to a vector of maps
         std::istringstream buffer(static_cast<char *>(request.data()));
         boost::archive::text_iarchive archive(buffer);
-        std::vector<NodeType> test;
+        std::vector<NodeType> message;
 
-        archive >> test;
+        archive >> message;
 
-        tag_hierarchy.PopulateGraph(test);
+        tag_hierarchy.Handle(message);
         //for (auto const &dict : test)
         //{
         //    for (auto const &x : dict)

@@ -25,6 +25,7 @@ target_include_directories(tag-hierarchy
     PRIVATE cppzmq
 )
 target_link_libraries(tag-hierarchy
+    PUBLIC python2.7
     PUBLIC tag_hierarchy
     PUBLIC pybind11
 )

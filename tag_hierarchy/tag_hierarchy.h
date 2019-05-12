@@ -11,5 +11,5 @@ public:
     TagHierarchy();
     ~TagHierarchy(); 
     std::unique_ptr<TagHierarchyImpl> impl_;
-    bool PopulateGraph(std::vector<NodeType>& nodes);
+    std::vector<NodeType> Handle(std::vector<NodeType>& message);
 };
