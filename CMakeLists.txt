@@ -11,12 +11,19 @@ add_subdirectory(tag_hierarchy)
 
 pybind11_add_module(tag_hierarchy_client python/cpp/client.cpp)
 target_link_libraries(tag_hierarchy_client
+    PRIVATE Boost::serialization
     PRIVATE libzmq
     PUBLIC pybind11
 )
 target_include_directories(tag_hierarchy_client
     PRIVATE cppzmq
     PRIVATE ${CMAKE_SOURCE_DIR}
+)
+install(TARGETS tag_hierarchy_client
+    LIBRARY
+    DESTINATION api/hierarchy
+    RUNTIME
+    DESTINATION api/hierarchy
 )
 
 add_executable(tag-hierarchy main.cpp)
@@ -29,3 +36,5 @@ target_link_libraries(tag-hierarchy
     PUBLIC pybind11
     PUBLIC ${PYTHON_LIBRARIES}
 )
+install(TARGETS tag-hierarchy
+    RUNTIME DESTINATION bin/)
