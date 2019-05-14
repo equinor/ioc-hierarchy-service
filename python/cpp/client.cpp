@@ -79,9 +79,4 @@ PYBIND11_MODULE(tag_hierarchy_client, m)
         eg. [[1, 4, 2], [2, 1, 3]] -> [2, 4, 3]
     )pbdoc");
 
-    m.def("aggregate_sparklines_np", &query, R"pbdoc(
-        Input a python list of numpy arrays (int) of equal length,
-        returns a list of the highest value at any single point,
-        eg. [np.array([1, 4, 2]), np.array([2, 1, 3])] -> [2, 4, 3]
-    )pbdoc");
 }

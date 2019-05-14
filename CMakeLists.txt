@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(tag-hierarchy)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 find_package(Boost COMPONENTS graph serialization REQUIRED)
 find_package(ZeroMQ REQUIRED)
