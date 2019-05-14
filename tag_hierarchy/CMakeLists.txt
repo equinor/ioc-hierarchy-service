@@ -5,7 +5,6 @@ target_include_directories(tag_hierarchy
     PUBLIC ${CMAKE_SOURCE_DIR}/cppzmq
 )
 target_link_libraries(tag_hierarchy
-    PUBLIC pybind11
-    PUBLIC Boost::graph
     PUBLIC Boost::serialization
+    PUBLIC pybind11
     PUBLIC libzmq)
