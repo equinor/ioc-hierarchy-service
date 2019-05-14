@@ -1,9 +1,10 @@
-#include <models/models.h>
+#include "models/models.h"
 
 #include <zmq.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
+#include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/variant.hpp>
@@ -14,6 +15,8 @@
 #include <algorithm>
 #include <string>
 
+// Copied this ugly duckling from the pybind11 website. It is necessary
+// for pybind11 to bind a boost::variant
 // `boost::variant` as an example -- can be any `std::variant`-like container
 namespace pybind11 { namespace detail {
     template <typename... Ts>
@@ -29,7 +32,7 @@ namespace pybind11 { namespace detail {
     };
 }} // namespace pybind11::detail
 
-int post_hierarchy_object(std::vector<NodeType> in)
+std::vector<NodeType> query(std::vector<NodeType> in)
 {
     zmq::context_t context (1);
     zmq::socket_t socket (context, ZMQ_REQ);
@@ -37,65 +40,22 @@ int post_hierarchy_object(std::vector<NodeType> in)
     std::cout << "Creating hierarchy server" << std::endl;
     socket.connect ("tcp://127.0.0.1:5556");
 
-    //for (auto const &dict : in)
-    //{
-    //    for (auto const &x : dict)
-    //    {
-    //        std::cout << x.first // string (key)
-    //                  << ':'
-    //                  << x.second // string's value
-    //                  << std::endl;
-    //    }
-    //}
-
     std::ostringstream buffer;
     {
         boost::archive::text_oarchive archive(buffer);
         archive << in;
     }
-    // The result can be extracted from the stringstream
-    std::cout << buffer.str() << std::endl;
-    //zmq::message_t message(sizeof(buffer));
     zmq::message_t message((void*)buffer.str().c_str(), buffer.str().size()+1);
-    //std::memcpy(message.data(), buffer.str().data(), buffer.str().length());
     socket.send(message);
     zmq::message_t reply;
     socket.recv(&reply);
-    std::cout << "Received World " << reply << std::endl;
+    std::istringstream in_buffer(static_cast<char *>(reply.data()));
+    boost::archive::text_iarchive archive(in_buffer);
+    std::vector<NodeType> reply_list;
+    archive >> reply_list;
     socket.close();
     context.close();
-    return 0;
-}
-
-std::vector<int>
-aggregate_sparklines_list(std::vector<std::vector<int>> in)
-{
-    auto retval = std::vector<int>();
-    const auto no_sparklines = in.size();
-    if (no_sparklines == 0) {
-        return retval;
-    }
-    auto lengths = std::vector<size_t>();
-    lengths.reserve(in.size());
-    size_t length = 338;
-    //for (size_t i = 0; i < no_sparklines; ++i) {
-    //    lengths.emplace_back(in[i].size());
-    //    length = std::max(length, in[i].size());
-    //}
-    //const auto length = *std::max_element(lengths.cbegin(), lengths.cend());
-    int max = -1;
-    for (size_t i = 0; i < length; ++i)
-    {
-        for (size_t j = 0; j < no_sparklines; ++j)
-        {
-            if (in[j].size() > i) {
-                max = std::max(max, in[j][i]);
-            }
-        }
-        retval.push_back(max);
-        max = -1;
-    }
-    return retval;
+    return reply_list;
 }
 
 namespace py = pybind11;
@@ -113,13 +73,13 @@ PYBIND11_MODULE(tag_hierarchy_client, m)
            aggregate_sparklines_list
     )pbdoc";
 
-    m.def("aggregate_sparklines_int", &aggregate_sparklines_list, R"pbdoc(
+    m.def("query", &query, R"pbdoc(
         Input a python list of lists of integers of equal length,
         returns a list of the highest value at any single point,
         eg. [[1, 4, 2], [2, 1, 3]] -> [2, 4, 3]
     )pbdoc");
 
-    m.def("aggregate_sparklines_np", &post_hierarchy_object, R"pbdoc(
+    m.def("aggregate_sparklines_np", &query, R"pbdoc(
         Input a python list of numpy arrays (int) of equal length,
         returns a list of the highest value at any single point,
         eg. [np.array([1, 4, 2]), np.array([2, 1, 3])] -> [2, 4, 3]

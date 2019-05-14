@@ -1,6 +1,6 @@
 #include "tag_hierarchy/tag_hierarchy.h"
-#include "models/models.h"
 
+#include "models/models.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
@@ -20,6 +20,7 @@ using TagHierarchyT = boost::labeled_graph<TagHierarchyGraph, std::string>;
 
 using VertexT = boost::graph_traits<TagHierarchyGraph>::vertex_descriptor;
 using EdgeT = boost::graph_traits<TagHierarchyGraph>::edge_descriptor;
+using VertexIterator = boost::graph_traits<TagHierarchyGraph>::vertex_iterator;
 
 using DispatchFunction =
     std::function<std::vector<NodeType>(std::vector<NodeType>&)>;
@@ -82,12 +83,10 @@ public:
     Nodes(std::vector<NodeType>& nodes) {
         auto command_map = nodes.at(0);
         auto retval = std::vector<NodeType>();
-        if (command_map["parentId"].type() != typeid(pybind11::none)) {
-            boost::graph_traits<TagHierarchyGraph>::vertex_iterator vi, vi_end;
-            for (boost::tie(vi, vi_end) = vertices(graph_); vi != vi_end; ++vi)
+        if (command_map["parentId"].type() == typeid(pybind11::none)) {
+            for (auto [vi, vi_end] = vertices(graph_); vi != vi_end; ++vi)
             {
-                TagHierarchyGraph::in_edge_iterator ei, ei_end;
-                boost::tie(ei, ei_end) = boost::in_edges(*vi, this->graph_);
+                auto [ei, ei_end] = boost::in_edges(*vi, this->graph_);
                 if (ei == ei_end)
                 {
                     retval.push_back(graph_[*vi].properties);
@@ -97,7 +96,13 @@ public:
             return retval;
         }
         else {
-            std::string command = boost::get<std::string>(command_map["parent_id"]);
+            std::string parent_id = boost::get<std::string>(command_map["parentId"]);
+            auto [ei, ei_end] = boost::adjacent_vertices(vertices_[parent_id], this->graph_);
+            for (auto iter = ei; iter != ei_end; ++iter) {
+                retval.push_back(graph_[*iter].properties);
+                std::cout << "Node " << graph_[*iter].id << " has parent " << parent_id
+                    << std::endl;
+            }
         }
 
         return retval;

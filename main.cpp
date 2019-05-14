@@ -14,6 +14,7 @@
 #include <boost/pending/indirect_cmp.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/variant.hpp>
@@ -29,19 +30,6 @@
 #include <vector>
 #include <iostream>
 
-
-//template < typename TimeMap > class bfs_time_visitor:public default_bfs_visitor {
-//  typedef typename property_traits < TimeMap >::value_type T;
-//public:
-//  bfs_time_visitor(TimeMap tmap, T & t):m_timemap(tmap), m_time(t) { }
-//  template < typename Vertex, typename Graph >
-//    void discover_vertex(Vertex u, const Graph & g) const
-//  {
-//    put(m_timemap, u, m_time++);
-//  }
-//  TimeMap m_timemap;
-//  T & m_time;
-//};
 
 int main ()
 {
@@ -67,40 +55,21 @@ int main ()
 
         archive >> message;
 
-        tag_hierarchy.Handle(message);
-        //for (auto const &dict : test)
-        //{
-        //    for (auto const &x : dict)
-        //    {
-        //        std::cout << x.first // string (key)
-        //                  << ':'
-        //                  << x.second // string's value
-        //                  << std::endl;
-        //    }
-        //}
+        const auto reply_list = tag_hierarchy.Handle(message);
+
         //  Send reply back to client
-        zmq::message_t reply(2);
-        memcpy(reply.data(), "OK", 2);
+        std::ostringstream out_buffer;
+        {
+            boost::archive::text_oarchive archive(out_buffer);
+            archive << reply_list;
+        }
+        // The result can be extracted from the stringstream
+        std::cout << out_buffer.str() << std::endl;
+        //zmq::message_t message(sizeof(buffer));
+        zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
+        //std::memcpy(message.data(), buffer.str().data(), buffer.str().length());
         socket.send(reply);
     }
-    //using namespace boost;
-    // Select the graph type we wish to use
-
-    //const auto v = Modelhierarchy{"a", "b", "c"};
-    //vertex_t new_vertex = boost::add_vertex(v.id, tag_hierarchy);
-    //tag_hierarchy["b"].name = v.name;
-    //tag_hierarchy["b"].parent_id = v.parent_id;
-    //vertex_t new_vertex2 = boost::add_vertex(Modelhierarchy{"d", "e", "f"}, tag_hierarchy);
-    //auto new_edge = boost::add_edge(new_vertex, new_vertex2, Connection{"First connection"}, tag_hierarchy);
-    //boost::write_graphviz(std::cout, tag_hierarchy,
-    //                      [&](auto &out, auto v) {
-    //                          out << "[id=\"" << tag_hierarchy["b"].id << "\"]" << std::endl;
-    //                          out << "[name=\"" << tag_hierarchy["b"].name << "\"]" << std::endl;
-    //                          out << "[parent_id=\"" << tag_hierarchy["b"].parent_id << "\"]" << std::endl;
-    //                          } /*,
-    //                      [&](auto &out, auto e) {
-    //                          out << "[type=\"" << tag_hierarchy["b"].type << "\"]";
-    //                      }*/);
     std::cout << std::flush;
 
     return 0;
