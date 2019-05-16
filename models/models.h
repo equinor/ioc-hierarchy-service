@@ -26,7 +26,12 @@ void serialize(Archive & ar, pybind11::none & g, const unsigned int version)
 } // namespace boost
 
 using NodeType =
-    std::map<std::string, boost::variant<int, double, pybind11::none, std::string>>;
+    std::map<std::string, boost::variant<int,
+    double,
+    pybind11::none,
+    std::string,
+    std::vector<int>,
+    std::vector<std::string>>>;
 
 struct Modelhierarchy {
     std::string id;

@@ -49,26 +49,42 @@ int main ()
         socket.recv(&request);
 
         // Convert the message to a vector of maps
-        std::istringstream buffer(static_cast<char *>(request.data()));
-        boost::archive::text_iarchive archive(buffer);
         std::vector<NodeType> message;
-
-        archive >> message;
-
-        const auto reply_list = tag_hierarchy.Handle(message);
-
-        //  Send reply back to client
-        std::ostringstream out_buffer;
+        try
         {
-            boost::archive::text_oarchive archive(out_buffer);
-            archive << reply_list;
+            std::istringstream buffer(static_cast<char *>(request.data()));
+            boost::archive::text_iarchive archive(buffer);
+
+            archive >> message;
         }
-        // The result can be extracted from the stringstream
-        std::cout << out_buffer.str() << std::endl;
-        //zmq::message_t message(sizeof(buffer));
-        zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
-        //std::memcpy(message.data(), buffer.str().data(), buffer.str().length());
-        socket.send(reply);
+        catch (const std::exception& exc) {
+            std::cerr << exc.what() << std::endl;
+        }
+
+        try
+        {
+            const auto reply_list = tag_hierarchy.Handle(message);
+            //  Send reply back to client
+            std::ostringstream out_buffer;
+            {
+                boost::archive::text_oarchive archive(out_buffer);
+                archive << reply_list;
+            }
+            // The result can be extracted from the stringstream
+            std::cout << out_buffer.str() << std::endl;
+            //zmq::message_t message(sizeof(buffer));
+            zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
+            //std::memcpy(message.data(), buffer.str().data(), buffer.str().length());
+            socket.send(reply);
+        }
+        catch (const std::exception& exc) {
+            std::cerr << "Error when handling message: " << exc.what() << std::endl;
+            zmq::message_t reply(5);
+            memcpy(reply.data(), "Error", 5);
+            socket.send(reply);
+            continue;
+        }
+
     }
     std::cout << std::flush;
 
