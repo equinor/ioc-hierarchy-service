@@ -43,7 +43,7 @@ public:
         path_.push_front(v);
         if (g[v].properties.count("is_modelelement"))
         {
-            const auto is_modelelement = boost::get<int>(g[v].properties.find("is_modelelement")->second);
+            const auto is_modelelement = boost::get<bool>(g[v].properties.find("is_modelelement")->second);
             if (is_modelelement)
             {
                 if (kpifilter_.size() != 0 &&
