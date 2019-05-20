@@ -19,11 +19,20 @@ target_include_directories(tag_hierarchy_client
     PRIVATE cppzmq
     PRIVATE ${CMAKE_SOURCE_DIR}
 )
+
+if (APPLE)
+    set (CLIENT_INSTALL_PATH
+        api/hierarchy/macos)
+else (APPLE)
+    set (CLIENT_INSTALL_PATH
+        api/hierarchy)
+endif (APPLE)
+
 install(TARGETS tag_hierarchy_client
     LIBRARY
-    DESTINATION api/hierarchy
+    DESTINATION ${CLIENT_INSTALL_PATH}
     RUNTIME
-    DESTINATION api/hierarchy
+    DESTINATION ${CLIENT_INSTALL_PATH}
 )
 
 add_executable(tag-hierarchy main.cpp)
@@ -36,5 +45,14 @@ target_link_libraries(tag-hierarchy
     PUBLIC pybind11
     PUBLIC ${PYTHON_LIBRARIES}
 )
+
+if (APPLE)
+    set (BINARY_INSTALL_PATH
+        bin/macos)
+else (APPLE)
+    set (BINARY_INSTALL_PATH
+        bin)
+endif (APPLE)
 install(TARGETS tag-hierarchy
-    RUNTIME DESTINATION bin/)
+    RUNTIME DESTINATION ${BINARY_INSTALL_PATH})
+
