@@ -33,8 +33,9 @@ using DispatchFunction =
 class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 {
 public:
-    explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes,
+    explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::map<VertexT, std::set<VertexT>>& valid_models,
                                       const std::vector<std::string> &kpifilter) : valid_nodes_(valid_nodes),
+                                                                                   valid_models_(valid_models),
                                                                                    kpifilter_(kpifilter),
                                                                                    path_(std::deque<VertexT>()) {}
 
@@ -70,6 +71,9 @@ public:
                     }
                     valid_nodes_.insert(path_part);
                 }
+                // I'm a valid model element. So the model needs to be added to the set of models
+                // that pertain to the second level of the hierarchy I am traversing
+                valid_models_[path_[path_.size() - 2]].insert(path_[1]);
             }
         }
         return;
@@ -82,6 +86,7 @@ private:
     std::set<VertexT> &valid_nodes_;
     const std::vector<std::string> &kpifilter_;
     std::deque<VertexT> path_;
+    std::map<VertexT, std::set<VertexT>>& valid_models_;
 };
 
 class TagHierarchyImpl {
@@ -178,7 +183,8 @@ public:
 
         std::cout << std::endl;
         auto valid_nodes = std::set<VertexT>();
-        auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, kpifilter);
+        auto valid_models = std::map<VertexT, std::set<VertexT>>();
+        auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter);
 
         auto const termfunc = [l2filter] (VertexT vertex, const TagHierarchyGraph& graph) {
             auto const levelno = boost::get<int>(graph[vertex].properties.at("levelno"));
@@ -211,7 +217,13 @@ public:
             {
                 continue;
             }
-            retval.push_back(graph_[*iter].properties);
+            auto valid_modelhierarchies = std::vector<std::string>();
+            for (auto const& modelhierarchy : valid_models[*iter]) {
+                valid_modelhierarchies.emplace_back(graph_[modelhierarchy].id);
+            }
+            auto props = graph_[*iter].properties;
+            props["modelhierarchies"] = valid_modelhierarchies;
+            retval.push_back(props);
         }
         return retval;
     }
