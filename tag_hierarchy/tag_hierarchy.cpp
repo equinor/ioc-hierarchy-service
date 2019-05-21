@@ -182,10 +182,6 @@ public:
         {
             l2filter = boost::get<std::vector<std::string>>(command_map.at("l2filter"));
         }
-        std::cout << "The l2filter items: ";
-        for (auto l2filteritem : l2filter) {
-            std::cout << l2filteritem;
-        }
 
         std::cout << std::endl;
         auto valid_nodes = std::set<VertexT>();
