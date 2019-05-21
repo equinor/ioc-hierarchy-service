@@ -169,6 +169,13 @@ public:
             std::cout << kpifilterid;
         }
 
+        auto l1filter = std::vector<std::string>();
+        if (command_map.count("l1filter") &&
+            command_map["l1filter"].type() == typeid(std::vector<std::string>))
+        {
+            l1filter = boost::get<std::vector<std::string>>(command_map.at("l1filter"));
+        }
+
         auto l2filter = std::vector<std::string>();
         if (command_map.count("l2filter") &&
             command_map["l2filter"].type() == typeid(std::vector<std::string>))
@@ -185,8 +192,11 @@ public:
         auto valid_models = std::map<VertexT, std::set<VertexT>>();
         auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter);
 
-        auto const termfunc = [l2filter] (VertexT vertex, const TagHierarchyGraph& graph) {
+        auto const termfunc = [l1filter, l2filter] (VertexT vertex, const TagHierarchyGraph& graph) {
             auto const levelno = boost::get<int>(graph[vertex].properties.at("levelno"));
+            if (levelno == 1 && l1filter.size() > 0) {
+                return std::find(cbegin(l1filter), cend(l1filter), graph[vertex].id) == cend(l1filter);
+            }
             if (levelno == 2 && l2filter.size() > 0) {
                 return std::find(cbegin(l2filter), cend(l2filter), graph[vertex].id) == cend(l2filter);
             }
