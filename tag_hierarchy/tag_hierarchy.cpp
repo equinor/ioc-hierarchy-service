@@ -139,17 +139,16 @@ public:
         boost::write_graphviz(std::cout, graph_,
                               [&](auto &out, auto v) {
                                   out << "[id=\"" << graph_[v].id << "\"]";
-                                  if (graph_[v].properties["parent_id"].which() == 3)
+                                  if (graph_[v].properties.count("parent_id") &&
+                                      graph_[v].properties.at("parent_id").type() == typeid(std::string))
                                   {
-                                      std::string parent_id = boost::get<std::string>(graph_[v].properties["parent_id"]);
+                                      auto const parent_id = boost::get<std::string>(graph_[v].properties.at("parent_id"));
                                       out << "[parent_id=\"" << parent_id << "\"]";
                                   }
-                                  // out << "[name=\"" << tag_hierarchy["b"].name << "\"]" << std::endl;
-                                  // out << "[parent_id=\"" << tag_hierarchy["b"].parent_id << "\"]" << std::endl;
-                              } /*,
+                              },
                               [&](auto &out, auto e) {
-                                  out << "[type=\"" << tag_hierarchy["b"].type << "\"]";
-                              }*/
+                                  out << "[type=\"" << graph_[e].type << "\"]";
+                              }
         );
         return retval;
     }
