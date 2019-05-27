@@ -101,8 +101,13 @@ public:
     PopulateGraph(std::vector<NodeType> &nodes)
     {
         auto retval = std::vector<NodeType>();
+        auto const command = *nodes.begin();
         nodes.erase(nodes.begin());
-        root_ = boost::add_vertex({"root", {{"id", "root"}, {"levelno", 0}}}, graph_);
+        if (command.count("add_root") &&
+            boost::get<bool>(command.at("add_root")))
+        {
+            root_ = boost::add_vertex({"root", {{"id", "root"}, {"levelno", 0}}}, graph_);
+        }
         for (auto &node : nodes)
         {
             std::string id = boost::get<std::string>(node["id"]);
@@ -132,24 +137,24 @@ public:
 
             vertices_[id] = current_vertex;
         }
-        for (auto vd : boost::make_iterator_range(boost::vertices(graph_)))
-        {
-            std::cout << graph_[vd].id << std::endl;
-        }
-        boost::write_graphviz(std::cout, graph_,
-                              [&](auto &out, auto v) {
-                                  out << "[id=\"" << graph_[v].id << "\"]";
-                                  if (graph_[v].properties.count("parent_id") &&
-                                      graph_[v].properties.at("parent_id").type() == typeid(std::string))
-                                  {
-                                      auto const parent_id = boost::get<std::string>(graph_[v].properties.at("parent_id"));
-                                      out << "[parent_id=\"" << parent_id << "\"]";
-                                  }
-                              },
-                              [&](auto &out, auto e) {
-                                  out << "[type=\"" << graph_[e].type << "\"]";
-                              }
-        );
+        //for (auto vd : boost::make_iterator_range(boost::vertices(graph_)))
+        //{
+        //    std::cout << graph_[vd].id << std::endl;
+        //}
+        //boost::write_graphviz(std::cout, graph_,
+        //                      [&](auto &out, auto v) {
+        //                          out << "[id=\"" << graph_[v].id << "\"]";
+        //                          if (graph_[v].properties.count("parent_id") &&
+        //                              graph_[v].properties.at("parent_id").type() == typeid(std::string))
+        //                          {
+        //                              auto const parent_id = boost::get<std::string>(graph_[v].properties.at("parent_id"));
+        //                              out << "[parent_id=\"" << parent_id << "\"]";
+        //                          }
+        //                      },
+        //                      [&](auto &out, auto e) {
+        //                          out << "[type=\"" << graph_[e].type << "\"]";
+        //                      }
+        //);
         return retval;
     }
 
