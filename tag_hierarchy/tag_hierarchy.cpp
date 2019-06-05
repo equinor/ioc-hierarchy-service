@@ -137,24 +137,6 @@ public:
 
             vertices_[id] = current_vertex;
         }
-        //for (auto vd : boost::make_iterator_range(boost::vertices(graph_)))
-        //{
-        //    std::cout << graph_[vd].id << std::endl;
-        //}
-        //boost::write_graphviz(std::cout, graph_,
-        //                      [&](auto &out, auto v) {
-        //                          out << "[id=\"" << graph_[v].id << "\"]";
-        //                          if (graph_[v].properties.count("parent_id") &&
-        //                              graph_[v].properties.at("parent_id").type() == typeid(std::string))
-        //                          {
-        //                              auto const parent_id = boost::get<std::string>(graph_[v].properties.at("parent_id"));
-        //                              out << "[parent_id=\"" << parent_id << "\"]";
-        //                          }
-        //                      },
-        //                      [&](auto &out, auto e) {
-        //                          out << "[type=\"" << graph_[e].type << "\"]";
-        //                      }
-        //);
         return retval;
     }
 
