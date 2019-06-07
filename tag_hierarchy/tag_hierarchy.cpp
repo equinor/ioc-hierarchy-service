@@ -8,6 +8,11 @@
 #include <boost/pending/indirect_cmp.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/graph/graph_utility.hpp> 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/variant.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include <functional>
 #include <set>
@@ -237,6 +242,13 @@ public:
                               }},
                          }){};
     TagHierarchyImpl(const TagHierarchyImpl& in) : command_func_dispatch_(in.command_func_dispatch_) {}
+
+    template<typename Archive>
+    void serialize(Archive& ar, const unsigned int version) {
+        ar & graph_;
+        ar & vertices_;
+        ar & root_;
+    }
 };
 
 TagHierarchy::TagHierarchy() {

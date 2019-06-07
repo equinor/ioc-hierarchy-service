@@ -16,6 +16,24 @@
 #include <string>
 #include <map>
 
+using NodeType =
+    std::map<std::string, boost::variant<bool,
+    int,
+    double,
+    pybind11::none,
+    std::string,
+    std::vector<int>,
+    std::vector<std::string>>>;
+
+struct Modelhierarchy {
+    std::string id;
+    NodeType properties;
+};
+
+struct Connection {
+    std::string type;
+};
+
 namespace boost {
 namespace serialization {
 
@@ -25,6 +43,11 @@ void serialize(Archive & ar, pybind11::none & g, const unsigned int version)
 {
 }
 
+template<class Archive>
+void serialize(Archive & ar, Modelhierarchy & g, const unsigned int version) {
+    ar & g.id;
+    ar & g.properties;
+}
 } // namespace serialization
 } // namespace boost
 
@@ -45,21 +68,3 @@ namespace pybind11 { namespace detail {
     };
 }} // namespace pybind11::detail
 
-
-using NodeType =
-    std::map<std::string, boost::variant<bool,
-    int,
-    double,
-    pybind11::none,
-    std::string,
-    std::vector<int>,
-    std::vector<std::string>>>;
-
-struct Modelhierarchy {
-    std::string id;
-    NodeType properties;
-};
-
-struct Connection {
-    std::string type;
-};
