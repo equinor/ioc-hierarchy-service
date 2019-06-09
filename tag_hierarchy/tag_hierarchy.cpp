@@ -1,7 +1,9 @@
 #include "tag_hierarchy/tag_hierarchy.h"
+#include "tag_hierarchy/graphstate.h"
 
 #include "models/models.h"
 
+#include <boost/graph/adj_list_serialize.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/graphviz.hpp>
@@ -226,6 +228,28 @@ public:
     }
 
     std::vector<NodeType>
+    Store(std::vector<NodeType>& message) {
+        auto retval = std::vector<NodeType>();
+        std::ostringstream stream;
+        boost::archive::text_oarchive archive(stream);
+        archive << this;
+        GraphState::Store(stream.str());
+        retval.push_back({{"success", true}});
+        return retval;
+    }
+
+    std::vector<NodeType>
+    Restore(std::vector<NodeType>& message) {
+        auto retval = std::vector<NodeType>();
+        const std::string graph_state = GraphState::Retrieve();
+        std::istringstream buffer(graph_state);
+        boost::archive::text_iarchive archive(buffer);
+        archive >> *this;
+        retval.push_back({{"success", true}});
+        return retval;
+    }
+
+    std::vector<NodeType>
     Handle(std::vector<NodeType> &message)
     {
         auto command_map = message.at(0);
@@ -239,6 +263,12 @@ public:
                               }},
                              {"nodes", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->Nodes(nodes);
+                              }},
+                             {"store", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
+                                  return this->Store(nodes);
+                              }},
+                             {"restore", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
+                                  return this->Restore(nodes);
                               }},
                          }){};
     TagHierarchyImpl(const TagHierarchyImpl& in) : command_func_dispatch_(in.command_func_dispatch_) {}

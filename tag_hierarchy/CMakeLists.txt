@@ -1,4 +1,9 @@
-add_library(tag_hierarchy tag_hierarchy.cpp tag_hierarchy.h)
+add_library(tag_hierarchy
+    tag_hierarchy.cpp
+    tag_hierarchy.h
+    graphstate.cpp
+    graphstate.h
+ )
 
 target_include_directories(tag_hierarchy
     PRIVATE ${CMAKE_SOURCE_DIR}

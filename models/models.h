@@ -48,6 +48,11 @@ void serialize(Archive & ar, Modelhierarchy & g, const unsigned int version) {
     ar & g.id;
     ar & g.properties;
 }
+
+template<class Archive>
+void serialize(Archive & ar, Connection & g, const unsigned int version) {
+    ar & g.type;
+}
 } // namespace serialization
 } // namespace boost
 
