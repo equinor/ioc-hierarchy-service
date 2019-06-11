@@ -232,7 +232,7 @@ public:
         auto retval = std::vector<NodeType>();
         std::ostringstream stream;
         boost::archive::text_oarchive archive(stream);
-        archive << this;
+        archive << *this;
         GraphState::Store(stream.str());
         retval.push_back({{"success", true}});
         return retval;
