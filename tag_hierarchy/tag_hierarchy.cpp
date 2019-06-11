@@ -240,6 +240,7 @@ public:
 
     std::vector<NodeType>
     Restore(std::vector<NodeType>& message) {
+        ClearGraph();
         auto retval = std::vector<NodeType>();
         const std::string graph_state = GraphState::Retrieve();
         std::istringstream buffer(graph_state);
@@ -247,6 +248,13 @@ public:
         archive >> *this;
         retval.push_back({{"success", true}});
         return retval;
+    }
+
+    void
+    ClearGraph() {
+        graph_.clear();
+        vertices_.clear();
+        root_ = 0;
     }
 
     std::vector<NodeType>

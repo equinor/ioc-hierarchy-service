@@ -64,6 +64,7 @@ int main ()
         try
         {
             const auto reply_list = tag_hierarchy.Handle(message);
+
             //  Send reply back to client
             std::ostringstream out_buffer;
             {
