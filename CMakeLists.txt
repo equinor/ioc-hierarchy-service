@@ -7,8 +7,10 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 find_package(Boost COMPONENTS serialization graph REQUIRED)
 find_package(ZeroMQ REQUIRED)
 find_package(PythonLibs)
+add_subdirectory(cpp_redis)
 add_subdirectory(pybind11)
 add_subdirectory(tag_hierarchy)
+add_subdirectory(backup_service)
 
 pybind11_add_module(tag_hierarchy_client python/cpp/client.cpp)
 target_link_libraries(tag_hierarchy_client
