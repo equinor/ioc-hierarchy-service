@@ -1,5 +1,4 @@
 #include "tag_hierarchy/tag_hierarchy.h"
-#include "tag_hierarchy/graphstate.h"
 
 #include "models/models.h"
 
@@ -233,8 +232,7 @@ public:
         std::ostringstream stream;
         boost::archive::text_oarchive archive(stream);
         archive << *this;
-        GraphState::Store(stream.str());
-        retval.push_back({{"success", true}});
+        retval.push_back({{"serialized_graph", stream.str()}});
         return retval;
     }
 
@@ -242,7 +240,8 @@ public:
     Restore(std::vector<NodeType>& message) {
         ClearGraph();
         auto retval = std::vector<NodeType>();
-        const std::string graph_state = GraphState::Retrieve();
+        const std::string graph_state =
+            boost::get<std::string>(message[0]["serialized_hierarchy"]);
         std::istringstream buffer(graph_state);
         boost::archive::text_iarchive archive(buffer);
         archive >> *this;

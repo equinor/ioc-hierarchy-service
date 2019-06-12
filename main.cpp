@@ -31,6 +31,59 @@
 #include <iostream>
 
 
+/* The messagehandler handles command which requires orchestration between
+   the server and the hierarchy
+*/
+class MessageHandler {
+    public:
+    std::vector<NodeType>
+    HandleRequest(std::vector<NodeType>& request) {
+        NodeType command_map = request[0];
+        std::string command = boost::get<std::string>(command_map["command"]);
+        if (command == "store")
+        {
+            const auto reply = tag_hierarchy_.Handle(request);
+            const auto serialized_hierarchy =
+                boost::get<std::string>(reply[0].at("serialized_graph"));
+            zmq::context_t context(1);
+            zmq::socket_t socket(context, ZMQ_REQ);
+            std::cout << "Connecting to backup service" << std::endl;
+            socket.connect("tcp://127.0.0.1:5555");
+            zmq::message_t backup_request(serialized_hierarchy.size());
+            memcpy(backup_request.data(), serialized_hierarchy.c_str(), serialized_hierarchy.size());
+            socket.send(backup_request);
+            zmq::message_t zmq_reply;
+            socket.recv(&zmq_reply);
+            auto retval = std::vector<NodeType>();
+            retval.push_back({{"success", true}});
+            return retval;
+        }
+        else if (command == "restore")
+        {
+            zmq::context_t context(1);
+            zmq::socket_t socket(context, ZMQ_REQ);
+            std::cout << "Connecting to backup service" << std::endl;
+            socket.connect("tcp://127.0.0.1:5555");
+            const auto message = std::string("GET_HIERARCHY");
+            zmq::message_t backup_request(message.size());
+            memcpy(backup_request.data(), message.c_str(), message.size());
+            socket.send(backup_request);
+            zmq::message_t zmq_reply;
+            socket.recv(&zmq_reply);
+            std::string serialized_hierarchy = static_cast<char*>(zmq_reply.data());
+            request[0]["serialized_hierarchy"] = serialized_hierarchy;
+            return tag_hierarchy_.Handle(request);
+        }
+        else {
+            return tag_hierarchy_.Handle(request);
+        }
+    }
+
+
+private:
+    TagHierarchy tag_hierarchy_;
+};
+
 int main ()
 {
     //  Prepare our context and socket
@@ -40,7 +93,7 @@ int main ()
     std::cout << "Creating hierarchy server" << std::endl;
     socket.bind ("tcp://127.0.0.1:5556");
 
-    auto tag_hierarchy = TagHierarchy();
+    auto messagehandler = MessageHandler();
 
     while (true) {
         zmq::message_t request;
@@ -63,7 +116,7 @@ int main ()
 
         try
         {
-            const auto reply_list = tag_hierarchy.Handle(message);
+            const auto reply_list = messagehandler.HandleRequest(message);
 
             //  Send reply back to client
             std::ostringstream out_buffer;

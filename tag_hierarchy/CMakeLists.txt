@@ -1,8 +1,6 @@
-add_library(tag_hierarchy
+add_library(tag_hierarchy STATIC
     tag_hierarchy.cpp
     tag_hierarchy.h
-    graphstate.cpp
-    graphstate.h
  )
 
 target_include_directories(tag_hierarchy
