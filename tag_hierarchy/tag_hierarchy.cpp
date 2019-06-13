@@ -257,7 +257,7 @@ public:
     ClearGraph() {
         graph_.clear();
         vertices_.clear();
-        root_ = 0;
+        root_ = std::numeric_limits<VertexT>::max();
     }
 
     std::vector<NodeType>
@@ -282,7 +282,9 @@ public:
                                   return this->Restore(nodes);
                               }},
                          }),
-                         root_(std::numeric_limits<VertexT>::max()) {};
+                         root_(std::numeric_limits<VertexT>::max())
+    {
+    };
     TagHierarchyImpl(const TagHierarchyImpl& in) : command_func_dispatch_(in.command_func_dispatch_) {}
 
     template<typename Archive>
