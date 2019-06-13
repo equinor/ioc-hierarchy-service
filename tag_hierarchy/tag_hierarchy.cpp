@@ -151,6 +151,10 @@ public:
     {
         auto command_map = nodes.at(0);
         auto retval = std::vector<NodeType>();
+        // Check if graph has been initialized
+        if (root_ == std::numeric_limits<VertexT>::max()) {
+            return retval;
+        }
         auto kpifilter = std::vector<std::string>();
         if (command_map.count("kpifilter") &&
             command_map["kpifilter"].type() == typeid(std::vector<std::string>))
@@ -277,7 +281,8 @@ public:
                              {"restore", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->Restore(nodes);
                               }},
-                         }){};
+                         }),
+                         root_(std::numeric_limits<VertexT>::max()) {};
     TagHierarchyImpl(const TagHierarchyImpl& in) : command_func_dispatch_(in.command_func_dispatch_) {}
 
     template<typename Archive>
