@@ -153,6 +153,7 @@ public:
         auto retval = std::vector<NodeType>();
         // Check if graph has been initialized
         if (root_ == std::numeric_limits<VertexT>::max()) {
+            retval.push_back({{std::string("error"), std::string("empty")}});
             return retval;
         }
         auto kpifilter = std::vector<std::string>();
@@ -253,6 +254,18 @@ public:
         return retval;
     }
 
+    std::vector<NodeType>
+    HealthCheck(std::vector<NodeType>& message) {
+        auto retval = std::vector<NodeType>();
+        if (root_ == std::numeric_limits<VertexT>::max()) {
+            retval.push_back({{std::string("ok"), false},
+                              {std::string("error"), std::string("Cache not populated")}});
+            return retval;
+        }
+        retval.push_back({{std::string("ok"), true}});
+        return retval;
+    }
+
     void
     ClearGraph() {
         graph_.clear();
@@ -280,6 +293,9 @@ public:
                               }},
                              {"restore", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->Restore(nodes);
+                              }},
+                             {"healthcheck", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
+                                  return this->HealthCheck(nodes);
                               }},
                          }),
                          root_(std::numeric_limits<VertexT>::max())
