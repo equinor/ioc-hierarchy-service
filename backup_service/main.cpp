@@ -90,7 +90,12 @@ int main ()
             std::cout << "Getting the cache key" << std::endl;
             auto reply_string_future = client.get(CACHE_KEY);
             client.sync_commit();
-            reply_string = reply_string_future.get().as_string();
+            try {
+                reply_string = reply_string_future.get().as_string();
+            }
+            catch (cpp_redis::redis_error) { // Hierarchy is not cached
+                reply_string = "ERROR";
+            }
         }
         else
         {

@@ -70,9 +70,15 @@ class MessageHandler {
             socket.send(backup_request);
             zmq::message_t zmq_reply;
             socket.recv(&zmq_reply);
-            std::string serialized_hierarchy = static_cast<char*>(zmq_reply.data());
-            request[0]["serialized_hierarchy"] = serialized_hierarchy;
-            return tag_hierarchy_.Handle(request);
+            std::string backup_reply = std::string(static_cast<char *>(zmq_reply.data()),
+                                                   zmq_reply.size());
+            if (backup_reply != "ERROR") {
+                request[0]["serialized_hierarchy"] = backup_reply;
+                return tag_hierarchy_.Handle(request);
+            }
+            auto retval = std::vector<NodeType>();
+            retval.push_back({{"error", "cache was not populated"}});
+            return retval;
         }
         else {
             return tag_hierarchy_.Handle(request);
