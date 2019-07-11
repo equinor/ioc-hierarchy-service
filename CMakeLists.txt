@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(tag-hierarchy)
+enable_testing()
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-find_package(Boost COMPONENTS serialization graph REQUIRED)
+find_package(Boost COMPONENTS serialization graph unit_test_framework REQUIRED)
 find_package(ZeroMQ REQUIRED)
 find_package(PythonLibs)
 add_subdirectory(cpp_redis)
