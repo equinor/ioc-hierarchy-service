@@ -17,8 +17,14 @@ add_executable(tag_hierarchy_test
     unittests/test_tag_hierarchy.cpp
 )
 
-add_test(NAME tag_hierarchy_test COMMAND tag_hierarchy_test)
+target_include_directories(tag_hierarchy_test
+    PRIVATE ${CMAKE_SOURCE_DIR}
+)
+
 target_link_libraries(tag_hierarchy_test
     PRIVATE tag_hierarchy
     PRIVATE Boost::unit_test_framework
+    PUBLIC ${PYTHON_LIBRARIES}
 )
+
+add_test(NAME tag_hierarchy_test COMMAND tag_hierarchy_test)
