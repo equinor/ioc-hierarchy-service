@@ -27,4 +27,13 @@ target_link_libraries(tag_hierarchy_test
     PUBLIC ${PYTHON_LIBRARIES}
 )
 
-add_test(NAME tag_hierarchy_test COMMAND tag_hierarchy_test)
+file(READ "unittests/test_tag_hierarchy.cpp" SOURCE_FILE_CONTENTS)
+string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)" 
+       FOUND_TESTS ${SOURCE_FILE_CONTENTS})
+foreach(HIT ${FOUND_TESTS})
+    string(REGEX REPLACE ".*\\( *([A-Za-z_0-9]+) *\\).*" "\\1" TEST_NAME ${HIT})
+   
+    add_test(NAME "tag_hierarchy_test.${TEST_NAME}" 
+            COMMAND tag_hierarchy_test
+            --run_test=NodesTest/${TEST_NAME} --catch_system_error=yes)
+endforeach()
