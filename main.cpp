@@ -90,14 +90,38 @@ private:
     TagHierarchy tag_hierarchy_;
 };
 
-int main ()
+namespace {
+    namespace local {
+        /* Based on an applications input arguments, determine if we are running
+           as a state manager or as a server */
+        ApplicationMode GetMode(int argc, char* argv[]) {
+            if (argc > 1) {
+                if (strcmp(argv[1], AppModeName.at(ApplicationMode::SERVER)) == 0) {
+                    return ApplicationMode::SERVER;
+                }
+                return ApplicationMode::STATE_MANAGER;
+            }
+            return ApplicationMode::SERVER;
+        }
+    }
+}
+
+
+int main (int argc, char* argv[])
 {
+    auto mode = local::GetMode(argc, argv);
     //  Prepare our context and socket
     zmq::context_t context (1);
     zmq::socket_t socket (context, ZMQ_REP);
 
     std::cout << "Creating hierarchy server" << std::endl;
-    socket.bind ("tcp://127.0.0.1:5556");
+
+    if (mode == ApplicationMode::SERVER) {
+        socket.bind ("tcp://127.0.0.1:5556");
+    }
+    else {
+        socket.bind ("tcp://127.0.0.1:5557");
+    }
 
     auto messagehandler = MessageHandler();
 

@@ -73,3 +73,9 @@ namespace pybind11 { namespace detail {
     };
 }} // namespace pybind11::detail
 
+enum class ApplicationMode {STATE_MANAGER, SERVER};
+
+static std::map<ApplicationMode, const char*> AppModeName = {
+    {ApplicationMode::STATE_MANAGER, "statemanager"},
+    {ApplicationMode::SERVER, "server"}
+};
