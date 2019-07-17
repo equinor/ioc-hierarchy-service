@@ -294,6 +294,10 @@ public:
                              {"restore", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->Restore(nodes);
                               }},
+                             {"flush", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
+                                  this->ClearGraph();
+                                  return {};
+                              }},
                              {"healthcheck", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->HealthCheck(nodes);
                               }},
