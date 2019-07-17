@@ -16,13 +16,17 @@
 #include <string>
 
 
-std::vector<NodeType> query(std::vector<NodeType> in)
+std::vector<NodeType> query(std::vector<NodeType> in, std::string app_mode)
 {
     zmq::context_t context (1);
     zmq::socket_t socket (context, ZMQ_REQ);
 
-    std::cout << "Creating hierarchy server" << std::endl;
-    socket.connect ("tcp://127.0.0.1:5556");
+    if (app_mode == AppModeName.at(ApplicationMode::SERVER)) {
+        socket.connect ("tcp://127.0.0.1:5556");
+    }
+    else {
+        socket.connect ("tcp://127.0.0.1:5557");
+    }
 
     std::ostringstream buffer;
     {
