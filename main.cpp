@@ -114,14 +114,23 @@ int main (int argc, char* argv[])
     zmq::context_t context (1);
     zmq::socket_t socket (context, ZMQ_REP);
 
-    std::cout << "Creating hierarchy server" << std::endl;
-
+    zmq::socket_t sub_socket (context, ZMQ_SUB);
     if (mode == ApplicationMode::SERVER) {
+        std::cout << "Creating hierarchy server" << std::endl;
+        // Listen to server requests
         socket.bind ("tcp://127.0.0.1:5556");
+        // Subscribe to updated state
+        sub_socket.connect("tcp://127.0.0.1:5559");
+        sub_socket.setsockopt(ZMQ_SUBSCRIBE, "", 0);
     }
     else {
+        std::cout << "Creating statemanager" << std::endl;
         socket.bind ("tcp://127.0.0.1:5557");
     }
+    zmq::pollitem_t items [] = {
+        {static_cast<void*>(socket), 0, ZMQ_POLLIN, 0},
+        {static_cast<void*>(sub_socket), 0, ZMQ_POLLIN, 0}
+    };
 
     auto messagehandler = MessageHandler();
 
@@ -129,46 +138,61 @@ int main (int argc, char* argv[])
         zmq::message_t request;
 
         //  Wait for next request from client
-        socket.recv(&request);
+        zmq::poll(&items[0], 2, -1);
 
-        // Convert the message to a vector of maps
-        std::vector<NodeType> message;
-        try
+        if (items[0].revents & ZMQ_POLLIN)
         {
-            std::istringstream buffer(static_cast<char *>(request.data()));
-            boost::archive::text_iarchive archive(buffer);
-
-            archive >> message;
-        }
-        catch (const std::exception& exc) {
-            std::cerr << exc.what() << std::endl;
-        }
-
-        try
-        {
-            const auto reply_list = messagehandler.HandleRequest(message);
-
-            //  Send reply back to client
-            std::ostringstream out_buffer;
+            socket.recv(&request, ZMQ_DONTWAIT);
+            // Convert the message to a vector of maps
+            std::vector<NodeType> message;
+            try
             {
-                boost::archive::text_oarchive archive(out_buffer);
-                archive << reply_list;
-            }
-            // The result can be extracted from the stringstream
-            std::cout << out_buffer.str() << std::endl;
-            //zmq::message_t message(sizeof(buffer));
-            zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
-            //std::memcpy(message.data(), buffer.str().data(), buffer.str().length());
-            socket.send(reply);
-        }
-        catch (const std::exception& exc) {
-            std::cerr << "Error when handling message: " << exc.what() << std::endl;
-            zmq::message_t reply(5);
-            memcpy(reply.data(), "Error", 5);
-            socket.send(reply);
-            continue;
-        }
+                std::istringstream buffer(static_cast<char *>(request.data()));
+                boost::archive::text_iarchive archive(buffer);
 
+                archive >> message;
+            }
+            catch (const std::exception &exc)
+            {
+                std::cerr << exc.what() << std::endl;
+            }
+
+            try
+            {
+                const auto reply_list = messagehandler.HandleRequest(message);
+
+                //  Send reply back to client
+                std::ostringstream out_buffer;
+                {
+                    boost::archive::text_oarchive archive(out_buffer);
+                    archive << reply_list;
+                }
+                // The result can be extracted from the stringstream
+                std::cout << out_buffer.str() << std::endl;
+                //zmq::message_t message(sizeof(buffer));
+                zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
+                //std::memcpy(message.data(), buffer.str().data(), buffer.str().length());
+                socket.send(reply);
+            }
+            catch (const std::exception &exc)
+            {
+                std::cerr << "Error when handling message: " << exc.what() << std::endl;
+                zmq::message_t reply(5);
+                memcpy(reply.data(), "Error", 5);
+                socket.send(reply);
+                continue;
+            }
+        }
+        if (items[1].revents & ZMQ_POLLIN) {
+            sub_socket.recv(&request, ZMQ_DONTWAIT);
+            const auto message = std::string(static_cast<char *>(request.data()), request.size());
+            if (message == "cache_updated") {
+                auto command = std::vector<NodeType>(
+                    {{{"command", std::string("restore")}}}
+                );
+                messagehandler.HandleRequest(command);
+            }
+        }
     }
     std::cout << std::flush;
 

@@ -72,6 +72,9 @@ int main ()
     }
     client.select(redis_db);
 
+    zmq::socket_t pub_socket (context, ZMQ_PUB);
+    pub_socket.bind("tcp://127.0.0.1:5559");
+
     while (true)
     {
         zmq::message_t request;
@@ -105,6 +108,12 @@ int main ()
             });
             client.sync_commit();
             reply_string = "Success";
+
+            // Publish a message that the cache has been updated
+            std::string pub_message("cache_updated");
+            zmq::message_t pub(pub_message.size());
+            memcpy(pub.data(), pub_message.c_str(), pub_message.size());
+            pub_socket.send(pub);
         }
 
         std::cout << "Replying " << reply_string << std::endl;
