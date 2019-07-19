@@ -4,6 +4,7 @@ project(tag-hierarchy)
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH 1)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 find_package(Boost COMPONENTS serialization graph unit_test_framework REQUIRED)
