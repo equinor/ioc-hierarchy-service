@@ -6,4 +6,4 @@
 	url = https://github.com/pybind/pybind11.git
 [submodule "cpp_redis"]
 	path = cpp_redis
-	url = git@github.com:cpp-redis/cpp_redis.git
+	url = https://github.com/cpp-redis/cpp_redis.git
