@@ -19,7 +19,7 @@ void GetRedisConnectionParams(std::string &redis_url,
                               int &redis_db,
                               std::string &redis_password)
 {
-    if (const char *redis_url_env = std::getenv("REDIS_URL"))
+    if (const char *redis_url_env = std::getenv("REDIS_URL_DAEMON"))
     {
         redis_url = std::string(redis_url_env);
     }
