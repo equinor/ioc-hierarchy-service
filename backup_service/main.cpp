@@ -54,23 +54,6 @@ int main ()
 
     // Setup redis client
     cpp_redis::active_logger = std::unique_ptr<cpp_redis::logger>(new cpp_redis::logger);
-    cpp_redis::client client;
-    client.connect(redis_url, redis_port,
-        [](const std::string& host, std::size_t port, cpp_redis::client::connect_state status) {
-            if (status == cpp_redis::client::connect_state::dropped) {
-                std::cout << "Client disconnected from host " << host << std::endl;
-            }
-            else if (status == cpp_redis::client::connect_state::failed) {
-                std::cout << "Client failed to connect to " << host << std::endl;
-            }
-            else if (status == cpp_redis::client::connect_state::ok) {
-                std::cout << "Client connected successfully to " << host << std::endl;
-            }
-        });
-    if (redis_password != "") {
-        client.auth(redis_password);
-    }
-    client.select(redis_db);
 
     zmq::socket_t pub_socket (context, ZMQ_PUB);
     pub_socket.bind("tcp://127.0.0.1:5559");
@@ -86,6 +69,24 @@ int main ()
         const auto message = std::string(static_cast<char *>(request.data()), request.size());
         auto reply_string = std::string();
 
+        // Setup the redis client
+        cpp_redis::client client;
+        client.connect(redis_url, redis_port,
+                       [](const std::string& host, std::size_t port, cpp_redis::client::connect_state status) {
+                           if (status == cpp_redis::client::connect_state::dropped) {
+                               std::cout << "Client disconnected from host " << host << std::endl;
+                           }
+                           else if (status == cpp_redis::client::connect_state::failed) {
+                               std::cout << "Client failed to connect to " << host << std::endl;
+                           }
+                           else if (status == cpp_redis::client::connect_state::ok) {
+                               std::cout << "Client connected successfully to " << host << std::endl;
+                           }
+                       });
+        if (redis_password != "") {
+            client.auth(redis_password);
+        }
+        client.select(redis_db);
         // Support setting or getting the hierarchy key
         // TODO: This whole service could/should be a generic redis connector!
         if (message == "GET_HIERARCHY")
@@ -116,6 +117,7 @@ int main ()
             pub_socket.send(pub);
         }
 
+        client.disconnect();
         std::cout << "Replying " << reply_string << std::endl;
         zmq::message_t reply(reply_string.size());
 
