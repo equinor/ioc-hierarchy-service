@@ -110,6 +110,8 @@ PYBIND11_MODULE(tag_hierarchy_client, m)
         Input a python list of lists of integers of equal length,
         returns a list of the highest value at any single point,
         eg. [[1, 4, 2], [2, 1, 3]] -> [2, 4, 3]
-    )pbdoc");
+    )pbdoc",
+    py::arg("in"), py::arg("app_mode"),
+    py::arg("request_timeout") = 300, py::arg("request_retries") = 3);
 
 }
