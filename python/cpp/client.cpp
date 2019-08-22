@@ -35,10 +35,13 @@ namespace local {
 }
 }
 
-std::vector<NodeType> query(std::vector<NodeType> in, std::string app_mode)
+std::vector<NodeType> query(std::vector<NodeType> in,
+                            std::string app_mode,
+                            int request_timeout = 300,
+                            int request_retries = 3)
 {
     zmq::context_t context (1);
-    auto retries_left = int { REQUEST_RETRIES };
+    auto retries_left = int { request_retries };
 
     auto reply_list = std::vector<NodeType>();
     auto socket = local::get_socket(context, app_mode);
@@ -57,7 +60,7 @@ std::vector<NodeType> query(std::vector<NodeType> in, std::string app_mode)
         zmq::pollitem_t items[] = {
                 {static_cast<void*>(*socket), 0 , ZMQ_POLLIN, 0}
         };
-        zmq::poll(&items[0], 1, REQUEST_TIMEOUT);
+        zmq::poll(&items[0], 1, request_timeout);
 
         // If there is a reply, process it
         if (items[0].revents & ZMQ_POLLIN) {
