@@ -25,6 +25,7 @@ using NodeType =
     std::vector<int>,
     std::vector<std::string>>>;
 
+
 struct Modelhierarchy {
     std::string id;
     NodeType properties;
@@ -33,6 +34,15 @@ struct Modelhierarchy {
 struct Connection {
     std::string type;
 };
+
+using TagHierarchyGraph = boost::adjacency_list<
+        boost::listS, boost::vecS, boost::bidirectionalS,
+        Modelhierarchy, Connection>;
+
+using TagHierarchyT = boost::labeled_graph<TagHierarchyGraph, std::string>;
+
+using VertexT = boost::graph_traits<TagHierarchyGraph>::vertex_descriptor;
+using EdgeT = boost::graph_traits<TagHierarchyGraph>::edge_descriptor;
 
 namespace boost {
 namespace serialization {

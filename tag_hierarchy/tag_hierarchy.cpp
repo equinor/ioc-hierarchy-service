@@ -1,5 +1,9 @@
 #include "tag_hierarchy/tag_hierarchy.h"
 
+
+#include "tag_hierarchy/filteredhierarchyvisitor.h"
+#include "tag_hierarchy/filteroptionsvisitor.h"
+
 #include "models/models.h"
 
 #include <boost/graph/adj_list_serialize.hpp>
@@ -20,14 +24,6 @@
 #include <deque>
 #include <typeinfo>
 
-using TagHierarchyGraph = boost::adjacency_list<
-    boost::listS, boost::vecS, boost::bidirectionalS,
-    Modelhierarchy, Connection>;
-
-using TagHierarchyT = boost::labeled_graph<TagHierarchyGraph, std::string>;
-
-using VertexT = boost::graph_traits<TagHierarchyGraph>::vertex_descriptor;
-using EdgeT = boost::graph_traits<TagHierarchyGraph>::edge_descriptor;
 using VertexIterator = boost::graph_traits<TagHierarchyGraph>::vertex_iterator;
 using InEdgeIterator = TagHierarchyGraph::in_edge_iterator;
 using OutEdgeIterator = TagHierarchyGraph::out_edge_iterator;
@@ -36,64 +32,6 @@ using DispatchFunction =
     std::function<std::vector<NodeType>(std::vector<NodeType>&)>;
 
 
-class FilteredHierarchyVisitor : public boost::default_dfs_visitor
-{
-public:
-    explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::map<VertexT, std::set<VertexT>>& valid_models,
-                                      const std::vector<std::string> &kpifilter) : valid_nodes_(valid_nodes),
-                                                                                   valid_models_(valid_models),
-                                                                                   kpifilter_(kpifilter),
-                                                                                   path_(std::deque<VertexT>()) {}
-
-    void discover_vertex(VertexT v, const TagHierarchyGraph &g)
-    {
-        path_.push_front(v);
-        if (g[v].properties.count("is_modelelement"))
-        {
-            const auto is_modelelement = boost::get<bool>(g[v].properties.find("is_modelelement")->second);
-            if (is_modelelement)
-            {
-                if (kpifilter_.size() != 0 &&
-                    g[v].properties.count("kpigroup_id"))
-                {
-
-                    if (g[v].properties.find("kpigroup_id")->second.type() == typeid(std::string))
-                    {
-                        const auto kpi_id = boost::get<std::string>(g[v].properties.find("kpigroup_id")->second);
-                        if (std::find(std::cbegin(kpifilter_), std::cend(kpifilter_), kpi_id) == std::cend(kpifilter_))
-                        {
-                            return;
-                        }
-                    }
-                    else { // KPI is null and filtered out
-                        return;
-                    }
-                }
-                for (auto const &path_part : path_)
-                {
-                    if (valid_nodes_.count(path_part) == 1)
-                    {
-                        break;
-                    }
-                    valid_nodes_.insert(path_part);
-                }
-                // I'm a valid model element. So the model needs to be added to the set of models
-                // that pertain to the second level of the hierarchy I am traversing
-                valid_models_[path_[path_.size() - 2]].insert(path_[1]);
-            }
-        }
-        return;
-    }
-    void finish_vertex(VertexT v, const TagHierarchyGraph &g) {
-        path_.pop_front();
-    }
-
-private:
-    std::set<VertexT> &valid_nodes_;
-    const std::vector<std::string> &kpifilter_;
-    std::deque<VertexT> path_;
-    std::map<VertexT, std::set<VertexT>>& valid_models_;
-};
 
 class TagHierarchyImpl {
 private:
@@ -181,18 +119,31 @@ public:
             l2filter = boost::get<std::vector<std::string>>(command_map.at("l2filter"));
         }
 
+        auto modelownerfilter = std::vector<std::string>();
+        if (command_map.count("modelownerfilter") &&
+            command_map["modelownerfilter"].type() == typeid(std::vector<std::string>))
+        {
+            modelownerfilter = boost::get<std::vector<std::string>>(command_map.at("modelownerfilter"));
+        }
+
         std::cout << std::endl;
         auto valid_nodes = std::set<VertexT>();
         auto valid_models = std::map<VertexT, std::set<VertexT>>();
         auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter);
 
-        auto const termfunc = [l1filter, l2filter] (VertexT vertex, const TagHierarchyGraph& graph) {
+        auto const termfunc = [l1filter, l2filter, modelownerfilter] (
+                VertexT vertex, const TagHierarchyGraph& graph) {
             auto const levelno = boost::get<int>(graph[vertex].properties.at("levelno"));
             if (levelno == 1 && l1filter.size() > 0) {
                 return std::find(cbegin(l1filter), cend(l1filter), graph[vertex].id) == cend(l1filter);
             }
             if (levelno == 2 && l2filter.size() > 0) {
                 return std::find(cbegin(l2filter), cend(l2filter), graph[vertex].id) == cend(l2filter);
+            }
+            if (modelownerfilter.size() > 0 && graph[vertex].properties.count("modelowner")) {
+                return std::find(cbegin(modelownerfilter), cend(modelownerfilter),
+                                 boost::get<std::string>(graph[vertex].properties.at("modelowner"))) ==
+                                 cend(modelownerfilter);
             }
             return false;
         };
@@ -229,6 +180,54 @@ public:
             retval.push_back(props);
         }
         return retval;
+    }
+
+    std::vector<NodeType>
+    FilterOptions(std::vector<NodeType> &nodes)
+    {
+        auto command_map = nodes.at(0);
+        // Check if graph has been initialized
+        if (root_ == std::numeric_limits<VertexT>::max()) {
+            return {{{std::string("error"), std::string("empty")}}};
+        }
+
+        auto l1filter = std::vector<std::string>();
+        if (command_map.count("l1filter") &&
+            command_map["l1filter"].type() == typeid(std::vector<std::string>))
+        {
+            l1filter = boost::get<std::vector<std::string>>(command_map.at("l1filter"));
+        }
+
+        auto l2filter = std::vector<std::string>();
+        if (command_map.count("l2filter") &&
+            command_map["l2filter"].type() == typeid(std::vector<std::string>))
+        {
+            l2filter = boost::get<std::vector<std::string>>(command_map.at("l2filter"));
+        }
+
+        std::cout << std::endl;
+        auto valid_modelowners = std::set<std::string>();
+        auto dfs_visitor = ModelOwnerFilterOptionsVisitor(valid_modelowners);
+
+        auto const termfunc = [l1filter, l2filter] (
+                VertexT vertex, const TagHierarchyGraph& graph) {
+            auto const levelno = boost::get<int>(graph[vertex].properties.at("levelno"));
+            if (levelno == 1 && l1filter.size() > 0) {
+                return std::find(cbegin(l1filter), cend(l1filter), graph[vertex].id) == cend(l1filter);
+            }
+            if (levelno == 2 && l2filter.size() > 0) {
+                return std::find(cbegin(l2filter), cend(l2filter), graph[vertex].id) == cend(l2filter);
+            }
+            return false;
+        };
+
+        std::vector<boost::default_color_type> colormap(num_vertices(graph_));
+        boost::depth_first_visit(graph_, root_, dfs_visitor, colormap.data(), termfunc);
+
+        return {{{std::string("modelowner_ids"), {
+            std::vector<std::string>(cbegin(valid_modelowners), cend(valid_modelowners))
+        }
+        }}};
     }
 
     std::vector<NodeType>
@@ -288,6 +287,9 @@ public:
                              {"nodes", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->Nodes(nodes);
                               }},
+                             {"filteroptions", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
+                                 return this->FilterOptions(nodes);
+                             }},
                              {"store", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->Store(nodes);
                               }},

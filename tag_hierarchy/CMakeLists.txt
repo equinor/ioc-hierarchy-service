@@ -1,7 +1,7 @@
 add_library(tag_hierarchy STATIC
     tag_hierarchy.cpp
     tag_hierarchy.h
-)
+        filteredhierarchyvisitor.h filteroptionsvisitor.h)
 
 target_include_directories(tag_hierarchy
     PRIVATE ${CMAKE_SOURCE_DIR}
