@@ -141,9 +141,10 @@ public:
                 return std::find(cbegin(l2filter), cend(l2filter), graph[vertex].id) == cend(l2filter);
             }
             if (modelownerfilter.size() > 0 && graph[vertex].properties.count("modelowner")) {
-                return std::find(cbegin(modelownerfilter), cend(modelownerfilter),
+                return graph[vertex].properties.at("modelowner").type() == typeid(std::string) &&
+                       std::find(cbegin(modelownerfilter), cend(modelownerfilter),
                                  boost::get<std::string>(graph[vertex].properties.at("modelowner"))) ==
-                                 cend(modelownerfilter);
+                       cend(modelownerfilter);
             }
             return false;
         };
