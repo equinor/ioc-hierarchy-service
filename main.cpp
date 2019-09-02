@@ -168,10 +168,7 @@ int main (int argc, char* argv[])
                     archive << reply_list;
                 }
                 // The result can be extracted from the stringstream
-                std::cout << out_buffer.str() << std::endl;
-                //zmq::message_t message(sizeof(buffer));
                 zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
-                //std::memcpy(message.data(), buffer.str().data(), buffer.str().length());
                 socket.send(reply);
             }
             catch (const std::exception &exc)
@@ -194,7 +191,6 @@ int main (int argc, char* argv[])
             }
         }
     }
-    std::cout << std::flush;
 
     return 0;
 }

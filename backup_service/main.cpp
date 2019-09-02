@@ -103,7 +103,6 @@ int main ()
         }
         else
         {
-            std::cout << "Setting the cache key" << std::endl;
             client.set(CACHE_KEY, message, [](const cpp_redis::reply &reply) {
                 std::cout << "Set the cache" << std::endl;
             });
@@ -118,7 +117,6 @@ int main ()
         }
 
         client.disconnect();
-        std::cout << "Replying " << reply_string << std::endl;
         zmq::message_t reply(reply_string.size());
 
         memcpy(reply.data(), reply_string.c_str(), reply_string.size());

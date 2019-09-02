@@ -56,7 +56,6 @@ public:
         {
             std::string id = boost::get<std::string>(node["id"]);
             const auto current_vertex = boost::add_vertex({id, node}, graph_);
-            std::cout << "Adding node " << id;
             if (node["parent_id"].type() == typeid(std::string))
             {
                 std::string parent_id = boost::get<std::string>(node["parent_id"]);
@@ -67,7 +66,6 @@ public:
                                     current_vertex,
                                     Connection{"physical_hierarchy"},
                                     graph_);
-                    std::cout << " with parent id " << parent_id << std::endl;
                 }
             }
             else
@@ -76,7 +74,6 @@ public:
                                 current_vertex,
                                 Connection{"physical_hierarchy"},
                                 graph_);
-                std::cout << " with root as parentid " << std::endl;
             }
 
             vertices_[id] = current_vertex;
@@ -100,10 +97,6 @@ public:
         {
             kpifilter = boost::get<std::vector<std::string>>(command_map["kpifilter"]);
         }
-        std::cout << "The valied kpis: ";
-        for (auto kpifilterid : kpifilter) {
-            std::cout << kpifilterid;
-        }
 
         auto l1filter = std::vector<std::string>();
         if (command_map.count("l1filter") &&
@@ -126,7 +119,6 @@ public:
             modelownerfilter = boost::get<std::vector<std::string>>(command_map.at("modelownerfilter"));
         }
 
-        std::cout << std::endl;
         auto valid_nodes = std::set<VertexT>();
         auto valid_models = std::map<VertexT, std::set<VertexT>>();
         auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter);
@@ -206,7 +198,6 @@ public:
             l2filter = boost::get<std::vector<std::string>>(command_map.at("l2filter"));
         }
 
-        std::cout << std::endl;
         auto valid_modelowners = std::set<std::string>();
         auto dfs_visitor = ModelOwnerFilterOptionsVisitor(valid_modelowners);
 
