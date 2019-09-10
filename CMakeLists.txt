@@ -26,19 +26,11 @@ target_include_directories(tag_hierarchy_client
     PRIVATE ${CMAKE_SOURCE_DIR}
 )
 
-if (APPLE)
-    set (CLIENT_INSTALL_PATH
-        api/hierarchy/macos)
-else (APPLE)
-    set (CLIENT_INSTALL_PATH
-        api/hierarchy)
-endif (APPLE)
-
 install(TARGETS tag_hierarchy_client
-    LIBRARY
-    DESTINATION ${CLIENT_INSTALL_PATH}
-    RUNTIME
-    DESTINATION ${CLIENT_INSTALL_PATH}
+     LIBRARY
+     DESTINATION lib/python3.7
+     RUNTIME
+     DESTINATION bin
 )
 
 add_executable(tag-hierarchy main.cpp)
@@ -52,13 +44,26 @@ target_link_libraries(tag-hierarchy
     PUBLIC ${PYTHON_LIBRARIES}
 )
 
-if (APPLE)
-    set (BINARY_INSTALL_PATH
-        bin/macos)
-else (APPLE)
-    set (BINARY_INSTALL_PATH
-        bin)
-endif (APPLE)
 install(TARGETS tag-hierarchy
-    RUNTIME DESTINATION ${BINARY_INSTALL_PATH})
+    RUNTIME DESTINATION bin
+)
 
+set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
+
+set(CPACK_PACKAGE_NAME "tag-hierarchy")
+set(CPACK_PACKAGE_VENDOR "Equinor")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "tag-hierarchy - handling tag hierarchies since 2019")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_SYSTEM_NAME "x86-64")
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Equinor - IOC")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/name_of_python_app/postinst;${CMAKE_SOURCE_DIR}/name_of_python_app/prerm;")
+set(CPACK_SET_DESTDIR "ON")
+set(CPACK_INSTALL_PREFIX /usr)
+
+include(CPack)
