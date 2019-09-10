@@ -23,8 +23,7 @@ stages:
     - bash: git submodule update --init --recursive
     - bash: docker build -t tag-hierarchy ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
-    - bash: |
-      docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.0.0-x86-64.deb $(Build.ArtifactsStagingDirectory)/
+    - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.0.0-x86-64.deb $(Build.ArtifactsStagingDirectory)/
 - stage: Publish
   displayName: Publish
   jobs:
