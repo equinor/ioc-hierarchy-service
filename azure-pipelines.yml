@@ -20,16 +20,16 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - bash: |
-      'docker build . -t tag-hierarchy-service'
-    - bash: |
-      docker create --name tag-hierarchy-service
-    - bash: |
-      docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.0.0-x86-64.deb
+    - bash: docker build . -t tag-hierarchy
+- stage: Publish
+  displayName: Publish
+  jobs:
+  - job: Publish
+    displayName: Publish
+    steps:
     - task: GithubRelease@0
       displayName: 'Create GitHub Release'
       inputs:
         gitHubConnection: equinor
         repositoryName: equinor/ioc-hierarchy-service
-        $(Build.ArtifactsStagingDirectory)/*.deb
-
+        assets: $(Build.ArtifactsStagingDirectory)/*.deb
