@@ -72,14 +72,14 @@ int main ()
         // Setup the redis client
         cpp_redis::client client;
         client.connect(redis_url, redis_port,
-                       [](const std::string& host, std::size_t port, cpp_redis::client::connect_state status) {
-                           if (status == cpp_redis::client::connect_state::dropped) {
+                       [](const std::string& host, std::size_t port, cpp_redis::connect_state status) {
+                           if (status == cpp_redis::connect_state::dropped) {
                                std::cout << "Client disconnected from host " << host << std::endl;
                            }
-                           else if (status == cpp_redis::client::connect_state::failed) {
+                           else if (status == cpp_redis::connect_state::failed) {
                                std::cout << "Client failed to connect to " << host << std::endl;
                            }
-                           else if (status == cpp_redis::client::connect_state::ok) {
+                           else if (status == cpp_redis::connect_state::ok) {
                                std::cout << "Client connected successfully to " << host << std::endl;
                            }
                        });
