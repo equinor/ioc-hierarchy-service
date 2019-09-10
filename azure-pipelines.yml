@@ -30,6 +30,6 @@ stages:
     - task: GithubRelease@0
       displayName: 'Create GitHub Release'
       inputs:
-        gitHubConnection: equinor
+        gitHubConnection: ioc-hierarchy-service
         repositoryName: equinor/ioc-hierarchy-service
         assets: $(Build.ArtifactsStagingDirectory)/*.deb
