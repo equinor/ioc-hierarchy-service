@@ -20,7 +20,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - bash: docker build . -t tag-hierarchy
+    - bash: docker build -t tag-hierarchy ./
 - stage: Publish
   displayName: Publish
   jobs:
