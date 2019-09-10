@@ -20,7 +20,7 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - checkout: self
+    - bash: git submodule update --init --recursive
     - bash: docker build -t tag-hierarchy ./
 - stage: Publish
   displayName: Publish
