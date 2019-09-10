@@ -8,9 +8,6 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- checkout: self
-
 resources:
 - repo: self
 
@@ -24,6 +21,7 @@ stages:
   - job: Build
     displayName: Build
     steps:
+    - checkout: self
     - bash: docker build -t tag-hierarchy ./
 - stage: Publish
   displayName: Publish
