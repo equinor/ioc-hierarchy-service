@@ -28,7 +28,7 @@ target_include_directories(tag_hierarchy_client
 
 install(TARGETS tag_hierarchy_client
      LIBRARY
-     DESTINATION lib/python3.7
+     DESTINATION local/lib/python3.7/site-packages
      RUNTIME
      DESTINATION bin
 )
