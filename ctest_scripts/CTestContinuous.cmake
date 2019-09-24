@@ -8,22 +8,18 @@
 
 set(CTEST_PROJECT_NAME "Hierarchy service")
 set(CTEST_SITE "localhost")
-set(CTEST_BUILD_NAME "ThreadSanitizer")
+set(CTEST_BUILD_NAME "Continuous")
 
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
-set(CTEST_MEMORYCHECK_TYPE "ThreadSanitizer")
-
 ctest_start(Experimental)
 
 file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
-CMAKE_CXX_FLAGS=-g -O1 -fsanitize=thread -fno-omit-frame-pointer -fPIC
-CMAKE_GENERATOR=Unix Makefiles
+CMAKE_BUILD_TYPE=Release
 ")
 
 ctest_configure()
 ctest_build(FLAGS -j8)
 ctest_test()
-ctest_memcheck()
 
 set(CTEST_DROP_METHOD "https")
 set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")
