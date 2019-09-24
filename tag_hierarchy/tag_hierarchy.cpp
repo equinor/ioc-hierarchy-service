@@ -32,6 +32,13 @@ using DispatchFunction =
     std::function<std::vector<NodeType>(std::vector<NodeType>&)>;
 
 
+class Command {
+public:
+    virtual std::vector<NodeType> Process(std::vector<NodeType>) = 0;
+    virtual std::string CommandName() = 0;
+    virtual DispatchFunction Function() = 0;
+};
+
 
 class TagHierarchyImpl {
 private:
@@ -41,6 +48,19 @@ private:
     VertexT root_;
 
 public:
+
+    TagHierarchyGraph& GetGraph() {
+        return graph_;
+    }
+
+    std::map<std::string, VertexT> GetVertices() {
+        return vertices_;
+    }
+
+    VertexT GetRoot() {
+        return root_;
+    }
+
     std::vector<NodeType>
     PopulateGraph(std::vector<NodeType> &nodes)
     {
@@ -272,7 +292,7 @@ public:
         return command_func_dispatch_[command](message);
     }
 
-    TagHierarchyImpl() : command_func_dispatch_({
+    TagHierarchyImpl() : command_func_dispatch_()/*{
                              {"populate_graph", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->PopulateGraph(nodes);
                               }},
@@ -295,11 +315,15 @@ public:
                              {"healthcheck", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->HealthCheck(nodes);
                               }},
-                         }),
+                         })*/,
                          root_(std::numeric_limits<VertexT>::max())
     {
     };
     TagHierarchyImpl(const TagHierarchyImpl& in) : command_func_dispatch_(in.command_func_dispatch_) {}
+
+    void Register(Command& in) {
+        command_func_dispatch_[in.CommandName()] = in.Function();
+    }
 
     template<typename Archive>
     void serialize(Archive& ar, const unsigned int version) {
@@ -308,6 +332,9 @@ public:
         ar & root_;
     }
 };
+
+
+
 
 TagHierarchy::TagHierarchy() {
     impl_ = std::make_unique<TagHierarchyImpl>();
