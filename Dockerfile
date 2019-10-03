@@ -18,4 +18,5 @@ WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
 RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=Release
 RUN make -j6 && make install
 RUN cpack .
+WORKDIR /usr/src/app/ioc-hierarchy-service
 
