@@ -12,14 +12,12 @@ struct Fixture {
      auto modelhierarchy = std::vector<NodeType>(
      #include "hierarchy_dump.cpp"
      );
-     tag_hierarchy.Handle(modelhierarchy);
+     TagHierarchy::Handle(modelhierarchy);
   }
 
   ~Fixture() {
       BOOST_TEST_MESSAGE( "teardown fixture" );
   }
-
-  TagHierarchy tag_hierarchy;
 };
 
 BOOST_FIXTURE_TEST_SUITE( NodesTest, Fixture );
@@ -29,7 +27,7 @@ BOOST_AUTO_TEST_CASE( test_nodes )
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), pybind11::none()}}}
     );
-    auto response = tag_hierarchy.Handle(query);
+    auto response = TagHierarchy::Handle(query);
     BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-1");
     BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2");
     BOOST_TEST(boost::get<int>(response[1].at("levelno")) == 1);
@@ -44,7 +42,7 @@ BOOST_AUTO_TEST_CASE( test_l2_nodes ) {
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}
     );
-    auto response = tag_hierarchy.Handle(query);
+    auto response = TagHierarchy::Handle(query);
     BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-2->Level2-1");
     BOOST_TEST(boost::get<int>(response[1].at("levelno")) == 2);
     BOOST_TEST(boost::get<std::string>(response[1].at("parent_id")) == parent_id);
@@ -56,7 +54,7 @@ BOOST_AUTO_TEST_CASE( test_l3_nodes ) {
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}
     );
-    auto response = tag_hierarchy.Handle(query);
+    auto response = TagHierarchy::Handle(query);
     BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2->Level2-1->Level3-2");
     BOOST_TEST(boost::get<int>(response[0].at("levelno")) == 3);
     BOOST_TEST(boost::get<std::string>(response[1].at("parent_id")) == parent_id);
@@ -70,7 +68,7 @@ BOOST_AUTO_TEST_CASE( test_l4_nodes ) {
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}
     );
-    auto response = tag_hierarchy.Handle(query);
+    auto response = TagHierarchy::Handle(query);
     BOOST_TEST(boost::get<int>(response[0].at("levelno")) == 4);
     // TODO make support for model element folders
     // assert response_l4.data[0]['type'] == NodeType.MODELELEMENTFOLDER
