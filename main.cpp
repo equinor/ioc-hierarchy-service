@@ -42,7 +42,7 @@ class MessageHandler {
         std::string command = boost::get<std::string>(command_map["command"]);
         if (command == "store")
         {
-            const auto reply = tag_hierarchy_.Handle(request);
+            const auto reply = TagHierarchy::Handle(request);
             const auto serialized_hierarchy =
                 boost::get<std::string>(reply[0].at("serialized_graph"));
             zmq::context_t context(1);
@@ -74,20 +74,16 @@ class MessageHandler {
                                                    zmq_reply.size());
             if (backup_reply != "ERROR") {
                 request[0]["serialized_hierarchy"] = backup_reply;
-                return tag_hierarchy_.Handle(request);
+                return TagHierarchy::Handle(request);
             }
             auto retval = std::vector<NodeType>();
             retval.push_back({{"error", "cache was not populated"}});
             return retval;
         }
         else {
-            return tag_hierarchy_.Handle(request);
+            return TagHierarchy::Handle(request);
         }
     }
-
-
-private:
-    TagHierarchy tag_hierarchy_;
 };
 
 namespace {

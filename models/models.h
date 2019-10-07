@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 
+// Typedefs for tag hierarchy
 using NodeType =
     std::map<std::string, boost::variant<bool,
     int,
