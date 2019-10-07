@@ -5,6 +5,9 @@
 trigger:
 - master
 
+pr:
+- master
+
 schedules:
 - cron: "0 0 * * *"
   displayName: Nightly build
