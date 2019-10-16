@@ -4,6 +4,7 @@
 //  
 //
 
+#include "config/config.h"
 #include <zmq.hpp>
 
 #include <cpp_redis/cpp_redis>
@@ -44,7 +45,8 @@ int main ()
     zmq::socket_t socket (context, ZMQ_REP);
 
     std::cout << "Starting backup server" << std::endl;
-    socket.bind ("tcp://127.0.0.1:5555");
+    const auto use_tcp = bool {std::getenv("ZEROMQ_USE_TCP")};
+    socket.bind (config::GetTagHierarchyBackupServiceAddress());
 
     std::string redis_url;
     std::size_t redis_port;
@@ -56,7 +58,7 @@ int main ()
     cpp_redis::active_logger = std::unique_ptr<cpp_redis::logger>(new cpp_redis::logger);
 
     zmq::socket_t pub_socket (context, ZMQ_PUB);
-    pub_socket.bind("tcp://127.0.0.1:5559");
+    pub_socket.bind(config::GetTagHierarchyStateChangeAddress());
 
     while (true)
     {

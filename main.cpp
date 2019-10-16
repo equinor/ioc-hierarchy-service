@@ -7,6 +7,7 @@
 #include "tag_hierarchy/tag_hierarchy.h"
 
 #include "models/models.h"
+#include "config/config.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
@@ -45,6 +46,7 @@ class MessageHandler {
     HandleRequest(std::vector<NodeType>& request) {
         NodeType command_map = request[0];
         std::string command = boost::get<std::string>(command_map["command"]);
+        const auto use_tcp = bool {std::getenv("ZEROMQ_USE_TCP")};
         if (command == "store")
         {
             const auto reply = TagHierarchy::Handle(request);
@@ -53,7 +55,7 @@ class MessageHandler {
             zmq::context_t context(1);
             zmq::socket_t socket(context, ZMQ_REQ);
             std::cout << "Connecting to backup service" << std::endl;
-            socket.connect("tcp://127.0.0.1:5555");
+            socket.connect(config::GetTagHierarchyBackupServiceAddress());
             zmq::message_t backup_request(serialized_hierarchy.size());
             memcpy(backup_request.data(), serialized_hierarchy.c_str(), serialized_hierarchy.size());
             socket.send(backup_request);
@@ -68,7 +70,7 @@ class MessageHandler {
             zmq::context_t context(1);
             zmq::socket_t socket(context, ZMQ_REQ);
             std::cout << "Connecting to backup service" << std::endl;
-            socket.connect("tcp://127.0.0.1:5555");
+            socket.connect(config::GetTagHierarchyBackupServiceAddress());
             const auto message = std::string("GET_HIERARCHY");
             zmq::message_t backup_request(message.size());
             memcpy(backup_request.data(), message.c_str(), message.size());
@@ -121,14 +123,14 @@ int main (int argc, char* argv[])
     if (mode == ApplicationMode::SERVER) {
         std::cout << "Creating hierarchy server" << std::endl;
         // Listen to server requests
-        socket.bind ("tcp://127.0.0.1:5556");
+        socket.bind (config::GetTagHierarchyServerAddress());
         // Subscribe to updated state
-        sub_socket.connect("tcp://127.0.0.1:5559");
+        sub_socket.connect(config::GetTagHierarchyStateChangeAddress());
         sub_socket.setsockopt(ZMQ_SUBSCRIBE, "", 0);
     }
     else {
         std::cout << "Creating statemanager" << std::endl;
-        socket.bind ("tcp://127.0.0.1:5557");
+        socket.bind (config::GetTagHierarchyStatemanagerAddress());
     }
     zmq::pollitem_t items [] = {
         {static_cast<void*>(socket), 0, ZMQ_POLLIN, 0},

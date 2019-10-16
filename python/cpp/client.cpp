@@ -1,4 +1,5 @@
 #include "models/models.h"
+#include "config/config.h"
 
 #include <zmq.hpp>
 #include <pybind11/pybind11.h>
@@ -22,11 +23,14 @@ namespace {
 namespace local {
     std::shared_ptr<zmq::socket_t> get_socket (zmq::context_t& context, const std::string& app_mode) {
         auto socket = std::make_shared<zmq::socket_t>(context, ZMQ_REQ);
+        const auto use_tcp = bool {std::getenv("ZEROMQ_USE_TCP")};
         if (app_mode == AppModeName.at(ApplicationMode::SERVER)) {
-            socket->connect ("tcp://127.0.0.1:5556");
+            const auto address = config::GetTagHierarchyServerAddress();
+            socket->connect (address);
         }
         else {
-            socket->connect ("tcp://127.0.0.1:5557");
+            const auto address = config::GetTagHierarchyStatemanagerAddress();
+            socket->connect (address);
         }
         const auto linger = int { 0 };
         socket->setsockopt(ZMQ_LINGER, &linger, sizeof (linger));
