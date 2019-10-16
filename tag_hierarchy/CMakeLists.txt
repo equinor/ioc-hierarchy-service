@@ -30,9 +30,13 @@ target_include_directories(tag_hierarchy_commands
         PRIVATE ${CMAKE_SOURCE_DIR}
         )
 target_link_libraries(tag_hierarchy_commands
+        PRIVATE absl::strings
+        PUBLIC opencensus-cpp::trace
+        PUBLIC opencensus-cpp::context
         PRIVATE tag_hierarchy
         PRIVATE ${PYTHON_LIBRARIES}
         PRIVATE Boost::graph
+        PUBLIC Boost::serialization
         PRIVATE pybind11
         )
 

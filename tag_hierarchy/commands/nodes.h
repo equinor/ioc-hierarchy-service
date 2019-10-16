@@ -11,9 +11,10 @@
 class Nodes : Command {
 public:
     Nodes();
-    std::vector<NodeType> ProcessRequest(std::vector<NodeType>& request) override;
     std::string CommandName() override;
     DispatchFunction Function() override;
+private:
+    std::vector<NodeType> ProcessRequest(std::vector<NodeType>& request) override;
 };
 
 #endif //TAG_HIERARCHY_NODES_H

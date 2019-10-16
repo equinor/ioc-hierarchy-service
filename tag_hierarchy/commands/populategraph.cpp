@@ -47,5 +47,6 @@ PopulateGraph::ProcessRequest(std::vector<NodeType> &nodes)
 
         vertices_[id] = current_vertex;
     }
+    retval.push_back({{std::string("success"), std::string("cache populated")}});
     return retval;
 }

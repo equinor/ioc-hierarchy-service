@@ -21,6 +21,11 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/variant.hpp>
 
+#include <opencensus/trace/span.h>
+#include <opencensus/trace/with_span.h>
+#include <opencensus/context/with_context.h>
+#include <opencensus/exporters/trace/stdout/stdout_exporter.h>
+
 #include <iostream>
 
 #include <zmq.hpp>
@@ -105,6 +110,8 @@ namespace {
 
 int main (int argc, char* argv[])
 {
+    // Initialize stdout exporter for opencensus
+    opencensus::exporters::trace::StdoutExporter::Register();
     auto mode = local::GetMode(argc, argv);
     //  Prepare our context and socket
     zmq::context_t context (1);
@@ -130,12 +137,16 @@ int main (int argc, char* argv[])
 
     auto messagehandler = MessageHandler();
 
+    static opencensus::trace::AlwaysSampler sampler;
     while (true) {
+        const auto span_title = std::string("Receiving message for ") + AppModeName[mode];
+        auto span = opencensus::trace::Span::StartSpan(span_title, nullptr, &sampler);
         zmq::message_t request;
 
         //  Wait for next request from client
         zmq::poll(&items[0], 2, -1);
 
+        opencensus::trace::WithSpan ws(span);
         if (items[0].revents & ZMQ_POLLIN)
         {
             socket.recv(&request, ZMQ_DONTWAIT);
@@ -145,12 +156,23 @@ int main (int argc, char* argv[])
             {
                 std::istringstream buffer(static_cast<char *>(request.data()));
                 boost::archive::text_iarchive archive(buffer);
-
                 archive >> message;
             }
             catch (const std::exception &exc)
             {
-                std::cerr << exc.what() << std::endl;
+                const auto log_string = std::string("Command threw exception: ") + exc.what();
+                span.AddAnnotation(log_string);
+                std::ostringstream out_buffer;
+                const auto reply_map =
+                        std::vector<NodeType>({{{std::string("error"), std::string("deserializing stream failed")},
+                                               {std::string("action"), std::string("resend")}}});
+                {
+                    boost::archive::text_oarchive archive(out_buffer);
+                    archive << reply_map;
+                }
+                // The result can be extracted from the stringstream
+                zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
+                socket.send(reply);
             }
 
             try
@@ -169,11 +191,19 @@ int main (int argc, char* argv[])
             }
             catch (const std::exception &exc)
             {
-                std::cerr << "Error when handling message: " << exc.what() << std::endl;
-                zmq::message_t reply(5);
-                memcpy(reply.data(), "Error", 5);
+                const auto log_string = std::string("An error occurred while replying to command: ") + exc.what();
+                span.AddAnnotation(log_string);
+                std::ostringstream out_buffer;
+                const auto reply_map =
+                        std::vector<NodeType>({{{std::string("error"), std::string("command failed")},
+                                               {std::string("action"), std::string("fix_parameters")}}});
+                {
+                    boost::archive::text_oarchive archive(out_buffer);
+                    archive << reply_map;
+                }
+                // The result can be extracted from the stringstream
+                zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
                 socket.send(reply);
-                continue;
             }
         }
         if (items[1].revents & ZMQ_POLLIN) {
@@ -186,6 +216,7 @@ int main (int argc, char* argv[])
                 messagehandler.HandleRequest(command);
             }
         }
+        span.End();
     }
 
     return 0;

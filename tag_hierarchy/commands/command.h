@@ -17,17 +17,19 @@ std::function<std::vector<NodeType>(std::vector<NodeType>&)>;
 class Command {
 public:
     Command();
-    std::vector<NodeType> Process(std::vector<NodeType>);
-    virtual std::vector<NodeType> ProcessRequest(std::vector<NodeType>&) = 0;
+    std::vector<NodeType> Process(std::vector<NodeType>& request);
     virtual std::string CommandName() = 0;
     virtual DispatchFunction Function() = 0;
+
+private:
+    virtual std::vector<NodeType> ProcessRequest(std::vector<NodeType>&) = 0;
 };
 
-#define REGISTER_COMMAND(Classname, Command) \
+#define REGISTER_COMMAND(Classname, CommandString) \
     Classname Classname##_instance;            \
     Classname::Classname() {TagHierarchy::Register(*this);} \
-    std::string Classname::CommandName() {return #Command;}\
-    DispatchFunction Classname::Function() {return std::bind(&Classname::ProcessRequest, *this, std::placeholders::_1);}
+    std::string Classname::CommandName() {return #CommandString;}\
+    DispatchFunction Classname::Function() {return [this](std::vector<NodeType>& in) {return this->Process(in);};}
 
 
 #endif //TAG_HIERARCHY_COMMAND_H

@@ -19,6 +19,7 @@
 #include <boost/serialization/variant.hpp>
 #include <boost/serialization/vector.hpp>
 
+
 #include <functional>
 #include <set>
 #include <deque>
@@ -120,7 +121,7 @@ public:
                               }},
                              {"flush", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   this->ClearGraph();
-                                  return {};
+                                  return {{{std::string("success"), std::string("hierarchy flushed")}}};
                               }},
                              {"healthcheck", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->HealthCheck(nodes);

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.7)
 project(tag-hierarchy)
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 
 find_package(Boost COMPONENTS serialization graph unit_test_framework REQUIRED)
@@ -12,6 +12,10 @@ find_package(PythonLibs)
 
 add_subdirectory(cpp_redis)
 add_subdirectory(pybind11)
+set(BUILD_TESTING OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+add_subdirectory(opencensus-cpp)
+set(BUILD_TESTING ON)
 add_subdirectory(tag_hierarchy)
 add_subdirectory(backup_service)
 
@@ -41,6 +45,9 @@ target_include_directories(tag-hierarchy
 target_link_libraries(tag-hierarchy
     PRIVATE tag_hierarchy_commands
     PUBLIC tag_hierarchy
+    PRIVATE Boost::serialization
+    PUBLIC opencensus-cpp::trace
+    PUBLIC opencensus-cpp::exporters_trace_stdout
     PUBLIC pybind11
     PUBLIC ${PYTHON_LIBRARIES}
 )

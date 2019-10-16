@@ -37,8 +37,8 @@ namespace local {
 
 std::vector<NodeType> query(std::vector<NodeType> in,
                             std::string app_mode,
-                            int request_timeout = 300,
-                            int request_retries = 3)
+                            int request_timeout = 1500,
+                            int request_retries = 1)
 {
     zmq::context_t context (1);
     auto retries_left = int { request_retries };
@@ -70,7 +70,15 @@ std::vector<NodeType> query(std::vector<NodeType> in,
             boost::archive::text_iarchive archive(in_buffer);
             archive >> reply_list;
             socket->close();
-            expect_reply = false;
+            if (reply_list.at(0).count("error") &&
+                reply_list.at(0).count("action") &&
+                boost::get<std::string>(reply_list.at(0).at("action")) == std::string("resend")) {
+                reply_list.clear();
+                expect_reply = true;
+            }
+            else {
+                expect_reply = false;
+            }
         }
         else if (--retries_left == 0) {
             std::cout << "Error: hierarchy daemon does not reply" << std::endl;
