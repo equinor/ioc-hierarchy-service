@@ -74,7 +74,8 @@ std::vector<NodeType> query(std::vector<NodeType> in,
             boost::archive::text_iarchive archive(in_buffer);
             archive >> reply_list;
             socket->close();
-            if (reply_list.at(0).count("error") &&
+            if (reply_list.size() > 0 &&
+                reply_list.at(0).count("error") &&
                 reply_list.at(0).count("action") &&
                 boost::get<std::string>(reply_list.at(0).at("action")) == std::string("resend")) {
                 reply_list.clear();
