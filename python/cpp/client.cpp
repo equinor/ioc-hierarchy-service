@@ -42,7 +42,7 @@ namespace local {
 std::vector<NodeType> query(std::vector<NodeType> in,
                             std::string app_mode,
                             int request_timeout = 1500,
-                            int request_retries = 1)
+                            int request_retries = 2)
 {
     zmq::context_t context (1);
     auto retries_left = int { request_retries };
@@ -74,11 +74,20 @@ std::vector<NodeType> query(std::vector<NodeType> in,
             boost::archive::text_iarchive archive(in_buffer);
             archive >> reply_list;
             socket->close();
-            if (reply_list.at(0).count("error") &&
+            if (reply_list.size() > 0 &&
+                reply_list.at(0).count("error") &&
                 reply_list.at(0).count("action") &&
                 boost::get<std::string>(reply_list.at(0).at("action")) == std::string("resend")) {
+                if (--retries_left == 0) {
+                    reply_list.push_back({{{std::string("error"), std::string("daemon not responding")}}});
+                    expect_reply = false;
+                    continue;
+                }
+                std::cout << "Error: daemon could not deserialize message, retrying" << std::endl;
+                std::cout << "The sent data was " << message.str() << std::endl;
                 reply_list.clear();
-                expect_reply = true;
+                socket = local::get_socket(context, app_mode);
+                socket->send(message);
             }
             else {
                 expect_reply = false;
@@ -94,6 +103,7 @@ std::vector<NodeType> query(std::vector<NodeType> in,
         else {
             std::cout << "Warning: no response from daemon, retrying" << std::endl;
             socket->close();
+            socket.reset();
             socket = local::get_socket(context, app_mode);
             socket->send(message);
         }
