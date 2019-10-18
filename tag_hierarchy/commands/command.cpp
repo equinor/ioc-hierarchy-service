@@ -23,6 +23,14 @@ Command::Process(std::vector<NodeType>& request) {
         opencensus::trace::WithSpan ws(span);
         try {
             result = ProcessRequest(request);
+            span.AddAnnotation("Finished running command");
+            if (!result.empty() &&
+                result.at(0).count("error")) {
+                const auto log_string = std::string("The ") + CommandName() +
+                                        std::string(" command failed with the error ") +
+                                        boost::get<std::string>(result.at(0).at("error"));
+                span.AddAnnotation(log_string);
+            }
         }
         catch (std::exception e) {
             const auto log_string = std::string("Command threw exception: ") + e.what();
