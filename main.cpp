@@ -183,6 +183,7 @@ int main (int argc, char* argv[])
                 // The result can be extracted from the stringstream
                 zmq::message_t reply((void *)out_buffer.str().c_str(), out_buffer.str().size() + 1);
                 socket.send(reply);
+                continue;
             }
 
             try
