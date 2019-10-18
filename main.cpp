@@ -43,7 +43,10 @@
    the server and the hierarchy
 */
 class MessageHandler {
-    public:
+public:
+    MessageHandler() = delete;
+    explicit MessageHandler(zmq::context_t& context) : context_(context) {};
+
     std::vector<NodeType>
     HandleRequest(std::vector<NodeType>& request) {
         NodeType command_map = request[0];
@@ -54,8 +57,7 @@ class MessageHandler {
             const auto reply = TagHierarchy::Handle(request);
             const auto serialized_hierarchy =
                 boost::get<std::string>(reply[0].at("serialized_graph"));
-            zmq::context_t context(1);
-            zmq::socket_t socket(context, ZMQ_REQ);
+            zmq::socket_t socket(context_, ZMQ_REQ);
             std::cout << "Connecting to backup service" << std::endl;
             socket.connect(config::GetTagHierarchyBackupServiceAddress());
             zmq::message_t backup_request(serialized_hierarchy.size());
@@ -69,8 +71,7 @@ class MessageHandler {
         }
         else if (command == "restore")
         {
-            zmq::context_t context(1);
-            zmq::socket_t socket(context, ZMQ_REQ);
+            zmq::socket_t socket(context_, ZMQ_REQ);
             std::cout << "Connecting to backup service" << std::endl;
             socket.connect(config::GetTagHierarchyBackupServiceAddress());
             const auto message = std::string("GET_HIERARCHY");
@@ -93,6 +94,8 @@ class MessageHandler {
             return TagHierarchy::Handle(request);
         }
     }
+private:
+    zmq::context_t& context_;
 };
 
 namespace {
@@ -139,7 +142,7 @@ int main (int argc, char* argv[])
         {static_cast<void*>(sub_socket), 0, ZMQ_POLLIN, 0}
     };
 
-    auto messagehandler = MessageHandler();
+    auto messagehandler = MessageHandler(context);
 
     static opencensus::trace::AlwaysSampler sampler;
     while (true) {
