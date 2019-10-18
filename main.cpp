@@ -37,6 +37,8 @@
 #include <iostream>
 
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 /* The messagehandler handles command which requires orchestration between
    the server and the hierarchy
 */
@@ -223,3 +225,4 @@ int main (int argc, char* argv[])
 
     return 0;
 }
+#pragma clang diagnostic pop
