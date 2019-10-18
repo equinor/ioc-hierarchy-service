@@ -49,6 +49,9 @@ public:
 
     std::vector<NodeType>
     HandleRequest(std::vector<NodeType>& request) {
+        if (request.empty()) {
+            return {{{std::string("error"), std::string("no command passed")}}};
+        }
         NodeType command_map = request[0];
         std::string command = boost::get<std::string>(command_map["command"]);
         const auto use_tcp = bool {std::getenv("ZEROMQ_USE_TCP")};
