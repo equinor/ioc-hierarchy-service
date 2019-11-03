@@ -40,3 +40,19 @@ Command::Process(std::vector<NodeType>& request) {
     span.End();
     return result;
 }
+
+TagHierarchyGraph &Command::GetGraph() {
+    return TagHierarchy::GetGraph();
+}
+
+std::map<std::string, VertexT> &Command::GetVertices() {
+    return TagHierarchy::GetVertices();
+}
+
+VertexT &Command::GetRoot() {
+    return TagHierarchy::GetRoot();
+}
+
+void Command::Register(Command &in) {
+    TagHierarchy::Register(in);
+}

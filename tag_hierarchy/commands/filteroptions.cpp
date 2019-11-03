@@ -11,8 +11,8 @@ REGISTER_COMMAND(FilterOptions, filteroptions)
 std::vector<NodeType>
 FilterOptions::ProcessRequest(std::vector<NodeType> &nodes)
 {
-    auto& root_ = TagHierarchy::GetRoot();
-    auto& graph_ = TagHierarchy::GetGraph();
+    auto& root_ = GetRoot();
+    auto& graph_ = GetGraph();
     auto command_map = nodes.at(0);
     // Check if graph has been initialized
     if (root_ == std::numeric_limits<VertexT>::max()) {

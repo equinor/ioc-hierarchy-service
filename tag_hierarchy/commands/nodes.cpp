@@ -11,9 +11,9 @@ REGISTER_COMMAND(Nodes, nodes)
 std::vector<NodeType>
 Nodes::ProcessRequest(std::vector<NodeType> &nodes)
 {
-    auto& root_ = TagHierarchy::GetRoot();
-    auto& graph_ = TagHierarchy::GetGraph();
-    auto& vertices_ = TagHierarchy::GetVertices();
+    auto& root_ = GetRoot();
+    auto& graph_ = GetGraph();
+    auto& vertices_ = GetVertices();
     auto command_map = nodes.at(0);
     auto retval = std::vector<NodeType>();
     // Check if graph has been initialized

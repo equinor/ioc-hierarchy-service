@@ -8,9 +8,12 @@
 class TagHierarchyImpl;
 
 class TagHierarchy {
+    friend class Command;
 public:
     static TagHierarchyImpl& GetTagHierarchy();
     static std::vector<NodeType> Handle(std::vector<NodeType>& message);
+
+private:
     static TagHierarchyGraph& GetGraph();
     static std::map<std::string, VertexT>& GetVertices();
     static VertexT& GetRoot();

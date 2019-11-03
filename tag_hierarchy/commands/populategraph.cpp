@@ -10,9 +10,9 @@ REGISTER_COMMAND(PopulateGraph, populate_graph)
 std::vector<NodeType>
 PopulateGraph::ProcessRequest(std::vector<NodeType> &nodes)
 {
-    auto& root_ = TagHierarchy::GetRoot();
-    auto& graph_ = TagHierarchy::GetGraph();
-    auto& vertices_ = TagHierarchy::GetVertices();
+    auto& root_ = GetRoot();
+    auto& graph_ = GetGraph();
+    auto& vertices_ = GetVertices();
     auto retval = std::vector<NodeType>();
     auto const command = *nodes.begin();
     nodes.erase(nodes.begin());
