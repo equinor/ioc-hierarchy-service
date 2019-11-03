@@ -1,11 +1,10 @@
 //
 // Created by Petter Moe Kvalvaag on 2019-10-03.
 //
+#include "tag_hierarchy/tag_hierarchy.h"
+#include <models/models.h>
 
 #include <vector>
-#include <models/models.h>
-#include <tag_hierarchy/tag_hierarchy.h>
-#include "tag_hierarchy/tag_hierarchy.h"
 
 #ifndef TAG_HIERARCHY_COMMAND_H
 #define TAG_HIERARCHY_COMMAND_H

@@ -9,11 +9,7 @@
 #include "models/models.h"
 #include "config/config.h"
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/graphviz.hpp>
-#include <boost/pending/indirect_cmp.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/map.hpp>

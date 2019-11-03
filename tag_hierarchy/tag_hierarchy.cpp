@@ -1,29 +1,18 @@
 #include "tag_hierarchy/tag_hierarchy.h"
 
-
-#include "tag_hierarchy/filteredhierarchyvisitor.h"
-#include "tag_hierarchy/filteroptionsvisitor.h"
-
 #include "models/models.h"
 
 #include <boost/graph/adj_list_serialize.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
-#include <boost/graph/graphviz.hpp>
 #include <boost/pending/indirect_cmp.hpp>
-#include <boost/range/irange.hpp>
-#include <boost/graph/graph_utility.hpp> 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/map.hpp>
-#include <boost/serialization/string.hpp>
 #include <boost/serialization/variant.hpp>
 #include <boost/serialization/vector.hpp>
 
 
 #include <functional>
-#include <set>
-#include <deque>
-#include <typeinfo>
 #include <tag_hierarchy/commands/command.h>
 
 using VertexIterator = boost::graph_traits<TagHierarchyGraph>::vertex_iterator;
