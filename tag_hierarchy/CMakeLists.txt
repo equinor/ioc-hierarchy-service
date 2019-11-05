@@ -1,18 +1,17 @@
-# Shared library because we use static initialization to register
+# Object library because we use static initialization to register
 # commands in the tag hierarchy service. Statically initialized
 # unused variables are dropped by the linker in static libraries
 add_library(tag_hierarchy_commands OBJECT
         commands/command.cpp
         commands/populategraph.cpp
         commands/nodes.cpp
-        commands/filteroptions.cpp commands/filteroptions.h)
+        commands/filteroptions.cpp)
 target_include_directories(tag_hierarchy_commands
         PRIVATE ${CMAKE_SOURCE_DIR}
         )
 target_link_libraries(tag_hierarchy_commands
         PUBLIC opencensus-cpp::trace
         PUBLIC opencensus-cpp::context
-        # PRIVATE tag_hierarchy
         PRIVATE ${PYTHON_LIBRARIES}
         PRIVATE Boost::graph
         PUBLIC Boost::serialization
@@ -22,7 +21,6 @@ target_link_libraries(tag_hierarchy_commands
 add_library(tag_hierarchy STATIC
         tag_hierarchy.cpp
         tag_hierarchy.h
-        $<TARGET_OBJECTS:tag_hierarchy_commands>
         )
 # Compile with -fpic so we can link a shared library into it
 set_property(TARGET tag_hierarchy PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -51,6 +49,7 @@ target_include_directories(tag_hierarchy_test
 
 target_link_libraries(tag_hierarchy_test
     PRIVATE tag_hierarchy
+    PRIVATE tag_hierarchy_commands
     PRIVATE Boost::unit_test_framework
     PUBLIC ${PYTHON_LIBRARIES}
 )
