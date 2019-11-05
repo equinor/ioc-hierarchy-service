@@ -50,6 +50,8 @@ target_include_directories(tag_hierarchy_test
 target_link_libraries(tag_hierarchy_test
     PRIVATE tag_hierarchy
     PRIVATE tag_hierarchy_commands
+    PUBLIC opencensus-cpp::trace
+    PUBLIC opencensus-cpp::exporters_trace_stdout
     PRIVATE Boost::unit_test_framework
     PUBLIC ${PYTHON_LIBRARIES}
 )
