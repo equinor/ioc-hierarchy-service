@@ -94,12 +94,12 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         {
             continue;
         }
-        auto valid_modelhierarchies = std::vector<std::string>();
+        auto valid_model_ids = std::vector<std::string>();
         for (auto const& modelhierarchy : valid_models[*iter]) {
-            valid_modelhierarchies.emplace_back(graph_[modelhierarchy].id);
+            valid_model_ids.emplace_back(graph_[modelhierarchy].id);
         }
         auto props = graph_[*iter].properties;
-        props["modelhierarchies"] = valid_modelhierarchies;
+        props["model_ids"] = valid_model_ids;
         retval.push_back(props);
     }
     return retval;
