@@ -5,8 +5,13 @@
 #include <boost/graph/adj_list_serialize.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <boost/pending/indirect_cmp.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/variant.hpp>
 #include <boost/serialization/vector.hpp>
@@ -53,8 +58,13 @@ public:
     Store(std::vector<NodeType>& message) {
         auto retval = std::vector<NodeType>();
         std::ostringstream stream;
-        boost::archive::text_oarchive archive(stream);
-        archive << *this;
+        {
+            boost::iostreams::filtering_stream<boost::iostreams::output> f;
+            f.push(boost::iostreams::gzip_compressor());
+            f.push(stream);
+            boost::archive::binary_oarchive archive(f);
+            archive << *this;
+        }
         retval.push_back({{"serialized_graph", stream.str()}});
         return retval;
     }
@@ -66,7 +76,10 @@ public:
         const std::string graph_state =
             boost::get<std::string>(message[0]["serialized_hierarchy"]);
         std::istringstream buffer(graph_state);
-        boost::archive::text_iarchive archive(buffer);
+        boost::iostreams::filtering_stream<boost::iostreams::input> f;
+        f.push(boost::iostreams::gzip_decompressor());
+        f.push(buffer);
+        boost::archive::binary_iarchive archive(f);
         archive >> *this;
         retval.push_back({{"success", true}});
         return retval;

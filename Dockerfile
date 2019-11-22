@@ -7,8 +7,8 @@ FROM gcc:8 as cppbuild
 #      && /tmp/cmake-install.sh --skip-license --prefix=/usr/bin/cmake \
 #      && rm /tmp/cmake-install.sh
 RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/local/bin/gfortran 999 \
-      && apt-get update && apt-get install -y cmake libboost-graph-dev libboost-serialization-dev \
-         libboost-test-dev libpython3-dev libzmq3-dev
+      && apt-get update && apt-get install -y cmake zlib1g-dev libboost-graph-dev libboost-serialization-dev \
+         libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev
 
 # ENV PATH="/usr/bin/cmake/bin:${PATH}"
 WORKDIR /usr/src/app/

@@ -35,6 +35,7 @@ find_package(PythonLibs)
 target_link_libraries(tag_hierarchy
     PUBLIC tag_hierarchy_commands
     PUBLIC ${PYTHON_LIBRARIES}
+    PRIVATE Boost::iostreams
     PUBLIC Boost::serialization
     PUBLIC pybind11
     PUBLIC libzmq)

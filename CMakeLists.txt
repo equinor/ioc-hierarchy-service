@@ -6,7 +6,7 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 
-find_package(Boost COMPONENTS serialization graph unit_test_framework REQUIRED)
+find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework REQUIRED)
 find_package(ZeroMQ REQUIRED)
 find_package(PythonLibs)
 
