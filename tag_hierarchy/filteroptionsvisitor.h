@@ -30,3 +30,24 @@ public:
 private:
     std::set<std::string>& valid_modelowners_;
 };
+
+class ModelClassFilterOptionsVisitor : public boost::default_dfs_visitor
+{
+public:
+    explicit ModelClassFilterOptionsVisitor(
+            std::set<std::string>& valid_modelclasses
+    ) : valid_modelclasses_(valid_modelclasses) {}
+
+    void discover_vertex(VertexT v, const TagHierarchyGraph &g)
+    {
+        if (g[v].properties.count("modelclass") &&
+            g[v].properties.find("modelclass")->second.type() == typeid(std::string)) {
+            valid_modelclasses_.insert(boost::get<std::string>(
+                    g[v].properties.at("modelclass")
+            ));
+        }
+    }
+
+private:
+    std::set<std::string>& valid_modelclasses_;
+};

@@ -49,11 +49,18 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         modelownerfilter = boost::get<std::vector<std::string>>(command_map.at("modelownerfilter"));
     }
 
+    auto modelclassfilter = std::vector<std::string>();
+    if (command_map.count("modelclassfilter") &&
+        command_map["modelclassfilter"].type() == typeid(std::vector<std::string>))
+    {
+        modelclassfilter = boost::get<std::vector<std::string>>(command_map.at("modelclassfilter"));
+    }
+
     auto valid_nodes = std::set<VertexT>();
     auto valid_models = std::map<VertexT, std::set<VertexT>>();
     auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter);
 
-    auto const termfunc = [l1filter, l2filter, modelownerfilter] (
+    auto const termfunc = [l1filter, l2filter, modelownerfilter, modelclassfilter] (
             VertexT vertex, const TagHierarchyGraph& graph) {
         auto const levelno = boost::get<int>(graph[vertex].properties.at("levelno"));
         if (levelno == 1 && l1filter.size() > 0) {
@@ -67,6 +74,12 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
                    std::find(cbegin(modelownerfilter), cend(modelownerfilter),
                              boost::get<std::string>(graph[vertex].properties.at("modelowner"))) ==
                    cend(modelownerfilter);
+        }
+        if (modelclassfilter.size() > 0 && graph[vertex].properties.count("modelclass")) {
+            return graph[vertex].properties.at("modelclass").type() == typeid(std::string) &&
+                   std::find(cbegin(modelclassfilter), cend(modelclassfilter),
+                             boost::get<std::string>(graph[vertex].properties.at("modelclass"))) ==
+                   cend(modelclassfilter);
         }
         return false;
     };
