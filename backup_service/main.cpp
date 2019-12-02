@@ -25,13 +25,13 @@ void GetRedisConnectionParams(std::string &redis_url,
         redis_url = std::string(redis_url_env);
     }
     std::stringstream str_value;
-    str_value << std::getenv("REDIS_PORT");
+    str_value << std::getenv("REDIS_PORT_DAEMON");
     str_value >> redis_port;
     str_value.clear();
-    str_value << std::getenv("REDIS_DB");
+    str_value << std::getenv("REDIS_DB_DAEMON");
     str_value >> redis_db;
     str_value.clear();
-    if (const char *redis_password_env = std::getenv("REDIS_PASSWORD"))
+    if (const char *redis_password_env = std::getenv("REDIS_PASSWORD_DAEMON"))
     {
         redis_password = std::string(redis_password_env);
     }
