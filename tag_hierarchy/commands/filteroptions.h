@@ -1,9 +1,7 @@
 //
 // Created by Petter Moe Kvalvaag on 2019-10-06.
 //
-
-#ifndef TAG_HIERARCHY_FILTEROPTIONS_H
-#define TAG_HIERARCHY_FILTEROPTIONS_H
+#pragma once
 
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/commands/command.h"
@@ -16,5 +14,3 @@ public:
 private:
     std::vector<NodeType> ProcessRequest(std::vector<NodeType>& request) override;
 };
-
-#endif //TAG_HIERARCHY_FILTEROPTIONS_H
