@@ -34,6 +34,7 @@ private:
     TagHierarchyGraph graph_;
     std::map<std::string, VertexT> vertices_;
     std::map<std::string, DispatchFunction> command_func_dispatch_;
+    EdgeLabelMap edge_labels_;
     VertexT root_;
 
 public:
@@ -44,6 +45,10 @@ public:
 
     std::map<std::string, VertexT>& GetVertices() {
         return vertices_;
+    }
+
+    EdgeLabelMap& GetEdgeLabels() {
+        return edge_labels_;
     }
 
     VertexT& GetRoot() {
@@ -129,6 +134,7 @@ public:
                                   return this->HealthCheck(nodes);
                               }},
                          }),
+                         edge_labels_({{{"Physical hierarchy", 0}}}),
                          root_(std::numeric_limits<VertexT>::max())
     {
     };
@@ -145,6 +151,7 @@ public:
         ar & graph_;
         ar & vertices_;
         ar & root_;
+        ar & edge_labels_;
     }
 };
 
@@ -168,6 +175,11 @@ TagHierarchy::GetGraph() {
 std::map<std::string, VertexT>&
 TagHierarchy::GetVertices() {
     return GetTagHierarchy().GetVertices();
+}
+
+EdgeLabelMap &
+TagHierarchy::GetEdgeLabels() {
+    return GetTagHierarchy().GetEdgeLabels();
 }
 
 VertexT&

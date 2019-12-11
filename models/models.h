@@ -33,8 +33,10 @@ struct Modelhierarchy {
 };
 
 struct Connection {
-    std::string type;
+    int id;
 };
+
+using EdgeLabelMap = std::map<std::string, int>;
 
 using TagHierarchyGraph = boost::adjacency_list<
         boost::listS, boost::vecS, boost::bidirectionalS,
@@ -62,7 +64,7 @@ void serialize(Archive & ar, Modelhierarchy & g, const unsigned int version) {
 
 template<class Archive>
 void serialize(Archive & ar, Connection & g, const unsigned int version) {
-    ar & g.type;
+    ar & g.id;
 }
 } // namespace serialization
 } // namespace boost

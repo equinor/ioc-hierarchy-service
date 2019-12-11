@@ -33,7 +33,7 @@ PopulateGraph::ProcessRequest(std::vector<NodeType> &nodes)
             {
                 boost::add_edge(parent_vertex->second,
                                 current_vertex,
-                                Connection{"physical_hierarchy"},
+                                Connection{0},
                                 graph_);
             }
         }
@@ -41,7 +41,7 @@ PopulateGraph::ProcessRequest(std::vector<NodeType> &nodes)
         {
             boost::add_edge(root_,
                             current_vertex,
-                            Connection{"physical_hierarchy"},
+                            Connection{0},
                             graph_);
         }
 
