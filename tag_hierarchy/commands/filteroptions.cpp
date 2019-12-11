@@ -4,7 +4,7 @@
 
 #include "tag_hierarchy/commands/filteroptions.h"
 
-#include "tag_hierarchy/filteroptionsvisitor.h"
+#include "tag_hierarchy/visitors/filteroptionsvisitor.h"
 
 REGISTER_COMMAND(FilterOptions, filteroptions)
 
