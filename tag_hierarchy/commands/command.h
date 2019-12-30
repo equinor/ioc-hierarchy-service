@@ -22,6 +22,7 @@ public:
 protected:
     TagHierarchyGraph& GetGraph();
     std::map<std::string, VertexT>& GetVertices();
+    EdgeLabelMap& GetEdgeLabels();
     VertexT& GetRoot();
     void Register(Command& in);
 

@@ -49,6 +49,10 @@ std::map<std::string, VertexT> &Command::GetVertices() {
     return TagHierarchy::GetVertices();
 }
 
+EdgeLabelMap& Command::GetEdgeLabels() {
+    return TagHierarchy::GetEdgeLabels();
+}
+
 VertexT &Command::GetRoot() {
     return TagHierarchy::GetRoot();
 }
