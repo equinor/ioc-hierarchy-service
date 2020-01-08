@@ -11,11 +11,11 @@ continuous:
 build_package:
 	docker build -t tag-hierarchy ./
 	docker create --name tag-hierarchy-service tag-hierarchy
-	docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.1.1-x86-64.deb .
+	docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.1.2-x86-64.deb .
 	docker rm tag-hierarchy-service	
 
 build_debug_package:
 	docker build -t tag-hierarchy ./ --build-arg CMAKE_BUILD_TYPE=Debug
 	docker create --name tag-hierarchy-service tag-hierarchy
-	docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.1.1-x86-64.deb .
+	docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.1.2-x86-64.deb .
 	docker rm tag-hierarchy-service	
