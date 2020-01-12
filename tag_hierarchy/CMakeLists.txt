@@ -4,6 +4,7 @@
 add_library(tag_hierarchy_commands OBJECT
         commands/command.cpp
         commands/populategraph.cpp
+        commands/search.cpp
         commands/nodes.cpp
         commands/filteroptions.cpp)
 target_include_directories(tag_hierarchy_commands
@@ -21,7 +22,7 @@ target_link_libraries(tag_hierarchy_commands
 add_library(tag_hierarchy STATIC
         tag_hierarchy.cpp
         tag_hierarchy.h
-        )
+        visitors/searchvisitor.h)
 # Compile with -fpic so we can link a shared library into it
 set_property(TARGET tag_hierarchy PROPERTY POSITION_INDEPENDENT_CODE ON)
 
@@ -41,7 +42,8 @@ target_link_libraries(tag_hierarchy
     PUBLIC libzmq)
 
 add_executable(tag_hierarchy_test
-    unittests/test_tag_hierarchy.cpp
+    # unittests/test_tag_hierarchy.cpp
+    unittests/test_search.cpp
 )
 
 target_include_directories(tag_hierarchy_test
