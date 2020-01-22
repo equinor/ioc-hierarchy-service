@@ -1,6 +1,7 @@
 #pragma once
 
 #include "models/models.h"
+#include "tag_hierarchy/utils/exceptions.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
@@ -11,11 +12,16 @@ class SearchVisitor : public boost::default_dfs_visitor
 public:
     explicit SearchVisitor(
             boost::algorithm::boyer_moore<std::string::const_iterator>& searcher,
-            std::map<std::string, std::vector<VertexT>>& hits
-    ) : searcher_(searcher), hits_(hits) {}
+            std::map<std::string, std::vector<VertexT>>& hits,
+            int max_results
+    ) : searcher_(searcher), hits_(hits), max_results_(max_results), no_results_(0) {}
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
+        if (no_results_ > max_results_) {
+            throw TagHierarchyUtil::StopTraversing();
+        }
+
         if (g[v].properties.count("type") == 0) {
             return;
         }
@@ -30,6 +36,7 @@ public:
                     corpus.end());
             if (searcher_(corpus.cbegin(), corpus.cend()) != not_found) {
                 hits_[node_type].push_back(v);
+                no_results_++;
             }
         }
         else if (node_type == "modelElement") {
@@ -44,13 +51,13 @@ public:
             for (const auto corpus : corpi) {
                 const auto not_found = std::pair<std::string::const_iterator, std::string::const_iterator>(corpus.end(),
                                                                                                            corpus.end());
-                if (searcher_(corpus.begin(), corpus.end()) != not_found ||
-                    searcher_(corpus.begin(), corpus.end()) != not_found) {
+                if (searcher_(corpus.begin(), corpus.end()) != not_found) {
                     has_match = true;
                 }
             }
             if (has_match) {
                 hits_[node_type].push_back(v);
+                no_results_++;
             }
         }
     }
@@ -58,4 +65,6 @@ public:
 private:
     boost::algorithm::boyer_moore<std::string::const_iterator> searcher_;
     std::map<std::string, std::vector<VertexT>>& hits_;
+    int max_results_;
+    int no_results_;
 };

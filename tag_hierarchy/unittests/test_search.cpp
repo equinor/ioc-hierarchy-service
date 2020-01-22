@@ -26,13 +26,13 @@ BOOST_AUTO_TEST_CASE( test_search )
 {
     auto query = std::vector<NodeType>(
         {{{std::string("command"), std::string("search")},
-          {std::string("search_term"), std::string("Level1")}}}
+          {std::string("search_term"), std::string("Level1")},
+          {std::string("max_results"), 20},
+          }}
     );
     auto response = TagHierarchy::Handle(query);
-    BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-1");
-    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2");
-    BOOST_TEST(boost::get<int>(response[1].at("levelno")) == 1);
-    BOOST_TEST(boost::get<pybind11::none>(response[1].at("parent_id")) == pybind11::none());
+    //BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-1");
+    BOOST_TEST(response.size() == 20);
     //Fixture::next_parent_id = boost::get<std::string>(response[1].at("id"));
     // BOOST_TEST(boost::get<std::string>(response[1].at("is_modelelement")) == false);
 }

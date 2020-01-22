@@ -41,9 +41,9 @@ target_link_libraries(tag_hierarchy
     PUBLIC pybind11
     PUBLIC libzmq)
 
+# TODO: Make macro for test targets
 add_executable(tag_hierarchy_test
-    # unittests/test_tag_hierarchy.cpp
-    unittests/test_search.cpp
+    unittests/test_tag_hierarchy.cpp
 )
 
 target_include_directories(tag_hierarchy_test
@@ -60,7 +60,7 @@ target_link_libraries(tag_hierarchy_test
 )
 
 file(READ "unittests/test_tag_hierarchy.cpp" SOURCE_FILE_CONTENTS)
-string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)" 
+string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)"
        FOUND_TESTS ${SOURCE_FILE_CONTENTS})
 foreach(HIT ${FOUND_TESTS})
     string(REGEX REPLACE ".*\\( *([A-Za-z_0-9]+) *\\).*" "\\1" TEST_NAME ${HIT})
@@ -68,4 +68,32 @@ foreach(HIT ${FOUND_TESTS})
     add_test(NAME "tag_hierarchy_test.${TEST_NAME}" 
             COMMAND tag_hierarchy_test
             --run_test=NodesTest/${TEST_NAME} --catch_system_error=yes)
+endforeach()
+
+add_executable(search_test
+    unittests/test_search.cpp
+        utils/exceptions.h)
+
+target_include_directories(search_test
+        PRIVATE ${CMAKE_SOURCE_DIR}
+        )
+
+target_link_libraries(search_test
+        PRIVATE tag_hierarchy
+        PRIVATE tag_hierarchy_commands
+        PUBLIC opencensus-cpp::trace
+        PUBLIC opencensus-cpp::exporters_trace_stdout
+        PRIVATE Boost::unit_test_framework
+        PUBLIC ${PYTHON_LIBRARIES}
+        )
+
+file(READ "unittests/test_search.cpp" SOURCE_FILE_CONTENTS)
+string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)"
+        FOUND_TESTS ${SOURCE_FILE_CONTENTS})
+foreach(HIT ${FOUND_TESTS})
+    string(REGEX REPLACE ".*\\( *([A-Za-z_0-9]+) *\\).*" "\\1" TEST_NAME ${HIT})
+
+    add_test(NAME "search_test.${TEST_NAME}"
+            COMMAND search_test
+            --run_test=SearchTest/${TEST_NAME} --catch_system_error=yes)
 endforeach()
