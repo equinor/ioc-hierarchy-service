@@ -8,6 +8,7 @@ add_library(tag_hierarchy_commands OBJECT
         commands/kpinodes.cpp
         commands/filteroptions.cpp
         commands/create_kpitree.cpp
+        utils/filters.cpp
 )
 target_include_directories(tag_hierarchy_commands
         PRIVATE ${CMAKE_SOURCE_DIR}
@@ -23,8 +24,7 @@ target_link_libraries(tag_hierarchy_commands
 
 add_library(tag_hierarchy STATIC
         tag_hierarchy.cpp
-        tag_hierarchy.h
-        visitors/createkpitreevisitor.h)
+        tag_hierarchy.h)
 # Compile with -fpic so we can link a shared library into it
 set_property(TARGET tag_hierarchy PROPERTY POSITION_INDEPENDENT_CODE ON)
 

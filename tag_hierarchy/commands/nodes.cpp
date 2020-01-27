@@ -6,6 +6,7 @@
 
 #include "tag_hierarchy/visitors/filteredhierarchyvisitor.h"
 #include "tag_hierarchy/tag_hierarchy.h"
+#include "tag_hierarchy/utils/filters.h"
 
 REGISTER_COMMAND(Nodes, nodes)
 
@@ -22,68 +23,11 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         retval.push_back({{std::string("error"), std::string("empty")}});
         return retval;
     }
-    auto kpifilter = std::vector<std::string>();
-    if (command_map.count("kpifilter") &&
-        command_map["kpifilter"].type() == typeid(std::vector<std::string>))
-    {
-        kpifilter = boost::get<std::vector<std::string>>(command_map["kpifilter"]);
-    }
-
-    auto l1filter = std::vector<std::string>();
-    if (command_map.count("l1filter") &&
-        command_map["l1filter"].type() == typeid(std::vector<std::string>))
-    {
-        l1filter = boost::get<std::vector<std::string>>(command_map.at("l1filter"));
-    }
-
-    auto l2filter = std::vector<std::string>();
-    if (command_map.count("l2filter") &&
-        command_map["l2filter"].type() == typeid(std::vector<std::string>))
-    {
-        l2filter = boost::get<std::vector<std::string>>(command_map.at("l2filter"));
-    }
-
-    auto modelownerfilter = std::vector<std::string>();
-    if (command_map.count("modelownerfilter") &&
-        command_map["modelownerfilter"].type() == typeid(std::vector<std::string>))
-    {
-        modelownerfilter = boost::get<std::vector<std::string>>(command_map.at("modelownerfilter"));
-    }
-
-    auto modelclassfilter = std::vector<std::string>();
-    if (command_map.count("modelclassfilter") &&
-        command_map["modelclassfilter"].type() == typeid(std::vector<std::string>))
-    {
-        modelclassfilter = boost::get<std::vector<std::string>>(command_map.at("modelclassfilter"));
-    }
 
     auto valid_nodes = std::set<VertexT>();
     auto valid_models = std::map<VertexT, std::set<VertexT>>();
+    auto kpifilter = std::vector<std::string>();
     auto dfs_visitor = FilteredHierarchyVisitor<TagHierarchyGraph>(valid_nodes, valid_models, kpifilter);
-
-    auto const termfunc = [l1filter, l2filter, modelownerfilter, modelclassfilter] (
-            VertexT vertex, const TagHierarchyGraph& graph) {
-        auto const levelno = boost::get<int>(graph[vertex].properties.at("levelno"));
-        if (levelno == 1 && l1filter.size() > 0) {
-            return std::find(cbegin(l1filter), cend(l1filter), graph[vertex].id) == cend(l1filter);
-        }
-        if (levelno == 2 && l2filter.size() > 0) {
-            return std::find(cbegin(l2filter), cend(l2filter), graph[vertex].id) == cend(l2filter);
-        }
-        if (modelownerfilter.size() > 0 && graph[vertex].properties.count("modelowner")) {
-            return graph[vertex].properties.at("modelowner").type() == typeid(std::string) &&
-                   std::find(cbegin(modelownerfilter), cend(modelownerfilter),
-                             boost::get<std::string>(graph[vertex].properties.at("modelowner"))) ==
-                   cend(modelownerfilter);
-        }
-        if (modelclassfilter.size() > 0 && graph[vertex].properties.count("modelclass")) {
-            return graph[vertex].properties.at("modelclass").type() == typeid(std::string) &&
-                   std::find(cbegin(modelclassfilter), cend(modelclassfilter),
-                             boost::get<std::string>(graph[vertex].properties.at("modelclass"))) ==
-                   cend(modelclassfilter);
-        }
-        return false;
-    };
 
     auto parent_vertex = VertexT();
     if (command_map["parentId"].type() == typeid(pybind11::none))
@@ -97,6 +41,7 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     }
 
     std::vector<boost::default_color_type> colormap(num_vertices(graph_));
+    const auto termfunc = TagHierarchyUtils::Filters::GetTermfunc<TagHierarchyGraph>(command_map);
     boost::depth_first_visit(graph_, parent_vertex, dfs_visitor, colormap.data(), termfunc);
 
     auto ei = TagHierarchyGraph::adjacency_iterator();
