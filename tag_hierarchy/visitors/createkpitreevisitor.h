@@ -24,7 +24,7 @@ public:
         if (should_connect) {
             path_.push_back(v);
         }
-        if (g[v].properties.count("kpigroup") &&
+        if (path_.size() > 1 && g[v].properties.count("kpigroup") &&
             g[v].properties.find("kpigroup")->second.type() == typeid(std::string)) {
             auto kpigroup = boost::get<std::string>(g[v].properties.at("kpigroup"));
             auto new_path = std::vector<VertexT>();

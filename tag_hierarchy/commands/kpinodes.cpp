@@ -27,7 +27,6 @@ KpiNodes::ProcessRequest(std::vector<NodeType> &nodes)
 
     auto valid_nodes = std::set<VertexT>();
     auto matched_kpis = std::map<VertexT, std::set<VertexT>>();
-    using FilteredGraph = boost::filtered_graph<TagHierarchyGraph, std::function<bool(EdgeT)>, boost::keep_all>;
     auto kpifilter = std::vector<std::string>();
     auto dfs_visitor = KpiNodesVisitor<FilteredGraph>(valid_nodes, matched_kpis, kpifilter);
 

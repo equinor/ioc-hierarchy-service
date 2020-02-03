@@ -25,7 +25,7 @@ public:
             {
                 if (g[v].properties.find("kpigroup_id")->second.type() == typeid(std::string))
                 {
-                    matched_kpis_[path_[path_.size() - 2]].insert(path_[1]);
+                    matched_kpis_[path_[path_.size() - 2]].insert(path_[0]);
                 }
                 else { // KPI is null and filtered out
                     return;
