@@ -10,6 +10,7 @@ set(CTEST_PROJECT_NAME "Hierarchy service")
 set(CTEST_SITE "localhost")
 set(CTEST_BUILD_NAME "Coverage")
 set(CTEST_COVERAGE_COMMAND "gcov")
+set(CTEST_COVERAGE_EXTRA_FLAGS "-l -p")
 
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 ctest_start(Experimental)

@@ -27,7 +27,13 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     auto valid_nodes = std::set<VertexT>();
     auto valid_models = std::map<VertexT, std::set<VertexT>>();
     auto kpifilter = std::vector<std::string>();
-    auto dfs_visitor = FilteredHierarchyVisitor<TagHierarchyGraph>(valid_nodes, valid_models, kpifilter);
+    std::function<bool(EdgeT)> edge_predicate = [&graph_](EdgeT edge) -> bool {
+        return graph_[edge].id == 0;
+    };
+    auto filtered_graph = FilteredGraph(
+            graph_, edge_predicate
+    );
+    auto dfs_visitor = FilteredHierarchyVisitor<FilteredGraph>(valid_nodes, valid_models, kpifilter);
 
     auto parent_vertex = VertexT();
     if (command_map["parentId"].type() == typeid(pybind11::none))
@@ -41,8 +47,8 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     }
 
     std::vector<boost::default_color_type> colormap(num_vertices(graph_));
-    const auto termfunc = TagHierarchyUtils::Filters::GetTermfunc<TagHierarchyGraph>(command_map);
-    boost::depth_first_visit(graph_, parent_vertex, dfs_visitor, colormap.data(), termfunc);
+    const auto termfunc = TagHierarchyUtils::Filters::GetTermfunc<FilteredGraph >(command_map);
+    boost::depth_first_visit(filtered_graph, parent_vertex, dfs_visitor, colormap.data(), termfunc);
 
     auto ei = TagHierarchyGraph::adjacency_iterator();
     auto ei_end = TagHierarchyGraph::adjacency_iterator();
