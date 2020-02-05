@@ -10,14 +10,23 @@
 struct Fixture {
   Fixture() {
      BOOST_TEST_MESSAGE( "Constructing test fixture" );
-     auto modelhierarchy = std::vector<NodeType>(
+     auto modelhierarchy = std::vector<NodeType>
+             (
      #include "hierarchy_dump.cpp"
      );
      TagHierarchy::Handle(modelhierarchy);
+     auto create_kpitree_command = std::vector<NodeType>(
+             {{{std::string("command"), std::string("create_kpitree")}}}
+             );
+      TagHierarchy::Handle(create_kpitree_command);
   }
 
   ~Fixture() {
       BOOST_TEST_MESSAGE( "teardown fixture" );
+      auto create_kpitree_command = std::vector<NodeType>(
+             {{{std::string("command"), std::string("flush")}}}
+             );
+      TagHierarchy::Handle(create_kpitree_command);
   }
 };
 
@@ -64,7 +73,7 @@ BOOST_AUTO_TEST_CASE( test_l3_nodes ) {
 }
 
 BOOST_AUTO_TEST_CASE( test_l4_nodes ) {
-    const auto parent_id = std::string("0b8b675f-0afb-7772-6409-81a069aedb2a");
+    const auto parent_id = std::string("1651b06c-f672-095b-8ace-ee14ef1a70ea");
     auto query = std::vector<NodeType>(
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}
@@ -78,4 +87,27 @@ BOOST_AUTO_TEST_CASE( test_l4_nodes ) {
     // assert response_l4.data[1]['parent_id'] == response_l4.data[0]['id']
 }
 
+BOOST_AUTO_TEST_CASE( test_kpi_nodes ) {
+    auto query = std::vector<NodeType>(
+            {{{std::string("command"), std::string("kpi_nodes")},
+                     {std::string("parentId"), pybind11::none()}}}
+    );
+    auto response = TagHierarchy::Handle(query);
+    BOOST_TEST(response.size() == 2);
+    auto kpi_ids = boost::get<std::vector<std::string>>(response[1].at("kpi_ids"));
+    BOOST_TEST(kpi_ids.size() == 81);
+}
+
+BOOST_AUTO_TEST_CASE( test_kpi_nodes_with_filter ) {
+    auto query = std::vector<NodeType>(
+            {{{std::string("command"), std::string("kpi_nodes")},
+                     {std::string("parentId"), pybind11::none()},
+        {std::string("modelownerfilter"), std::vector<std::string>({"8eb4a1e1-1316-bcef-b20f-bbbaed2a4e95"})},
+    }}
+    );
+    auto response = TagHierarchy::Handle(query);
+    BOOST_TEST(response.size() == 1);
+    auto kpi_ids = boost::get<std::vector<std::string>>(response[0].at("kpi_ids"));
+    BOOST_TEST(kpi_ids.size() == 81);
+}
 BOOST_AUTO_TEST_SUITE_END()

@@ -17,7 +17,7 @@ namespace TagHierarchyUtils {
                 }
                 // If we are not a model, stop here
                 if (graph[vertex].properties.count("type") &&
-                    +            boost::get<std::string>(graph[vertex].properties.at("type")) != "model") {
+                    boost::get<std::string>(graph[vertex].properties.at("type")) != "model") {
                     return false;
                 }
                 auto model_is_valid = true;

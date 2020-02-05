@@ -29,6 +29,7 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     auto kpifilter = std::vector<std::string>();
     std::function<bool(EdgeT)> edge_predicate = [&graph_](EdgeT edge) -> bool {
         return graph_[edge].id == 0;
+        //return true;
     };
     auto filtered_graph = FilteredGraph(
             graph_, edge_predicate

@@ -6,6 +6,7 @@
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/commands/kpinodes.h"
 #include "tag_hierarchy/utils/filters.h"
+#include "tag_hierarchy/utils/graphutils.h"
 
 #include <boost/graph/filtered_graph.hpp>
 
@@ -53,6 +54,7 @@ KpiNodes::ProcessRequest(std::vector<NodeType> &nodes)
 
     auto ei = FilteredGraph::adjacency_iterator();
     auto ei_end = FilteredGraph::adjacency_iterator();
+    const auto levelno = TagHierarchyUtils::Graph::FindLevel(parent_vertex, filtered_graph);
     boost::tie(ei, ei_end) = boost::adjacent_vertices(parent_vertex, filtered_graph);
     for (auto iter = ei; iter != ei_end; ++iter)
     {
@@ -66,6 +68,7 @@ KpiNodes::ProcessRequest(std::vector<NodeType> &nodes)
         }
         auto props = graph_[*iter].properties;
         props["kpi_ids"] = matched_kpi_ids;
+        props["levelno"] = levelno + 1;
         retval.push_back(props);
     }
     return retval;
