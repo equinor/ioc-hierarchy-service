@@ -22,8 +22,8 @@ CMAKE_GENERATOR=Unix Makefiles
 
 ctest_configure()
 ctest_build(FLAGS -j8)
-ctest_test()
-ctest_memcheck()
+ctest_test(EXCLUDE ^opencensus)
+ctest_memcheck(EXCLUDE ^opencensus)
 
 set(CTEST_DROP_METHOD "https")
 set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")
