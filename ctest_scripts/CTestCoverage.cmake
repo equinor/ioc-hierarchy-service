@@ -23,7 +23,7 @@ CMAKE_LDFLAGS=-fprofile-arcs -ftest-coverage
 ctest_configure()
 ctest_build(FLAGS -j8)
 ctest_test(EXCLUDE ^opencensus)
-ctest_coverage(EXCLUDE ^opencensus)
+ctest_coverage()
 
 set(CTEST_DROP_METHOD "https")
 set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")
