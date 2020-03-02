@@ -11,14 +11,14 @@ class SearchVisitor : public boost::default_dfs_visitor
 {
 public:
     explicit SearchVisitor(
-            boost::algorithm::boyer_moore<std::string::const_iterator>& searcher,
+            std::function<bool(std::string::const_iterator begin, std::string::const_iterator end)> searcher,
             std::map<std::string, std::vector<VertexT>>& hits,
             int max_results
     ) : searcher_(searcher), hits_(hits), max_results_(max_results), no_results_(0) {}
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
-        if (no_results_ > max_results_) {
+        if (no_results_ >= max_results_) {
             throw TagHierarchyUtil::StopTraversing();
         }
 
@@ -34,7 +34,7 @@ public:
             auto corpus = boost::get<std::string>(g[v].properties.at("name"));
             const auto not_found = std::pair<std::string::const_iterator, std::string::const_iterator>(corpus.end(),
                     corpus.end());
-            if (searcher_(corpus.cbegin(), corpus.cend()) != not_found) {
+            if (searcher_(corpus.cbegin(), corpus.cend())) {
                 hits_[node_type].push_back(v);
                 no_results_++;
             }
@@ -49,11 +49,7 @@ public:
             }
             auto has_match = false;
             for (const auto corpus : corpi) {
-                const auto not_found = std::pair<std::string::const_iterator, std::string::const_iterator>(corpus.end(),
-                                                                                                           corpus.end());
-                if (searcher_(corpus.begin(), corpus.end()) != not_found) {
-                    has_match = true;
-                }
+                has_match |= searcher_(corpus.begin(), corpus.end());
             }
             if (has_match) {
                 hits_[node_type].push_back(v);
@@ -63,7 +59,7 @@ public:
     }
 
 private:
-    boost::algorithm::boyer_moore<std::string::const_iterator> searcher_;
+    std::function<bool(std::string::const_iterator begin, std::string::const_iterator end)> searcher_;
     std::map<std::string, std::vector<VertexT>>& hits_;
     int max_results_;
     int no_results_;
