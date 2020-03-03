@@ -1,3 +1,6 @@
+# This builds a container that can be used to debug the unit tests of this project in a consistent environment
+# in docker.
+# Ref. https://stackoverflow.com/questions/55272484/how-to-code-run-programs-in-a-docker-container-using-clion/55424792
 FROM ubuntu:cosmic
 ########################################################
 # Essential packages for remote debugging and login in

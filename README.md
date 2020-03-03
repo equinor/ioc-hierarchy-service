@@ -28,12 +28,13 @@ Components communicate via ZeroMQ(ZMQ). We use the patterns REQ-REP
 (request-response) when the python client communicates with the server
 or the statemanager.
 
-From the python perspective, a request has to pass a list of dictionaries
-and expects a list of dictionaries in return. By convention the first
+To communicate with the process from python, the `query` function must be
+used. The `query` function takes a list of dictionaries as input
+and returns a list of dictionaries. By convention the first
 dictionary of a request constitutes the command. Any number of
 subsequent dictionaries constitute the data associated with the command.
 
-The python module is built in C++ using the package `pybind11`, which
+The python client module is built in C++ using the package `pybind11`, which
 translates the python dictionaries into C++ native `std::map`. Since
 C++ is statically typed, only a subset of dictionary key and value
 types are permitted, and this is supported on the C++ by using
@@ -73,8 +74,6 @@ latest state.
 If the message sent to the backup service is `"GET_HIERARCHY"` it will
 return a message with the serialized state, which the server can use to
 re-initialize itself with the latest state.
-
-TODO Add a command reference
 
 # Development
 ## Getting started running CLion with Docker
