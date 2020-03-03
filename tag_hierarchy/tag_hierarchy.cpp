@@ -140,10 +140,9 @@ public:
     };
     TagHierarchyImpl(const TagHierarchyImpl& in) : command_func_dispatch_(in.command_func_dispatch_) {}
 
-    void Register(Command& in) {
-        auto command_name = in.CommandName();
+    void Register(Command& in, std::string name) {
         auto func = in.Function();
-        command_func_dispatch_[command_name] = func;
+        command_func_dispatch_[name] = func;
     }
 
     template<typename Archive>
@@ -188,6 +187,6 @@ TagHierarchy::GetRoot() {
 }
 
 void
-TagHierarchy::Register(Command &in) {
-    GetTagHierarchy().Register(in);
+TagHierarchy::Register(Command &in, std::string name) {
+    GetTagHierarchy().Register(in, name);
 }

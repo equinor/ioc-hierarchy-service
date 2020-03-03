@@ -8,9 +8,7 @@
 
 class PopulateGraph : Command {
 public:
-    PopulateGraph();
-    std::string CommandName() override;
-    DispatchFunction Function() override;
+    PopulateGraph(std::string name);
 private:
     std::vector<NodeType> ProcessRequest(std::vector<NodeType>& request) override;
 };
