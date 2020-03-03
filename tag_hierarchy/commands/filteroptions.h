@@ -8,9 +8,7 @@
 
 class FilterOptions : Command {
 public:
-    FilterOptions();
-    std::string CommandName() override;
-    DispatchFunction Function() override;
+    FilterOptions(std::string name);
 private:
     std::vector<NodeType> ProcessRequest(std::vector<NodeType>& request) override;
 };

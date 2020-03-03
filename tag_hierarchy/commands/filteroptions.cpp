@@ -6,7 +6,9 @@
 
 #include "tag_hierarchy/visitors/filteroptionsvisitor.h"
 
-REGISTER_COMMAND(FilterOptions, filteroptions)
+FilterOptions filteroptions(std::string("filteroptions"));
+
+FilterOptions::FilterOptions(std::string name) : Command(name) {}
 
 std::vector<NodeType>
 FilterOptions::ProcessRequest(std::vector<NodeType> &nodes)

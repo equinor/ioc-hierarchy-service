@@ -18,5 +18,5 @@ private:
     static std::map<std::string, VertexT>& GetVertices();
     static EdgeLabelMap & GetEdgeLabels();
     static VertexT& GetRoot();
-    static void Register(Command& in);
+    static void Register(Command& in, std::string name);
 };
