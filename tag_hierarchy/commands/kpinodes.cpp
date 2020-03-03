@@ -2,16 +2,18 @@
 // Created by Petter Moe Kvalvaag on 2019-10-03.
 //
 
-#include "tag_hierarchy/commands/nodes.h"
-
-#include "tag_hierarchy/visitors/filteredhierarchyvisitor.h"
+#include <tag_hierarchy/visitors/kpinodesvisitor.h>
 #include "tag_hierarchy/tag_hierarchy.h"
+#include "tag_hierarchy/commands/kpinodes.h"
 #include "tag_hierarchy/utils/filters.h"
+#include "tag_hierarchy/utils/graphutils.h"
 
-REGISTER_COMMAND(Nodes, nodes)
+#include <boost/graph/filtered_graph.hpp>
+
+REGISTER_COMMAND(KpiNodes, kpi_nodes)
 
 std::vector<NodeType>
-Nodes::ProcessRequest(std::vector<NodeType> &nodes)
+KpiNodes::ProcessRequest(std::vector<NodeType> &nodes)
 {
     auto& root_ = GetRoot();
     auto& graph_ = GetGraph();
@@ -25,16 +27,9 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     }
 
     auto valid_nodes = std::set<VertexT>();
-    auto valid_models = std::map<VertexT, std::set<VertexT>>();
+    auto matched_kpis = std::map<VertexT, std::set<VertexT>>();
     auto kpifilter = std::vector<std::string>();
-    std::function<bool(EdgeT)> edge_predicate = [&graph_](EdgeT edge) -> bool {
-        return graph_[edge].id == 0;
-        //return true;
-    };
-    auto filtered_graph = FilteredGraph(
-            graph_, edge_predicate
-    );
-    auto dfs_visitor = FilteredHierarchyVisitor<FilteredGraph>(valid_nodes, valid_models, kpifilter);
+    auto dfs_visitor = KpiNodesVisitor<FilteredGraph>(valid_nodes, matched_kpis, kpifilter);
 
     auto parent_vertex = VertexT();
     if (command_map["parentId"].type() == typeid(pybind11::none))
@@ -48,24 +43,32 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     }
 
     std::vector<boost::default_color_type> colormap(num_vertices(graph_));
-    const auto termfunc = TagHierarchyUtils::Filters::GetTermfunc<FilteredGraph >(command_map);
+    std::function<bool(EdgeT)> edge_predicate = [&graph_](EdgeT edge) -> bool {
+        return graph_[edge].id != 0;
+    };
+    auto filtered_graph = FilteredGraph(
+            graph_, edge_predicate
+            );
+    const auto termfunc = TagHierarchyUtils::Filters::GetTermfunc<FilteredGraph>(command_map);
     boost::depth_first_visit(filtered_graph, parent_vertex, dfs_visitor, colormap.data(), termfunc);
 
-    auto ei = TagHierarchyGraph::adjacency_iterator();
-    auto ei_end = TagHierarchyGraph::adjacency_iterator();
-    boost::tie(ei, ei_end) = boost::adjacent_vertices(parent_vertex, graph_);
+    auto ei = FilteredGraph::adjacency_iterator();
+    auto ei_end = FilteredGraph::adjacency_iterator();
+    const auto levelno = TagHierarchyUtils::Graph::FindLevel(parent_vertex, filtered_graph);
+    boost::tie(ei, ei_end) = boost::adjacent_vertices(parent_vertex, filtered_graph);
     for (auto iter = ei; iter != ei_end; ++iter)
     {
         if (valid_nodes.count(*iter) == 0)
         {
             continue;
         }
-        auto valid_model_ids = std::vector<std::string>();
-        for (auto const& modelhierarchy : valid_models[*iter]) {
-            valid_model_ids.emplace_back(graph_[modelhierarchy].id);
+        auto matched_kpi_ids = std::vector<std::string>();
+        for (auto const& kpi : matched_kpis[*iter]) {
+            matched_kpi_ids.emplace_back(graph_[kpi].id);
         }
         auto props = graph_[*iter].properties;
-        props["model_ids"] = valid_model_ids;
+        props["kpi_ids"] = matched_kpi_ids;
+        props["levelno"] = levelno + 1;
         retval.push_back(props);
     }
     return retval;

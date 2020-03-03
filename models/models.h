@@ -7,6 +7,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/labeled_graph.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/filtered_graph.hpp>
 #include <boost/pending/indirect_cmp.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -46,6 +47,8 @@ using TagHierarchyT = boost::labeled_graph<TagHierarchyGraph, std::string>;
 
 using VertexT = boost::graph_traits<TagHierarchyGraph>::vertex_descriptor;
 using EdgeT = boost::graph_traits<TagHierarchyGraph>::edge_descriptor;
+
+using FilteredGraph = boost::filtered_graph<TagHierarchyGraph, std::function<bool(EdgeT)>, boost::keep_all>;
 
 namespace boost {
 namespace serialization {

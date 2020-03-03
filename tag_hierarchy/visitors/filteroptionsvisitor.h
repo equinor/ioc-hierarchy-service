@@ -10,6 +10,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
 
+template<typename GraphT>
 class ModelOwnerFilterOptionsVisitor : public boost::default_dfs_visitor
 {
 public:
@@ -17,7 +18,7 @@ public:
             std::set<std::string>& valid_modelowners
     ) : valid_modelowners_(valid_modelowners) {}
 
-    void discover_vertex(VertexT v, const TagHierarchyGraph &g)
+    void discover_vertex(VertexT v, const GraphT &g)
     {
         if (g[v].properties.count("modelowner") &&
             g[v].properties.find("modelowner")->second.type() == typeid(std::string)) {
@@ -31,6 +32,7 @@ private:
     std::set<std::string>& valid_modelowners_;
 };
 
+template<typename GraphT>
 class ModelClassFilterOptionsVisitor : public boost::default_dfs_visitor
 {
 public:
@@ -38,7 +40,7 @@ public:
             std::set<std::string>& valid_modelclasses
     ) : valid_modelclasses_(valid_modelclasses) {}
 
-    void discover_vertex(VertexT v, const TagHierarchyGraph &g)
+    void discover_vertex(VertexT v, const GraphT &g)
     {
         if (g[v].properties.count("modelclass") &&
             g[v].properties.find("modelclass")->second.type() == typeid(std::string)) {

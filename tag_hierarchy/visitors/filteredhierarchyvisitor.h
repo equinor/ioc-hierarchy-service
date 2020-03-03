@@ -8,7 +8,9 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
+#include <boost/graph/filtered_graph.hpp>
 
+template<class GraphT>
 class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 {
 public:
@@ -18,7 +20,7 @@ public:
                                                                                    kpifilter_(kpifilter),
                                                                                    path_(std::deque<VertexT>()) {}
 
-    void discover_vertex(VertexT v, const TagHierarchyGraph &g)
+    void discover_vertex(VertexT v, const GraphT &g)
     {
         path_.push_front(v);
         if (g[v].properties.count("is_modelelement"))
@@ -57,7 +59,7 @@ public:
         }
         return;
     }
-    void finish_vertex(VertexT v, const TagHierarchyGraph &g) {
+    void finish_vertex(VertexT v, const GraphT &g) {
         path_.pop_front();
     }
 
