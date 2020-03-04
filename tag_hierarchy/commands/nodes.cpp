@@ -6,7 +6,9 @@
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/commands/nodes.h"
 
-REGISTER_COMMAND(Nodes, nodes)
+Nodes nodes(std::string("nodes"));
+
+Nodes::Nodes(std::string name) : Command(name) {}
 
 std::vector<NodeType>
 Nodes::ProcessRequest(std::vector<NodeType> &nodes)

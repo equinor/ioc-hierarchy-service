@@ -19,7 +19,7 @@ CMAKE_BUILD_TYPE=Release
 
 ctest_configure()
 ctest_build(FLAGS -j8)
-ctest_test()
+ctest_test(EXCLUDE ^opencensus)
 
 set(CTEST_DROP_METHOD "https")
 set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")

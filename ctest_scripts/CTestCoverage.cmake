@@ -22,7 +22,7 @@ CMAKE_LDFLAGS=-fprofile-arcs -ftest-coverage
 
 ctest_configure()
 ctest_build(FLAGS -j8)
-ctest_test()
+ctest_test(EXCLUDE ^opencensus)
 ctest_coverage()
 
 set(CTEST_DROP_METHOD "https")

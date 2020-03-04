@@ -22,8 +22,8 @@ CMAKE_CXX_FLAGS=-g -O1 -fsanitize=undefined -fno-omit-frame-pointer
 
 ctest_configure()
 ctest_build(FLAGS -j8)
-ctest_test()
-ctest_memcheck()
+ctest_test(EXCLUDE ^opencensus)
+ctest_memcheck(EXCLUDE ^opencensus)
 
 set(CTEST_DROP_METHOD "https")
 set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")

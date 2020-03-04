@@ -8,9 +8,8 @@
 
 class Nodes : Command {
 public:
-    Nodes();
-    std::string CommandName() override;
-    DispatchFunction Function() override;
+    Nodes(std::string name);
+
 private:
     std::vector<NodeType> ProcessRequest(std::vector<NodeType>& request) override;
 };

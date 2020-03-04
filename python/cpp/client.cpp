@@ -23,7 +23,7 @@ namespace {
 namespace local {
     std::shared_ptr<zmq::socket_t> get_socket (zmq::context_t& context, const std::string& app_mode) {
         auto socket = std::make_shared<zmq::socket_t>(context, ZMQ_REQ);
-        const auto use_tcp = bool {std::getenv("ZEROMQ_USE_TCP")};
+        const auto use_tcp = bool (std::getenv("ZEROMQ_USE_TCP"));
         if (app_mode == AppModeName.at(ApplicationMode::SERVER)) {
             const auto address = config::GetTagHierarchyServerAddress();
             socket->connect (address);

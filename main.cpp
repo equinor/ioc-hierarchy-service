@@ -50,7 +50,7 @@ public:
         }
         NodeType command_map = request[0];
         std::string command = boost::get<std::string>(command_map["command"]);
-        const auto use_tcp = bool {std::getenv("ZEROMQ_USE_TCP")};
+        const auto use_tcp = bool (std::getenv("ZEROMQ_USE_TCP"));
         if (command == "store")
         {
             const auto reply = TagHierarchy::Handle(request);

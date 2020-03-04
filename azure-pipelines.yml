@@ -3,17 +3,13 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-- master
-
-pr:
-- master
-
-schedules:
-- cron: "0 0 * * *"
-  displayName: Nightly build
   branches:
     include:
     - master
+    - id-*
+
+pr:
+- master
 
 resources:
 - repo: self
@@ -36,7 +32,7 @@ stages:
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.1.2-x86-64.deb .
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name continuous tag-hierarchy bash -c 'make continuous'
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name nightly tag-hierarchy bash -c 'make nightly'
-      condition: eq(variables['Build.Reason'], 'Schedule')
+      condition: or(eq(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     - task: GithubRelease@0
       displayName: 'Create GitHub Release'
       inputs:

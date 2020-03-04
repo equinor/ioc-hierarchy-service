@@ -33,8 +33,6 @@ BOOST_AUTO_TEST_CASE( test_nodes )
     BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2");
     BOOST_TEST(boost::get<int>(response[1].at("levelno")) == 1);
     BOOST_TEST(boost::get<pybind11::none>(response[1].at("parent_id")) == pybind11::none());
-    //Fixture::next_parent_id = boost::get<std::string>(response[1].at("id"));
-    // BOOST_TEST(boost::get<std::string>(response[1].at("is_modelelement")) == false);
 }
 
 BOOST_AUTO_TEST_CASE( test_l2_nodes ) {
@@ -60,7 +58,6 @@ BOOST_AUTO_TEST_CASE( test_l3_nodes ) {
     BOOST_TEST(boost::get<int>(response[0].at("levelno")) == 3);
     BOOST_TEST(boost::get<std::string>(response[1].at("parent_id")) == parent_id);
     std::cout << boost::get<std::string>(response[1].at("id"));
-    //BOOST_TEST(boost::get<bool>(response[0].at("is_modelelement")) == false;
 }
 
 BOOST_AUTO_TEST_CASE( test_l4_nodes ) {
@@ -71,11 +68,6 @@ BOOST_AUTO_TEST_CASE( test_l4_nodes ) {
     );
     auto response = TagHierarchy::Handle(query);
     BOOST_TEST(boost::get<int>(response[0].at("levelno")) == 4);
-    // TODO make support for model element folders
-    // assert response_l4.data[0]['type'] == NodeType.MODELELEMENTFOLDER
-    // assert response_l4.data[1]['is_modelelement'] is True
-    // assert response_l4.data[0]['parent_id'] == response_l3.data[1]['id']
-    // assert response_l4.data[1]['parent_id'] == response_l4.data[0]['id']
 }
 
 BOOST_AUTO_TEST_SUITE_END()
