@@ -21,7 +21,7 @@ the health of the service:
 The following diagram describes which components are bundled with the
 debian package and how they are intended to be used:
 
-![Architecture diagram][docs/hierarchy_daemon.png]
+![Architecture diagram](docs/hierarchy_daemon.png)
 
 ## Communication
 Components communicate via ZeroMQ(ZMQ). We use the patterns REQ-REP
