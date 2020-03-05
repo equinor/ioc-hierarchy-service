@@ -22,7 +22,6 @@ protected:
     TagHierarchyGraph& GetGraph();
     std::map<std::string, VertexT>& GetVertices();
     VertexT& GetRoot();
-    void Register(Command& in, std::string name);
 
 private:
     virtual std::vector<NodeType> ProcessRequest(std::vector<NodeType>&) = 0;
