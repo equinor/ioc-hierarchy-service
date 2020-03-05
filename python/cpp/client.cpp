@@ -16,9 +16,6 @@
 #include <algorithm>
 #include <string>
 
-#define REQUEST_TIMEOUT 1500
-#define REQUEST_RETRIES 3
-
 namespace {
 namespace local {
     std::shared_ptr<zmq::socket_t> get_socket (zmq::context_t& context, const std::string& app_mode) {
@@ -36,6 +33,51 @@ namespace local {
         socket->setsockopt(ZMQ_LINGER, &linger, sizeof (linger));
         return socket;
     }
+
+    zmq::message_t
+    SendMessage(std::shared_ptr<zmq::socket_t>& socket, std::vector<NodeType>& in) {
+        auto buffer = std::ostringstream();
+        {
+            boost::archive::text_oarchive archive(buffer);
+            archive << in;
+        }
+        zmq::message_t message((void*)buffer.str().c_str(), buffer.str().size()+1);
+        socket->send(message);
+        return message;
+    }
+
+    bool
+    ProcessRequest(std::shared_ptr<zmq::socket_t> socket,
+                   std::vector<NodeType>& reply_list,
+                   int& retries_left,
+                   zmq::message_t& message,
+                   zmq::context_t& context,
+                   const std::string& app_mode) {
+        zmq::message_t reply;
+        socket->recv(&reply);
+        std::istringstream in_buffer(static_cast<char *>(reply.data()));
+        boost::archive::text_iarchive archive(in_buffer);
+        archive >> reply_list;
+        socket->close();
+        if (reply_list.size() > 0 &&
+            reply_list.at(0).count("error") &&
+            reply_list.at(0).count("action") &&
+            boost::get<std::string>(reply_list.at(0).at("action")) == std::string("resend")) {
+            if (--retries_left == 0) {
+                reply_list.push_back({{{std::string("error"), std::string("daemon not responding")}}});
+                return false;
+            }
+            std::cout << "Error: daemon could not deserialize message, retrying" << std::endl;
+            std::cout << "The sent data was " << message.str() << std::endl;
+            reply_list.clear();
+            socket = local::get_socket(context, app_mode);
+            socket->send(message);
+        }
+        else {
+            return false;
+        }
+        return true;
+    }
 }
 }
 
@@ -50,14 +92,7 @@ std::vector<NodeType> query(std::vector<NodeType> in,
     auto reply_list = std::vector<NodeType>();
     auto socket = local::get_socket(context, app_mode);
 
-    auto buffer = std::ostringstream();
-    {
-        boost::archive::text_oarchive archive(buffer);
-        archive << in;
-    }
-    zmq::message_t message((void*)buffer.str().c_str(), buffer.str().size()+1);
-
-    socket->send(message);
+    zmq::message_t message = local::SendMessage(socket, in);
 
     auto expect_reply = bool { true };
     while (expect_reply){
@@ -66,32 +101,10 @@ std::vector<NodeType> query(std::vector<NodeType> in,
         };
         zmq::poll(&items[0], 1, request_timeout);
 
-        // If there is a reply, process it
+            // If there is a reply, process it
         if (items[0].revents & ZMQ_POLLIN) {
-            zmq::message_t reply;
-            socket->recv(&reply);
-            std::istringstream in_buffer(static_cast<char *>(reply.data()));
-            boost::archive::text_iarchive archive(in_buffer);
-            archive >> reply_list;
-            socket->close();
-            if (reply_list.size() > 0 &&
-                reply_list.at(0).count("error") &&
-                reply_list.at(0).count("action") &&
-                boost::get<std::string>(reply_list.at(0).at("action")) == std::string("resend")) {
-                if (--retries_left == 0) {
-                    reply_list.push_back({{{std::string("error"), std::string("daemon not responding")}}});
-                    expect_reply = false;
-                    continue;
-                }
-                std::cout << "Error: daemon could not deserialize message, retrying" << std::endl;
-                std::cout << "The sent data was " << message.str() << std::endl;
-                reply_list.clear();
-                socket = local::get_socket(context, app_mode);
-                socket->send(message);
-            }
-            else {
-                expect_reply = false;
-            }
+            expect_reply &= local::ProcessRequest(socket, reply_list, retries_left,
+                                                  message, context, app_mode);
         }
         else if (--retries_left == 0) {
             std::cout << "Error: hierarchy daemon does not reply" << std::endl;
@@ -118,20 +131,19 @@ namespace py = pybind11;
 PYBIND11_MODULE(tag_hierarchy_client, m)
 {
     m.doc() = R"pbdoc(
-        Supporting module for performant aggregation
-        of status vectors
+        Supporting module for connection to the tag-hierarchy services
         -----------------------
-        .. currentmodule:: aggregate_sparklines
+        .. currentmodule:: tag_hierarchy_client
         .. autosummary::
            :toctree: _generate
-           aggregate_sparklines_np_array
-           aggregate_sparklines_list
+           query
     )pbdoc";
 
     m.def("query", &query, R"pbdoc(
-        Input a python list of lists of integers of equal length,
-        returns a list of the highest value at any single point,
-        eg. [[1, 4, 2], [2, 1, 3]] -> [2, 4, 3]
+        Input a list of dictionaries to send to the server.
+        The parameter 'app_mode' can be 'server' or 'statemanager'depending on who to talk to
+        The parameter 'request_timeout' how long to wait for a reply in milliseconds
+        The parameter 'request_retries' specifies how many times to retry on failure
     )pbdoc",
     py::arg("in"), py::arg("app_mode"),
     py::arg("request_timeout") = 300, py::arg("request_retries") = 3);
