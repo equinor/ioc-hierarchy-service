@@ -2,6 +2,7 @@
 
 #include "models/models.h"
 #include "tag_hierarchy/utils/exceptions.h"
+#include "tag_hierarchy/utils/search.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
@@ -11,7 +12,7 @@ class SearchVisitor : public boost::default_dfs_visitor
 {
 public:
     explicit SearchVisitor(
-            std::function<bool(std::string::const_iterator begin, std::string::const_iterator end)> searcher,
+            std::shared_ptr<SearchUtils::Searcher> searcher,
             std::map<std::string, std::vector<VertexT>>& hits,
             int max_results
     ) : searcher_(searcher), hits_(hits), max_results_(max_results), no_results_(0) {}
@@ -34,7 +35,7 @@ public:
             auto corpus = boost::get<std::string>(g[v].properties.at("name"));
             const auto not_found = std::pair<std::string::const_iterator, std::string::const_iterator>(corpus.end(),
                     corpus.end());
-            if (searcher_(corpus.cbegin(), corpus.cend())) {
+            if (searcher_->HasTerm(corpus.cbegin(), corpus.cend())) {
                 hits_[node_type].push_back(v);
                 no_results_++;
             }
@@ -49,7 +50,7 @@ public:
             }
             auto has_match = false;
             for (const auto corpus : corpi) {
-                has_match |= searcher_(corpus.begin(), corpus.end());
+                has_match |= searcher_->HasTerm(corpus.begin(), corpus.end());
             }
             if (has_match) {
                 hits_[node_type].push_back(v);
@@ -59,7 +60,7 @@ public:
     }
 
 private:
-    std::function<bool(std::string::const_iterator begin, std::string::const_iterator end)> searcher_;
+    std::shared_ptr<SearchUtils::Searcher> searcher_;
     std::map<std::string, std::vector<VertexT>>& hits_;
     int max_results_;
     int no_results_;

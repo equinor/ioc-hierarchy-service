@@ -72,7 +72,7 @@ endforeach()
 
 add_executable(search_test
     unittests/test_search.cpp
-        utils/exceptions.h)
+        utils/exceptions.h utils/search.h)
 
 target_include_directories(search_test
         PRIVATE ${CMAKE_SOURCE_DIR}

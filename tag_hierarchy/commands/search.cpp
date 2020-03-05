@@ -6,28 +6,48 @@
 
 #include "tag_hierarchy/visitors/searchvisitor.h"
 #include "tag_hierarchy/utils/exceptions.h"
+#include "tag_hierarchy/utils/search.h"
 
+#include <algorithm>
+#include <regex>
 #include <boost/algorithm/searching/boyer_moore.hpp>
 
 namespace {
     namespace local {
-        std::function<bool(std::string::const_iterator, std::string::const_iterator)>
+        struct BoyerMooreSearcher : SearchUtils::Searcher {
+            BoyerMooreSearcher(const std::string& search_term) : Searcher(search_term),
+                                                                 searcher_(boost::algorithm::boyer_moore<std::string::const_iterator>(
+                                                                         search_term_.cbegin(), search_term_.cend())){
+            }
+            bool HasTerm(std::string::const_iterator begin, std::string::const_iterator end) override {
+                const auto not_found = std::pair<std::string::const_iterator, std::string::const_iterator>(end, end);
+                return searcher_(begin, end) != not_found;
+            }
+
+            boost::algorithm::boyer_moore<std::string::const_iterator> searcher_;
+        };
+        struct RegExSearcher : SearchUtils::Searcher {
+            RegExSearcher(const std::string& search_term) : Searcher(search_term),
+                                                            searcher_(search_term){
+            }
+            bool HasTerm(std::string::const_iterator begin, std::string::const_iterator end) override {
+                auto result = std::regex_search(begin, end, searcher_);
+                std::cout << "Matching " << std::string(begin, end) << " against " << search_term_ << ": " << result << std::endl ;
+                return result;
+            }
+            std::regex searcher_;
+        };
+        std::shared_ptr<SearchUtils::Searcher>
         GetSearcher(const NodeType& command_map) {
             const auto search_term = boost::get<std::string>(command_map.at("search_term"));
             const auto search_algorithm = command_map.count("search_algorithm") ?
                                           boost::get<std::string>(command_map.at("search_algorithm")) :
                                           std::string("boyer-moore");
             if (search_algorithm == "boyer-moore") {
-                return [search_term] (std::string::const_iterator begin, std::string::const_iterator end) {
-                    static boost::algorithm::boyer_moore<std::string::const_iterator> searcher(
-                            search_term.cbegin(), search_term.cend()
-                    );
-                    const auto not_found = std::pair<std::string::const_iterator, std::string::const_iterator>(end, end);
-                    if (searcher(begin, end) != not_found) {
-                        return true;
-                    }
-                    return false;
-                };
+                return std::make_shared<BoyerMooreSearcher>(search_term);
+            }
+            if (search_algorithm == "regex") {
+                return std::make_shared<RegExSearcher>(search_term);
             }
         }
     }
