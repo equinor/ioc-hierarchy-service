@@ -56,6 +56,3 @@ std::map<std::string, VertexT> &Command::GetVertices() {
 VertexT &Command::GetRoot() {
     return TagHierarchy::GetRoot();
 }
-
-void Command::Register(Command &in, std::string name) {
-}

@@ -18,20 +18,27 @@
 
 // Typedefs for tag hierarchy
 using NodeType =
-    std::map<std::string, boost::variant<bool,
-    int,
-    double,
-    pybind11::none,
-    std::string,
-    std::vector<int>,
-    std::vector<std::string>>>;
+std::map<std::string,
+         boost::variant<bool,
+                        int,
+                        double,
+                        pybind11::none,
+                        std::string,
+                        std::vector<int>,
+                        std::vector<std::string>>>;
 
 
+/*
+ * Modelhierarchy is the struct which is associated with all vertices in the graph
+ */
 struct Modelhierarchy {
     std::string id;
     NodeType properties;
 };
 
+/*
+ * Connection is the struct which is associated with all edges in the graph
+ */
 struct Connection {
     int id;
 };
