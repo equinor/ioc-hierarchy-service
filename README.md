@@ -21,7 +21,7 @@ the health of the service:
 The following diagram describes which components are bundled with the
 debian package and how they are intended to be used:
 
-![Architecture diagram][docs/hierarchy_daemon.png]
+![Architecture diagram](docs/hierarchy_daemon.png)
 
 ## Communication
 Components communicate via ZeroMQ(ZMQ). We use the patterns REQ-REP
@@ -75,6 +75,45 @@ If the message sent to the backup service is `"GET_HIERARCHY"` it will
 return a message with the serialized state, which the server can use to
 re-initialize itself with the latest state.
 
+## Dependencies
+The project uses a number of third party dependencies:
+
+### Boost
+Boost is almost an extension of the C++ standard library, and we use
+a few features from it
+* Boost graph library - Used to model the hierarchy as a graph data
+structure. Provides the central algorithm used for tree traversal
+* Boost variant - Used to provide type safe unions that help us manage
+dictionaries with different types coming from Python
+* Boost serialization -  Used to serialize the graph for backups
+* Boost iostreams - Used for compression the serialized graph
+* Boost test - Used for unit testing
+
+When developing in the docker container, boost is installed using the
+system package manager. For development on mac, boost can be installed
+using homebrew.
+
+### Other libraries
+The project has a few other dependencies
+* ZeroMQ - This library handles the interprocess communication between
+the python client and the servers
+* cppzmq - Provides c++ bindings to libzmq
+* cpp_redis - Provides functionality for storing strings in Redis cache
+* opencensus_cpp - Provides logging functionality
+* pybind11 - Seamless integration of call interfaces between Python
+and C++
+
+All libraries are kept vanilla, no upstream changes have been made, and
+we hope to keep it that way. Libraries should be updated when security
+concerns are discovered, or when new functionality or substantial
+performance fixes are made.
+
+When new major versions are released, upgrades should be considered to
+avoid accumulating technical debt. If any of the libraries go through
+significant API changes in the future, consider writing a wrapper
+between the application and the library to mitigate future risks of
+rewriting.
+
 # Development
 ## Getting started running CLion with Docker
 Preconditions: Docker and CLion must be installed on your local computer
@@ -84,4 +123,11 @@ to configure clion. (The Dockerfile and docker-compose.yml mentioned
 in the article are already in git.) Note however, if something goes wrong in step 3a, rebuild is not available from
 the CLion. Commandline is necessary for doing docker-compose build to rebuild. If on windows running _Docker desktop_, you 
 might have to go to Docker desktop settings and _expose localhost without TLS_.
+
+## Developing outside Docker
+To develop on a mac, use homebrew to install boost (google for latest
+instructions). You can use clion which supports CMake projects out of
+the box, or any other IDE which supports CMake. Windows development has
+been attempted, but challenges building the ZeroMQ library stopped the
+effort.
 

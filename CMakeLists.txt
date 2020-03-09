@@ -16,6 +16,7 @@ set(BUILD_TESTING OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(opencensus-cpp)
 set(BUILD_TESTING ON)
+set(CMAKE_DIRECTORY_LABELS tag_hierarchy)
 add_subdirectory(tag_hierarchy)
 add_subdirectory(backup_service)
 
