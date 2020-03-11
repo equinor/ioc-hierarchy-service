@@ -2,7 +2,7 @@
 // Created by Petter Moe Kvalvaag on 2019-10-03.
 //
 
-#include <tag_hierarchy/filteredhierarchyvisitor.h>
+#include <tag_hierarchy/visitors/filteredhierarchyvisitor.h>
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/commands/nodes.h"
 
