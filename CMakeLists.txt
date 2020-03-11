@@ -38,7 +38,10 @@ install(TARGETS tag_hierarchy_client
      DESTINATION bin
 )
 
-add_executable(tag-hierarchy main.cpp)
+add_executable(tag-hierarchy
+        main.cpp
+        models/models.h
+        )
 target_include_directories(tag-hierarchy
     PRIVATE ${CMAKE_SOURCE_DIR}
     PRIVATE cppzmq

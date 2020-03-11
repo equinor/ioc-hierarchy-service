@@ -3,9 +3,16 @@
 # unused variables are dropped by the linker in static libraries
 add_library(tag_hierarchy_commands OBJECT
         commands/command.cpp
+        commands/command.h
         commands/populategraph.cpp
+        commands/populategraph.h
         commands/nodes.cpp
-        commands/filteroptions.cpp)
+        commands/nodes.h
+        commands/filteroptions.cpp
+        commands/filteroptions.h
+        visitors/filteredhierarchyvisitor.h
+        visitors/filteroptionsvisitor.h
+        )
 target_include_directories(tag_hierarchy_commands
         PRIVATE ${CMAKE_SOURCE_DIR}
         )
