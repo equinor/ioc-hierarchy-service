@@ -21,16 +21,17 @@ FilterOptions::ProcessRequest(std::vector<NodeType> &nodes)
         return {{{std::string("error"), std::string("empty")}}};
     }
 
+    auto index_map = VertexDescMap();
+    boost::associative_property_map<VertexDescMap> colormap(index_map);
     const auto filter_type = boost::get<std::string>(command_map.at("type"));
     auto valid_ids = std::set<std::string>();
-    std::vector<boost::default_color_type> colormap(num_vertices(graph_));
     if (filter_type == "modelowner") {
         const auto visitor = ModelOwnerFilterOptionsVisitor(valid_ids);
-        boost::depth_first_visit(graph_, root_, visitor, colormap.data());
+        boost::depth_first_visit(graph_, root_, visitor, colormap);
     }
     else if (filter_type == "modelclass") {
         const auto visitor = ModelClassFilterOptionsVisitor(valid_ids);
-        boost::depth_first_visit(graph_, root_, visitor, colormap.data());
+        boost::depth_first_visit(graph_, root_, visitor, colormap);
     }
     else {
         return {{{std::string("error"), std::string("unknown filter type")}}};
