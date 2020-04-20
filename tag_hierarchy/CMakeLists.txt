@@ -4,6 +4,8 @@
 add_library(tag_hierarchy_commands OBJECT
         commands/command.cpp
         commands/command.h
+        commands/delete.cpp
+        commands/delete.h
         commands/populategraph.cpp
         commands/populategraph.h
         commands/nodes.cpp
@@ -47,9 +49,12 @@ target_link_libraries(tag_hierarchy
     PUBLIC pybind11
     PUBLIC libzmq)
 
-add_executable(tag_hierarchy_test
+set(UNIT_TEST_FILES
     unittests/test_tag_hierarchy.cpp
+    unittests/test_delete_command.cpp
 )
+add_executable(tag_hierarchy_test
+        ${UNIT_TEST_FILES})
 
 target_include_directories(tag_hierarchy_test
     PRIVATE ${CMAKE_SOURCE_DIR}
@@ -64,13 +69,18 @@ target_link_libraries(tag_hierarchy_test
     PUBLIC ${PYTHON_LIBRARIES}
 )
 
-file(READ "unittests/test_tag_hierarchy.cpp" SOURCE_FILE_CONTENTS)
-string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)" 
+foreach(UNIT_TEST_FILE ${UNIT_TEST_FILES})
+file(READ "${UNIT_TEST_FILE}" SOURCE_FILE_CONTENTS)
+string(REGEX MATCHALL "BOOST_.+_TEST_SUITE\\( *([A-Za-z_0-9]+).*\\)"
+        TEST_SUITE_NAME ${SOURCE_FILE_CONTENTS})
+set(TEST_SUITE_NAME ${CMAKE_MATCH_1})
+string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)"
        FOUND_TESTS ${SOURCE_FILE_CONTENTS})
 foreach(HIT ${FOUND_TESTS})
     string(REGEX REPLACE ".*\\( *([A-Za-z_0-9]+) *\\).*" "\\1" TEST_NAME ${HIT})
    
     add_test(NAME "tag_hierarchy_test.${TEST_NAME}" 
             COMMAND tag_hierarchy_test
-            --run_test=NodesTest/${TEST_NAME} --catch_system_error=yes)
+            --run_test=${TEST_SUITE_NAME}/${TEST_NAME} --catch_system_error=yes)
+endforeach()
 endforeach()

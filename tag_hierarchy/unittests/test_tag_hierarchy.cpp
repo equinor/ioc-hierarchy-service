@@ -1,25 +1,12 @@
 #define BOOST_TEST_MODULE tag_hierarchy
-#define BOOST_TEST_DYN_LINK
 
 #include "models/models.h"
 
 #include <boost/test/unit_test.hpp>
 
 #include "tag_hierarchy/tag_hierarchy.h"
+#include "tag_hierarchy/unittests/fixture.h"
 
-struct Fixture {
-  Fixture() {
-     BOOST_TEST_MESSAGE( "Constructing test fixture" );
-     auto modelhierarchy = std::vector<NodeType>(
-     #include "hierarchy_dump.cpp"
-     );
-     TagHierarchy::Handle(modelhierarchy);
-  }
-
-  ~Fixture() {
-      BOOST_TEST_MESSAGE( "teardown fixture" );
-  }
-};
 
 BOOST_FIXTURE_TEST_SUITE( NodesTest, Fixture );
 BOOST_AUTO_TEST_CASE( test_nodes )
