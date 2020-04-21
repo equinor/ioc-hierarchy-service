@@ -52,6 +52,7 @@ target_link_libraries(tag_hierarchy
 set(UNIT_TEST_FILES
     unittests/test_tag_hierarchy.cpp
     unittests/test_delete_command.cpp
+    unittests/test_load_save.cpp
 )
 add_executable(tag_hierarchy_test
         ${UNIT_TEST_FILES})
@@ -59,6 +60,7 @@ add_executable(tag_hierarchy_test
 target_include_directories(tag_hierarchy_test
     PRIVATE ${CMAKE_SOURCE_DIR}
 )
+target_compile_definitions(tag_hierarchy_test PRIVATE BOOST_TEST_DYN_LINK)
 
 target_link_libraries(tag_hierarchy_test
     PRIVATE tag_hierarchy

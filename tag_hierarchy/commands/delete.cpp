@@ -4,14 +4,21 @@ namespace {
     namespace local {
         /* Recursively delete all children and all connecting edges from \param vertex */
         std::string
-        DeleteVertex(TagHierarchyGraph& graph, VertexT vertex) {
+        DeleteVertex(TagHierarchyGraph& graph, VertexT vertex, std::vector<VertexT> vertices_to_delete = {}, int depth=0) {
+            depth++;
             auto [vi, vi_end] = boost::adjacent_vertices(vertex, graph);
-            for (auto iter = vi; vi != vi_end; vi = iter) {
-                ++iter;
-                DeleteVertex(graph, *vi);
+            auto next = decltype(vi)();
+            for (next = vi; vi != vi_end; vi = next) {
+                ++next;
+                DeleteVertex(graph, *vi, vertices_to_delete, depth);
             }
-            boost::clear_vertex(vertex, graph);
-            boost::remove_vertex(vertex, graph);
+            vertices_to_delete.push_back(vertex);
+            if (depth==1) {
+                for (auto vertex_to_delete : vertices_to_delete) {
+                    boost::clear_in_edges(vertex_to_delete, graph);
+                    boost::remove_vertex(vertex_to_delete, graph);
+                }
+            }
             return "Success";
         }
     }
@@ -28,7 +35,6 @@ Delete::ProcessRequest(std::vector<NodeType> &nodes)
     auto& graph = GetGraph();
     auto& vertices = GetVertices();
     auto command_map = nodes.at(0);
-    // Check if graph has been initialized
     auto nodes_to_delete = boost::get<std::vector<std::string>>(command_map.at("nodes"));
     auto status = NodeType();
     for (auto const& node : nodes_to_delete) {

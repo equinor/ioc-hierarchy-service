@@ -1,8 +1,9 @@
-#define BOOST_TEST_MODULE tag_hierarchy
+#define BOOST_TEST_MODULE tag_hierarchy_test
+#define BOOST_TEST_MAIN
+#include <boost/test/unit_test.hpp>
+
 
 #include "models/models.h"
-
-#include <boost/test/unit_test.hpp>
 
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/unittests/fixture.h"
