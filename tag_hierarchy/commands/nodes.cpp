@@ -114,8 +114,9 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         parent_vertex = vertices_[parent_id];
     }
 
-    std::vector<boost::default_color_type> colormap(num_vertices(graph_));
-    boost::depth_first_visit(graph_, parent_vertex, dfs_visitor, colormap.data(), termfunc);
+    auto index_map = VertexDescMap();
+    boost::associative_property_map<VertexDescMap> colormap(index_map);
+    boost::depth_first_visit(graph_, parent_vertex, dfs_visitor, colormap, termfunc);
 
     auto ei = TagHierarchyGraph::adjacency_iterator();
     auto ei_end = TagHierarchyGraph::adjacency_iterator();

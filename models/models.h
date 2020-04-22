@@ -46,13 +46,16 @@ struct Connection {
 using EdgeLabelMap = std::map<std::string, int>;
 
 using TagHierarchyGraph = boost::adjacency_list<
-        boost::listS, boost::vecS, boost::bidirectionalS,
+        boost::listS, boost::listS, boost::bidirectionalS,
         Modelhierarchy, Connection>;
 
 using TagHierarchyT = boost::labeled_graph<TagHierarchyGraph, std::string>;
 
 using VertexT = boost::graph_traits<TagHierarchyGraph>::vertex_descriptor;
+using VertexIter = boost::graph_traits<TagHierarchyGraph>::vertex_iterator;
 using EdgeT = boost::graph_traits<TagHierarchyGraph>::edge_descriptor;
+
+using VertexDescMap = std::map<VertexT, size_t>;
 
 namespace boost {
 namespace serialization {
