@@ -44,6 +44,7 @@ Delete::ProcessRequest(std::vector<NodeType> &nodes)
         }
         auto vertex = vertices[node];
         status[node] = local::DeleteVertex(graph, vertex);
+        vertices.erase(node);
     }
     return {status};
 }
