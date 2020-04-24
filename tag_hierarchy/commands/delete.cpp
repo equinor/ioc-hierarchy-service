@@ -39,7 +39,7 @@ Delete::ProcessRequest(std::vector<NodeType> &nodes)
     auto status = NodeType();
     for (auto const& node : nodes_to_delete) {
         if (!vertices.count(node)) {
-            status[node] = "Not found";
+            status[node] = std::string("Not found");
             continue;
         }
         auto vertex = vertices[node];
