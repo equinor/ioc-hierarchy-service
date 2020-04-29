@@ -16,17 +16,43 @@
 #include <string>
 #include <map>
 
-// Typedefs for tag hierarchy
-using NodeType =
-std::map<std::string,
-         boost::variant<bool,
-                        int,
-                        double,
-                        pybind11::none,
-                        std::string,
-                        std::vector<int>,
-                        std::vector<std::string>>>;
 
+// Typedefs for tag hierarchy
+using Variants = boost::variant<
+        bool,
+        int,
+        double,
+        pybind11::none,
+        std::string,
+        std::vector<int>,
+        std::vector<std::string>
+>;
+
+using NodeType = std::map<std::string, Variants>;
+
+// How to print a NodeType
+static inline std::ostream& operator << (std::ostream& os, const NodeType& node)
+{
+    os << std::endl << "    {" << std::endl;
+    for (const auto& [key, value]: node) {
+        if (value.type() == typeid(std::string)) {
+            os << "        " << key << " : " << boost::get<std::string>(value) << std::endl;
+        }
+    }
+    os << "    }" << std::endl;
+    return os;
+}
+
+// How to print an std::vector of NodeTypes
+static inline std::ostream& operator << (std::ostream& os, const std::vector<NodeType>& nodes)
+{
+    os << std::endl << "[" ;
+    for (auto const node: nodes) {
+        os << node;
+    }
+    os << "]" << std::endl;
+    return os;
+}
 
 /*
  * Modelhierarchy is the struct which is associated with all vertices in the graph
