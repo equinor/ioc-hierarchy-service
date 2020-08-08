@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 
 find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework REQUIRED)
 find_package(ZeroMQ REQUIRED)
-find_package(PythonLibs)
+find_package(Python COMPONENTS Interpreter Development)
 
 add_subdirectory(cpp_redis)
 add_subdirectory(pybind11)
@@ -33,7 +33,7 @@ target_include_directories(tag_hierarchy_client
 )
 install(TARGETS tag_hierarchy_client
      LIBRARY
-     DESTINATION local/lib/python3.7/site-packages
+     DESTINATION ${Python_SITEARCH}
      RUNTIME
      DESTINATION bin
 )
