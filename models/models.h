@@ -54,6 +54,7 @@ static inline std::ostream& operator << (std::ostream& os, const std::vector<Nod
     return os;
 }
 
+#pragma GCC visibility push(default)
 /*
  * Modelhierarchy is the struct which is associated with all vertices in the graph
  */
@@ -68,6 +69,7 @@ struct Modelhierarchy {
 struct Connection {
     int id;
 };
+#pragma visibility pop
 
 using EdgeLabelMap = std::map<std::string, int>;
 
@@ -128,3 +130,4 @@ static std::map<ApplicationMode, const char*> AppModeName = {
     {ApplicationMode::STATE_MANAGER, "statemanager"},
     {ApplicationMode::SERVER, "server"}
 };
+
