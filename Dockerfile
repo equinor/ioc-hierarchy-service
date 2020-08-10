@@ -1,8 +1,8 @@
 # This builds the a debian package of the project
 FROM gcc:8 as cppbuild
 RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/local/bin/gfortran 999 \
-      && apt-get update && apt-get install -y cmake zlib1g-dev libboost-graph-dev libboost-serialization-dev \
-         libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev
+      && apt-get update && apt-get install -y cmake zlib1g-dev libboost-graph-dev libtsan0 \
+      libboost-serialization-dev libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev
 
 WORKDIR /usr/src/app/
 COPY . ioc-hierarchy-service
