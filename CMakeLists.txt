@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.7)
 project(tag-hierarchy)
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 
 find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework REQUIRED)
 find_package(ZeroMQ REQUIRED)
-find_package(PythonLibs)
+find_package(Python COMPONENTS Interpreter Development)
 
 add_subdirectory(cpp_redis)
 add_subdirectory(pybind11)
@@ -33,7 +33,7 @@ target_include_directories(tag_hierarchy_client
 )
 install(TARGETS tag_hierarchy_client
      LIBRARY
-     DESTINATION local/lib/python3.7/site-packages
+     DESTINATION ${Python_SITEARCH}
      RUNTIME
      DESTINATION bin
 )
@@ -69,12 +69,19 @@ set(CPACK_PACKAGE_VERSION "1.1.3")
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "1")
 set(CPACK_PACKAGE_VERSION_PATCH "3")
-SET(CPACK_SYSTEM_NAME "x86-64")
+set(CPACK_SYSTEM_NAME "x86-64")
+set(CPACK_INSTALL_PREFIX /usr)
+set(CPACK_SET_DESTDIR "ON")
 
-set(CPACK_GENERATOR "DEB")
+# Debian settings
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Equinor - IOC")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-set(CPACK_SET_DESTDIR "ON")
-set(CPACK_INSTALL_PREFIX /usr)
+
+# RPM settings
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+  "/usr/lib64/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}"
+  "${Python_SITEARCH}"
+)
+set(CPACK_RPM_PACKAGE_RELOCATABLE 0)
 
 include(CPack)
