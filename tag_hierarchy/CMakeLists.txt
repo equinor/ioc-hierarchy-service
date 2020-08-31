@@ -51,6 +51,7 @@ target_link_libraries(tag_hierarchy
 
 set(UNIT_TEST_FILES
     unittests/test_tag_hierarchy.cpp
+    unittests/test_filter_options.cpp
     unittests/test_delete_command.cpp
     unittests/test_load_save.cpp
 )
