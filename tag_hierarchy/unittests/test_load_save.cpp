@@ -25,7 +25,7 @@ BOOST_FIXTURE_TEST_SUITE( LoadSaveCommandsTest, Fixture );
                          {std::string("parentId"), pybind11::none()}}}
         );
         auto response2 = TagHierarchy::Handle(query2);
-        BOOST_TEST(boost::get<std::string>(response2[0].at("name")) == "Level1-1");
+        BOOST_TEST(boost::get<std::string>(response2[0].at("name")) == "Level1-2");
         BOOST_TEST(response2.size() == 2);
 
         // Verify that vertices are still correctly looked up by ID
@@ -35,7 +35,7 @@ BOOST_FIXTURE_TEST_SUITE( LoadSaveCommandsTest, Fixture );
                          {std::string("parentId"), parent_id}}}
         );
         auto l3response = TagHierarchy::Handle(l3query);
-        BOOST_TEST(boost::get<std::string>(l3response[1].at("name")) == "Level1-2->Level2-1->Level3-2");
+        BOOST_TEST(boost::get<std::string>(l3response[1].at("name")) == "Level1-2->Level2-1->Level3-1");
         BOOST_TEST(boost::get<int>(l3response[0].at("levelno")) == 3);
         BOOST_TEST(boost::get<std::string>(l3response[1].at("parent_id")) == parent_id);
         std::cout << boost::get<std::string>(l3response[1].at("id"));
