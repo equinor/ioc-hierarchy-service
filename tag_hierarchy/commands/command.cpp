@@ -25,10 +25,10 @@ Command::Process(std::vector<NodeType>& request) {
             result = ProcessRequest(request);
             span.AddAnnotation("Finished running command");
             if (!result.empty() &&
-                result.at(0).count("error")) {
+                result.at(0).count(boost::flyweight<std::string>("error"))) {
                 const auto log_string = std::string("The ") + name_ +
                                         std::string(" command failed with the error ") +
-                                        boost::get<std::string>(result.at(0).at("error"));
+                  boost::get<std::string>(result.at(0).at(boost::flyweight<std::string>("error")));
                 span.AddAnnotation(log_string);
             }
         }

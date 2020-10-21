@@ -15,7 +15,7 @@
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/variant.hpp>
 #include <boost/serialization/vector.hpp>
-
+#include <boost/flyweight/serialize.hpp>
 
 #include <functional>
 #include <tag_hierarchy/commands/command.h>
@@ -70,7 +70,7 @@ public:
             boost::archive::binary_oarchive archive(f);
             archive << *this;
         }
-        retval.push_back({{"serialized_graph", stream.str()}});
+        retval.push_back({{boost::flyweight<std::string>("serialized_graph"), stream.str()}});
         return retval;
     }
 
@@ -79,14 +79,14 @@ public:
         ClearGraph();
         auto retval = std::vector<NodeType>();
         const std::string graph_state =
-            boost::get<std::string>(message[0]["serialized_hierarchy"]);
+          boost::get<std::string>(message[0][boost::flyweight<std::string>("serialized_hierarchy")]);
         std::istringstream buffer(graph_state);
         boost::iostreams::filtering_stream<boost::iostreams::input> f;
         f.push(boost::iostreams::gzip_decompressor());
         f.push(buffer);
         boost::archive::binary_iarchive archive(f);
         archive >> *this;
-        retval.push_back({{"success", true}});
+        retval.push_back({{boost::flyweight<std::string>("success"), true}});
         return retval;
     }
 
@@ -94,11 +94,11 @@ public:
     HealthCheck(std::vector<NodeType>& message) {
         auto retval = std::vector<NodeType>();
         if (root_ == std::numeric_limits<VertexT>::max()) {
-            retval.push_back({{std::string("ok"), false},
-                              {std::string("error"), std::string("Cache not populated")}});
+          retval.push_back({{boost::flyweight<std::string>("ok"), false},
+                            {boost::flyweight<std::string>("error"), std::string("Cache not populated")}});
             return retval;
         }
-        retval.push_back({{std::string("ok"), true}});
+        retval.push_back({{boost::flyweight<std::string>("ok"), true}});
         return retval;
     }
 
@@ -113,7 +113,7 @@ public:
     Handle(std::vector<NodeType> &message)
     {
         auto command_map = message.at(0);
-        std::string command = boost::get<std::string>(command_map["command"]);
+        std::string command = boost::get<std::string>(command_map[boost::flyweight<std::string>("command")]);
         auto func = command_func_dispatch_[command];
         auto retval = func(message);
         return retval; //command_func_dispatch_[command](message);
@@ -128,7 +128,7 @@ public:
                               }},
                              {"flush", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   this->ClearGraph();
-                                  return {{{std::string("success"), std::string("hierarchy flushed")}}};
+                                  return {{{boost::flyweight<std::string>("success"), std::string("hierarchy flushed")}}};
                               }},
                              {"healthcheck", [this](std::vector<NodeType> &nodes) -> std::vector<NodeType> {
                                   return this->HealthCheck(nodes);

@@ -4,6 +4,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
+#include <boost/flyweight.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/labeled_graph.hpp>
 #include <boost/graph/breadth_first_search.hpp>
@@ -28,7 +29,7 @@ using Variants = boost::variant<
         std::vector<std::string>
 >;
 
-using NodeType = std::map<std::string, Variants>;
+using NodeType = std::map<boost::flyweight<std::string>, Variants>;
 
 // How to print a NodeType
 static inline std::ostream& operator << (std::ostream& os, const NodeType& node)
@@ -121,6 +122,24 @@ namespace pybind11 { namespace detail {
         static auto call(Args &&...args) -> decltype(boost::apply_visitor(args...)) {
             return boost::apply_visitor(args...);
         }
+    };
+
+    template <typename T>
+    struct type_caster<boost::flyweight<T>> {
+      // PYBIND11_TYPE_CASTER(boost::flyweight<T>, _(make_caster<T>::name()));
+      PYBIND11_TYPE_CASTER(boost::flyweight<T>, _("str"));
+      bool load(handle src, bool convert) {
+        return_value_policy policy;
+        handle parent;
+        auto caster = make_caster<T>();
+        const auto retval = caster.load(src, convert);
+        value = boost::flyweight<T>(cast_op<T &&>(std::move(caster)));
+        // value = boost::flyweight<T>(caster.value);
+        return retval;
+      }
+      static handle cast(boost::flyweight<T> src, return_value_policy policy, handle parent) {
+        return make_caster<T>::cast(src.get(), policy, parent);
+      }
     };
 }} // namespace pybind11::detail
 

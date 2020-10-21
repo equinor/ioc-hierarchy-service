@@ -21,18 +21,18 @@ public:
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
         path_.push_front(v);
-        if (g[v].properties.count("is_modelelement"))
+        if (g[v].properties.count(boost::flyweight<std::string>("is_modelelement")))
         {
-            const auto is_modelelement = boost::get<bool>(g[v].properties.find("is_modelelement")->second);
+          const auto is_modelelement = boost::get<bool>(g[v].properties.find(boost::flyweight<std::string>("is_modelelement"))->second);
             if (is_modelelement)
             {
                 if (kpifilter_.size() != 0 &&
-                    g[v].properties.count("kpigroup_id"))
+                    g[v].properties.count(boost::flyweight<std::string>("kpigroup_id")))
                 {
 
-                    if (g[v].properties.find("kpigroup_id")->second.type() == typeid(std::string))
+                  if (g[v].properties.find(boost::flyweight<std::string>("kpigroup_id"))->second.type() == typeid(std::string))
                     {
-                        const auto kpi_id = boost::get<std::string>(g[v].properties.find("kpigroup_id")->second);
+                      const auto kpi_id = boost::get<std::string>(g[v].properties.find(boost::flyweight<std::string>("kpigroup_id"))->second);
                         if (std::find(std::cbegin(kpifilter_), std::cend(kpifilter_), kpi_id) == std::cend(kpifilter_))
                         {
                             return;
