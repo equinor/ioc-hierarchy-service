@@ -10,6 +10,7 @@
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/variant.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/flyweight/serialize.hpp>
 #include <boost/variant.hpp>
 
 #include <vector>
@@ -60,11 +61,11 @@ namespace local {
         archive >> reply_list;
         socket->close();
         if (reply_list.size() > 0 &&
-            reply_list.at(0).count("error") &&
-            reply_list.at(0).count("action") &&
-            boost::get<std::string>(reply_list.at(0).at("action")) == std::string("resend")) {
+            reply_list.at(0).count(boost::flyweight<std::string>("error")) &&
+            reply_list.at(0).count(boost::flyweight<std::string>("action")) &&
+            boost::get<std::string>(reply_list.at(0).at(boost::flyweight<std::string>("action"))) == std::string("resend")) {
             if (--retries_left == 0) {
-                reply_list.push_back({{{std::string("error"), std::string("daemon not responding")}}});
+              reply_list.push_back({{{boost::flyweight<std::string>("error"), std::string("daemon not responding")}}});
                 return false;
             }
             std::cout << "Error: daemon could not deserialize message, retrying" << std::endl;
@@ -111,7 +112,7 @@ std::vector<NodeType> query(std::vector<NodeType> in,
             expect_reply = false;
             socket->close();
             socket.reset();
-            reply_list.push_back({{{std::string("error"), std::string("daemon not responding")}}});
+            reply_list.push_back({{{boost::flyweight<std::string>("error"), std::string("daemon not responding")}}});
         }
         else {
             std::cout << "Warning: no response from daemon, retrying" << std::endl;

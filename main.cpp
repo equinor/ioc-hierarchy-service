@@ -16,6 +16,7 @@
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/variant.hpp>
 #include <boost/serialization/vector.hpp>
+#include <boost/flyweight/serialize.hpp>
 #include <boost/variant.hpp>
 
 #include <opencensus/trace/span.h>
@@ -46,10 +47,10 @@ public:
     std::vector<NodeType>
     HandleRequest(std::vector<NodeType>& request) {
         if (request.empty()) {
-            return {{{std::string("error"), std::string("no command passed")}}};
+          return {{{boost::flyweight<std::string>("error"), std::string("no command passed")}}};
         }
         NodeType command_map = request[0];
-        std::string command = boost::get<std::string>(command_map["command"]);
+        std::string command = boost::get<std::string>(command_map[boost::flyweight<std::string>("command")]);
         const auto use_tcp = bool (std::getenv("ZEROMQ_USE_TCP"));
         if (command == "store")
         {
@@ -68,7 +69,7 @@ private:
     StoreHierarchy(std::vector<NodeType>& request) {
         const auto reply = TagHierarchy::Handle(request);
         const auto serialized_hierarchy =
-                boost::get<std::string>(reply[0].at("serialized_graph"));
+          boost::get<std::string>(reply[0].at(boost::flyweight<std::string>("serialized_graph")));
         zmq::socket_t socket(context_, ZMQ_REQ);
         std::cout << "Connecting to backup service" << std::endl;
         socket.connect(config::GetTagHierarchyBackupServiceAddress());
@@ -78,7 +79,7 @@ private:
         zmq::message_t zmq_reply;
         socket.recv(&zmq_reply);
         auto retval = std::vector<NodeType>();
-        retval.push_back({{"success", true}});
+        retval.push_back({{boost::flyweight<std::string>("success"), true}});
         return retval;
     }
 
@@ -96,11 +97,11 @@ private:
         std::string backup_reply = std::string(static_cast<char *>(zmq_reply.data()),
                                                zmq_reply.size());
         if (backup_reply != "ERROR") {
-            request[0]["serialized_hierarchy"] = backup_reply;
+          request[0][boost::flyweight<std::string>("serialized_hierarchy")] = backup_reply;
             return TagHierarchy::Handle(request);
         }
         auto retval = std::vector<NodeType>();
-        retval.push_back({{"error", "cache was not populated"}});
+        retval.push_back({{boost::flyweight<std::string>("error"), "cache was not populated"}});
         return retval;
     }
     zmq::context_t& context_;
@@ -153,8 +154,8 @@ namespace {
                 span.AddAnnotation(log_string);
                 std::ostringstream out_buffer;
                 const auto reply_map =
-                        std::vector<NodeType>({{{std::string("error"), std::string("deserializing stream failed")},
-                                                       {std::string("action"), std::string("resend")}}});
+                  std::vector<NodeType>({{{boost::flyweight<std::string>("error"), std::string("deserializing stream failed")},
+                                          {boost::flyweight<std::string>("action"), std::string("resend")}}});
                 {
                     boost::archive::text_oarchive archive(out_buffer);
                     archive << reply_map;
@@ -189,8 +190,8 @@ namespace {
                 span.AddAnnotation(log_string);
                 std::ostringstream out_buffer;
                 const auto reply_map =
-                        std::vector<NodeType>({{{std::string("error"), std::string("command failed")},
-                                                       {std::string("action"), std::string("fix_parameters")}}});
+                  std::vector<NodeType>({{{boost::flyweight<std::string>("error"), std::string("command failed")},
+                                          {boost::flyweight<std::string>("action"), std::string("fix_parameters")}}});
                 {
                     boost::archive::text_oarchive archive(out_buffer);
                     archive << reply_map;
@@ -224,7 +225,7 @@ namespace {
             const auto message = std::string(static_cast<char *>(request.data()), request.size());
             if (message == "cache_updated") {
                 auto command = std::vector<NodeType>(
-                        {{{"command", std::string("restore")}}}
+                                                     {{{boost::flyweight<std::string>("command"), std::string("restore")}}}
                 );
                 messagehandler.HandleRequest(command);
             }

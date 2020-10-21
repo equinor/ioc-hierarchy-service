@@ -19,10 +19,10 @@ public:
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
-        if (g[v].properties.count("modelowner") &&
-            g[v].properties.find("modelowner")->second.type() == typeid(std::string)) {
+      if (g[v].properties.count(boost::flyweight<std::string>("modelowner")) &&
+          g[v].properties.find(boost::flyweight<std::string>("modelowner"))->second.type() == typeid(std::string)) {
             valid_modelowners_.insert(boost::get<std::string>(
-                    g[v].properties.at("modelowner")
+                                                              g[v].properties.at(boost::flyweight<std::string>("modelowner"))
             ));
         }
     }
@@ -40,10 +40,10 @@ public:
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
-        if (g[v].properties.count("modelclass") &&
-            g[v].properties.find("modelclass")->second.type() == typeid(std::string)) {
+      if (g[v].properties.count(boost::flyweight<std::string>("modelclass")) &&
+          g[v].properties.find(boost::flyweight<std::string>("modelclass"))->second.type() == typeid(std::string)) {
             valid_modelclasses_.insert(boost::get<std::string>(
-                    g[v].properties.at("modelclass")
+                                                               g[v].properties.at(boost::flyweight<std::string>("modelclass"))
             ));
         }
     }

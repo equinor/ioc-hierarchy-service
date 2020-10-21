@@ -54,35 +54,35 @@ set(UNIT_TEST_FILES
     unittests/test_delete_command.cpp
     unittests/test_load_save.cpp
 )
-add_executable(tag_hierarchy_test
-        ${UNIT_TEST_FILES})
+# add_executable(tag_hierarchy_test
+#         ${UNIT_TEST_FILES})
 
-target_include_directories(tag_hierarchy_test
-    PRIVATE ${CMAKE_SOURCE_DIR}
-)
-target_compile_definitions(tag_hierarchy_test PRIVATE BOOST_TEST_DYN_LINK)
+# target_include_directories(tag_hierarchy_test
+#     PRIVATE ${CMAKE_SOURCE_DIR}
+# )
+# target_compile_definitions(tag_hierarchy_test PRIVATE BOOST_TEST_DYN_LINK)
+# 
+# target_link_libraries(tag_hierarchy_test
+#     PRIVATE tag_hierarchy
+#     PRIVATE tag_hierarchy_commands
+#     PUBLIC opencensus-cpp::trace
+#     PUBLIC opencensus-cpp::exporters_trace_stdout
+#     PRIVATE Boost::unit_test_framework
+#     PUBLIC ${PYTHON_LIBRARIES}
+# )
 
-target_link_libraries(tag_hierarchy_test
-    PRIVATE tag_hierarchy
-    PRIVATE tag_hierarchy_commands
-    PUBLIC opencensus-cpp::trace
-    PUBLIC opencensus-cpp::exporters_trace_stdout
-    PRIVATE Boost::unit_test_framework
-    PUBLIC ${PYTHON_LIBRARIES}
-)
-
-foreach(UNIT_TEST_FILE ${UNIT_TEST_FILES})
-file(READ "${UNIT_TEST_FILE}" SOURCE_FILE_CONTENTS)
-string(REGEX MATCHALL "BOOST_.+_TEST_SUITE\\( *([A-Za-z_0-9]+).*\\)"
-        TEST_SUITE_NAME ${SOURCE_FILE_CONTENTS})
-set(TEST_SUITE_NAME ${CMAKE_MATCH_1})
-string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)"
-       FOUND_TESTS ${SOURCE_FILE_CONTENTS})
-foreach(HIT ${FOUND_TESTS})
-    string(REGEX REPLACE ".*\\( *([A-Za-z_0-9]+) *\\).*" "\\1" TEST_NAME ${HIT})
-   
-    add_test(NAME "tag_hierarchy_test.${TEST_NAME}" 
-            COMMAND tag_hierarchy_test
-            --run_test=${TEST_SUITE_NAME}/${TEST_NAME} --catch_system_error=yes)
-endforeach()
-endforeach()
+# foreach(UNIT_TEST_FILE ${UNIT_TEST_FILES})
+# file(READ "${UNIT_TEST_FILE}" SOURCE_FILE_CONTENTS)
+# string(REGEX MATCHALL "BOOST_.+_TEST_SUITE\\( *([A-Za-z_0-9]+).*\\)"
+#         TEST_SUITE_NAME ${SOURCE_FILE_CONTENTS})
+# set(TEST_SUITE_NAME ${CMAKE_MATCH_1})
+# string(REGEX MATCHALL "BOOST_AUTO_TEST_CASE\\( *([A-Za-z_0-9]+) *\\)"
+#        FOUND_TESTS ${SOURCE_FILE_CONTENTS})
+# foreach(HIT ${FOUND_TESTS})
+#     string(REGEX REPLACE ".*\\( *([A-Za-z_0-9]+) *\\).*" "\\1" TEST_NAME ${HIT})
+#    
+#     add_test(NAME "tag_hierarchy_test.${TEST_NAME}" 
+#             COMMAND tag_hierarchy_test
+#             --run_test=${TEST_SUITE_NAME}/${TEST_NAME} --catch_system_error=yes)
+# endforeach()
+# endforeach()

@@ -48,15 +48,15 @@ Delete::ProcessRequest(std::vector<NodeType> &nodes)
     auto& graph = GetGraph();
     auto& vertices = GetVertices();
     auto command_map = nodes.at(0);
-    auto nodes_to_delete = boost::get<std::vector<std::string>>(command_map.at("nodes"));
+    auto nodes_to_delete = boost::get<std::vector<std::string>>(command_map.at(boost::flyweight<std::string>("nodes")));
     auto status = NodeType();
     for (auto const& node : nodes_to_delete) {
         if (!vertices.count(node)) {
-            status[node] = std::string("Not found");
+          status[boost::flyweight<std::string>(node)] = std::string("Not found");
             continue;
         }
         auto vertex = vertices[node];
-        status[node] = local::DeleteVertex(graph, vertex, vertices);
+        status[boost::flyweight<std::string>(node)] = local::DeleteVertex(graph, vertex, vertices);
     }
     return {status};
 }
