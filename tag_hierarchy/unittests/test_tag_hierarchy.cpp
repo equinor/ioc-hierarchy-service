@@ -17,8 +17,8 @@ BOOST_AUTO_TEST_CASE( test_nodes )
           {std::string("parentId"), pybind11::none()}}}
     );
     auto response = TagHierarchy::Handle(query);
-    BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-1");
-    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2");
+    BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-2");
+    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-1");
     BOOST_TEST(boost::get<int>(response[1].at("levelno")) == 1);
     BOOST_TEST(boost::get<pybind11::none>(response[1].at("parent_id")) == pybind11::none());
 }
@@ -42,14 +42,14 @@ BOOST_AUTO_TEST_CASE( test_l3_nodes ) {
           {std::string("parentId"), parent_id}}}
     );
     auto response = TagHierarchy::Handle(query);
-    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2->Level2-1->Level3-2");
+    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2->Level2-1->Level3-1");
     BOOST_TEST(boost::get<int>(response[0].at("levelno")) == 3);
     BOOST_TEST(boost::get<std::string>(response[1].at("parent_id")) == parent_id);
     std::cout << boost::get<std::string>(response[1].at("id"));
 }
 
 BOOST_AUTO_TEST_CASE( test_l4_nodes ) {
-    const auto parent_id = std::string("0b8b675f-0afb-7772-6409-81a069aedb2a");
+    const auto parent_id = std::string("cfc07435-e890-9bf7-b4c8-645dced9ab73");
     auto query = std::vector<NodeType>(
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}

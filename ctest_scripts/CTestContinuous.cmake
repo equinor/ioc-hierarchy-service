@@ -22,7 +22,7 @@ ctest_build(FLAGS -j8)
 ctest_test(EXCLUDE ^opencensus)
 
 set(CTEST_DROP_METHOD "https")
-set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")
+set(CTEST_DROP_SITE "s039-ioc-cdash.azurewebsites.net")
 set(CTEST_DROP_LOCATION "/submit.php?project=ioc-hierarchy-service")
 set(CTEST_DROP_SITE_CDASH TRUE)
 ctest_submit()

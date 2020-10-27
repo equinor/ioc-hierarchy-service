@@ -25,17 +25,8 @@ FilterOptions::ProcessRequest(std::vector<NodeType> &nodes)
     boost::associative_property_map<VertexDescMap> colormap(index_map);
     const auto filter_type = boost::get<std::string>(command_map.at("type"));
     auto valid_ids = std::set<std::string>();
-    if (filter_type == "modelowner") {
-        const auto visitor = ModelOwnerFilterOptionsVisitor(valid_ids);
-        boost::depth_first_visit(graph_, root_, visitor, colormap);
-    }
-    else if (filter_type == "modelclass") {
-        const auto visitor = ModelClassFilterOptionsVisitor(valid_ids);
-        boost::depth_first_visit(graph_, root_, visitor, colormap);
-    }
-    else {
-        return {{{std::string("error"), std::string("unknown filter type")}}};
-    }
+    const auto visitor = FilterOptionsVisitor(valid_ids, filter_type);
+    boost::depth_first_visit(graph_, root_, visitor, colormap);
 
     std::string return_key = filter_type + "_ids";
     return {{{
