@@ -56,7 +56,9 @@ set(UNIT_TEST_FILES
     unittests/test_load_save.cpp
 )
 add_executable(tag_hierarchy_test
-        ${UNIT_TEST_FILES})
+    unittests/fixture.cpp
+    ${UNIT_TEST_FILES}
+)
 
 target_include_directories(tag_hierarchy_test
     PRIVATE ${CMAKE_SOURCE_DIR}
