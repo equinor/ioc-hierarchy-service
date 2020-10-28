@@ -31,9 +31,17 @@ target_include_directories(tag_hierarchy_client
     PRIVATE cppzmq
     PRIVATE ${CMAKE_SOURCE_DIR}
 )
+
+option(USE_LOCAL_PYTHON "Build for local python in /usr/local" ON)
+if(USE_LOCAL_PYTHON)
+  set(PYTHON_LIBRARY_LOCATION /usr/local/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages)
+else()
+  set(PYTHON_LIBRARY_LOCATION ${Python_SITEARCH})
+endif()
+
 install(TARGETS tag_hierarchy_client
      LIBRARY
-     DESTINATION ${Python_SITEARCH}
+     DESTINATION ${PYTHON_LIBRARY_LOCATION}
      RUNTIME
      DESTINATION bin
 )
