@@ -55,6 +55,7 @@ set(UNIT_TEST_FILES
     unittests/test_delete_command.cpp
     unittests/test_load_save.cpp
 )
+
 add_executable(tag_hierarchy_test
     unittests/fixture.cpp
     ${UNIT_TEST_FILES}
@@ -63,6 +64,7 @@ add_executable(tag_hierarchy_test
 target_include_directories(tag_hierarchy_test
     PRIVATE ${CMAKE_SOURCE_DIR}
 )
+
 target_compile_definitions(tag_hierarchy_test PRIVATE BOOST_TEST_DYN_LINK)
 
 target_link_libraries(tag_hierarchy_test
@@ -71,6 +73,21 @@ target_link_libraries(tag_hierarchy_test
     PUBLIC opencensus-cpp::trace
     PUBLIC opencensus-cpp::exporters_trace_stdout
     PRIVATE Boost::unit_test_framework
+    PUBLIC ${PYTHON_LIBRARIES}
+)
+
+add_executable(
+    create_test_data EXCLUDE_FROM_ALL
+    unittests/create_test_data.cpp
+)
+
+target_include_directories(create_test_data
+    PRIVATE ${CMAKE_SOURCE_DIR}
+)
+
+target_link_libraries(create_test_data
+    PRIVATE tag_hierarchy
+    PUBLIC opencensus-cpp::exporters_trace_stdout
     PUBLIC ${PYTHON_LIBRARIES}
 )
 
@@ -85,6 +102,7 @@ foreach(HIT ${FOUND_TESTS})
     string(REGEX REPLACE ".*\\( *([A-Za-z_0-9]+) *\\).*" "\\1" TEST_NAME ${HIT})
    
     add_test(NAME "tag_hierarchy_test.${TEST_NAME}" 
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMAND tag_hierarchy_test
             --run_test=${TEST_SUITE_NAME}/${TEST_NAME} --catch_system_error=yes)
 endforeach()
