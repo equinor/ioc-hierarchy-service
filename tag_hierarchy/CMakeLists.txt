@@ -54,7 +54,7 @@ set(UNIT_TEST_FILES
     unittests/test_filter_options.cpp
     unittests/test_delete_command.cpp
     unittests/test_load_save.cpp
-)
+    unittests/test_is_suppressed_field.cpp)
 add_executable(tag_hierarchy_test
     unittests/fixture.cpp
     ${UNIT_TEST_FILES}

@@ -13,10 +13,11 @@ class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 {
 public:
     explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::map<VertexT, std::set<VertexT>>& valid_models,
-                                      const std::vector<std::string> &kpifilter) : valid_nodes_(valid_nodes),
+                                      const std::vector<std::string> &kpifilter, std::set<VertexT>& suppressedNodes) : valid_nodes_(valid_nodes),
                                                                                    valid_models_(valid_models),
                                                                                    kpifilter_(kpifilter),
-                                                                                   path_(std::deque<VertexT>()) {}
+                                                                                   path_(std::deque<VertexT>()),
+                                                                                   suppressed_nodes_(suppressedNodes) {}
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
@@ -61,8 +62,36 @@ public:
         path_.pop_front();
     }
 
+    void finish_edge(EdgeT e, const TagHierarchyGraph &g) {
+        auto targetVertex = target(e, g);
+
+        // Is the target a model element node?
+        if (g[targetVertex].properties.count("is_modelelement")
+            && boost::get<bool>(g[targetVertex].properties.find("is_modelelement")->second)) {
+            // Yes, the target is a model element node.
+            // Is this model element suppressed?
+            if (g[targetVertex].properties.count("issuppressed")
+                && boost::get<bool>(g[targetVertex].properties.find("issuppressed")->second)) {
+                // Yes, it is suppressed. Then the source node should be suppressed as well.
+                auto sourceVertex = source(e, g);
+                suppressed_nodes_.insert(sourceVertex);
+                suppressed_nodes_.insert(targetVertex);
+            }
+        }
+        else {
+            // No, this is not a model element node.
+            // Is the target node suppressed?
+            if (suppressed_nodes_.find(targetVertex) != suppressed_nodes_.end()) {
+                // Yes, then the suppression should propagate to the source node.
+                auto sourceVertex = source(e, g);
+                suppressed_nodes_.insert(sourceVertex);
+            }
+        }
+    }
+
 private:
     std::set<VertexT> &valid_nodes_;
+    std::set<VertexT> &suppressed_nodes_;
     const std::vector<std::string> &kpifilter_;
     std::deque<VertexT> path_;
     std::map<VertexT, std::set<VertexT>>& valid_models_;
