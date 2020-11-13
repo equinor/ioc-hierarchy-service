@@ -12,49 +12,49 @@
 
 // Used for verifying that the values of field for alarm suppression
 // is valid for a nodes obtained with input command to cache.
-void verify_correct_suppression_relationship(bool isParentSuppressed,
-                                             const std::string& parentId,
+void verify_correct_suppression_relationship(bool is_parent_suppressed,
+                                             const std::string& parent_id,
                                              const std::vector<NodeType>& command) {
     // We verify this relationship by obtaining the suppression state of all children,
     // and checking if at least one of these are true. If that is the case, the parent
     // should be suppressed too. If not, the parent should not be suppressed.
 
     // Make a query containing the parent ID, and insert the command.
-    auto childrenQuery = std::vector<NodeType>(
+    auto children_query = std::vector<NodeType>(
             {{
-                {std::string("parentId"), parentId}
+                {std::string("parentId"), parent_id}
             }}
             );
 
-    childrenQuery[0].insert(command[0].begin(), command[0].end());
+    children_query[0].insert(command[0].begin(), command[0].end());
 
-    auto childrenQueryResponse = TagHierarchy::Handle(childrenQuery);
+    auto children_query_response = TagHierarchy::Handle(children_query);
 
     // Did the query return any child nodes?
-    if (childrenQueryResponse.empty()) {
+    if (children_query_response.empty()) {
         // No, then we return. This is the stop condition of the recursion.
         return;
     }
 
     // Aggregate the suppression state of the children. This determines the value that
     // the parent _should_ have.
-    bool shouldParentBeSuppressed = false;
-    for (auto const& node: childrenQueryResponse) {
+    bool should_parent_be_suppressed = false;
+    for (auto const& node: children_query_response) {
         // Aggregate the suppression value from the children of the parent node.
-        bool isChildSuppressed = boost::get<bool>(node.find("issuppressed")->second);
-        shouldParentBeSuppressed |= isChildSuppressed;
+        bool is_child_suppressed = boost::get<bool>(node.find("issuppressed")->second);
+        should_parent_be_suppressed |= is_child_suppressed;
 
         // Verify the same for all the children.
-        std::string nodeId = boost::get<std::string>(node.find("id")->second);
+        std::string node_id = boost::get<std::string>(node.find("id")->second);
         verify_correct_suppression_relationship(
-                isChildSuppressed,
-                nodeId,
+                is_child_suppressed,
+                node_id,
                 command
                 );
     }
 
     // Verify that the suppression is as it should be in the parent.
-    BOOST_TEST(isParentSuppressed == shouldParentBeSuppressed);
+    BOOST_TEST(is_parent_suppressed == should_parent_be_suppressed);
 }
 
 // Verify that the suppression relationship is correct for input filter.
@@ -66,31 +66,31 @@ void verify_correct_suppression_relationship_with_filter(const std::vector<NodeT
                 {std::string("parentId"), pybind11::none()}
              }}
     );
-    for (const auto& filterEntry : filter) {
-        query[0].insert(filterEntry.begin(), filterEntry.end());
+    for (const auto& filter_entry : filter) {
+        query[0].insert(filter_entry.begin(), filter_entry.end());
     }
 
     auto response = TagHierarchy::Handle(query);
 
     // Construct the command to pass on when querying for child nodes.
-    auto childNodesCommand = std::vector<NodeType>(
+    auto child_nodes_command = std::vector<NodeType>(
             {{
                      {std::string("command"), std::string("nodes")}
              }}
     );
 
     // Insert filter into the command.
-    for (const auto& filterEntry : filter) {
-        childNodesCommand[0].insert(filterEntry.begin(), filterEntry.end());
+    for (const auto& filter_entry : filter) {
+        child_nodes_command[0].insert(filter_entry.begin(), filter_entry.end());
     }
 
     // Verify the suppression relationship for all nodes in the query result.
     for (const auto& props : response) {
-        std::string nodeId = boost::get<std::string>(props.find("id")->second);
+        std::string node_id = boost::get<std::string>(props.find("id")->second);
         verify_correct_suppression_relationship(
                 boost::get<bool>(props.find("issuppressed")->second),
-                nodeId,
-                childNodesCommand
+                node_id,
+                child_nodes_command
         );
     }
 }

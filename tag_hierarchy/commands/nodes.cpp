@@ -135,16 +135,9 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         auto props = graph_[*iter].properties;
         props["model_ids"] = valid_model_ids;
 
-        // Write suppression property to all nodes of the graph.
-        // Is the node suppressed?
-        if (suppressed_nodes.find(*iter) != suppressed_nodes.end()) {
-            // Yes, then write this property.
-            props["issuppressed"] = true;
-        }
-        else {
-            // No, this node is not suppressed.
-            props["issuppressed"] = false;
-        }
+        // Write suppression property to the nodes of the graph.
+        props["issuppressed"] = (suppressed_nodes.find(*iter) != suppressed_nodes.end());
+
         retval.push_back(props);
     }
     return retval;
