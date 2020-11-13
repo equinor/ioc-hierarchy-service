@@ -60,8 +60,8 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
 
     auto valid_nodes = std::set<VertexT>();
     auto valid_models = std::map<VertexT, std::set<VertexT>>();
-    auto suppressedNodes = std::set<VertexT>();
-    auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter, suppressedNodes);
+    auto suppressed_nodes = std::set<VertexT>();
+    auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter, suppressed_nodes);
 
     auto const termfunc = [l1filter, l2filter, modelownerfilter, modelclassfilter] (
             VertexT vertex, const TagHierarchyGraph& graph) {
@@ -137,7 +137,7 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
 
         // Write suppression property to all nodes of the graph.
         // Is the node suppressed?
-        if (suppressedNodes.find(*iter) != suppressedNodes.end()) {
+        if (suppressed_nodes.find(*iter) != suppressed_nodes.end()) {
             // Yes, then write this property.
             props["issuppressed"] = true;
         }
