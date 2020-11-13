@@ -110,7 +110,12 @@ BOOST_FIXTURE_TEST_SUITE( FieldIsSuppressedTest, Fixture );
     BOOST_AUTO_TEST_CASE( test_is_suppressed_propagation_with_model_owner_filter )
     {
         verify_correct_suppression_relationship_with_filter(std::vector<NodeType>(
-                {{{std::string("modelownerfilter"), std::string("8eb4a1e1-1316-bcef-b20f-bbbaed2a4e95")}}}));
+                {{
+                    {
+                        std::string("modelownerfilter"), std::vector<std::string>{"8eb4a1e1-1316-bcef-b20f-bbbaed2a4e95"}
+                    }
+                }}
+                ));
     }
 
     // Tests that the field for alarm suppression is propagated from
@@ -119,7 +124,12 @@ BOOST_FIXTURE_TEST_SUITE( FieldIsSuppressedTest, Fixture );
     BOOST_AUTO_TEST_CASE( test_is_suppressed_propagation_with_model_class_filter )
     {
         verify_correct_suppression_relationship_with_filter(std::vector<NodeType>(
-                {{{std::string("modelclassfilter"), std::string("44380be8-76d2-a1fd-dc50-0ad8f4c151e4")}}}));
+                {{
+                         {
+                             std::string("modelclassfilter"), std::vector<std::string>{"44380be8-76d2-a1fd-dc50-0ad8f4c151e4"}
+                         }
+                }}
+                ));
     }
 
 BOOST_AUTO_TEST_SUITE_END()
