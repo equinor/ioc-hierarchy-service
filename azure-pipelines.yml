@@ -4,12 +4,10 @@
 
 trigger:
   branches:
-    include:
+    exclude:
+    - wip*
+  pr:
     - master
-    - id-*
-
-pr:
-- master
 
 resources:
 - repo: self
