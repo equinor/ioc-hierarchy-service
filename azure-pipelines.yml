@@ -6,8 +6,6 @@ trigger:
   branches:
     exclude:
     - wip*
-  pr:
-    - master
 
 resources:
 - repo: self
