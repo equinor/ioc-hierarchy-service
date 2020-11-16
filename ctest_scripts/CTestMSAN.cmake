@@ -37,6 +37,6 @@ set(CTEST_DROP_LOCATION "/submit.php?project=ioc-hierarchy-service")
 set(CTEST_DROP_SITE_CDASH TRUE)
 ctest_submit()
 
-if (test_result or memcheck_result)
+if (test_result OR memcheck_result)
   message(FATAL_ERROR "Tests failed")
 endif ()
