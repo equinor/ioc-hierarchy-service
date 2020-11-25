@@ -17,6 +17,9 @@ ctest_start(Experimental)
 
 file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
 CMAKE_CXX_FLAGS=-g -O1 -fsanitize=thread -fno-omit-frame-pointer -fPIC
+CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=thread")
+CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=thread")
+CMAKE_STATIC_LINKER_FLAGS  "${CMAKE_STATIC_LINKER_FLAGS} -fsanitize=thread")
 CMAKE_GENERATOR=Unix Makefiles
 ")
 
