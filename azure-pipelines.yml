@@ -3,13 +3,12 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-  branches:
+  tags:
     include:
-    - master
-    - id-*
-
-pr:
-- master
+    - v*
+  branches:
+    exclude:
+    - wip*
 
 resources:
 - repo: self
@@ -22,6 +21,7 @@ stages:
   displayName: Build image
   jobs:  
   - job: Build
+    timeoutInMinutes: 120
     displayName: Build
     pool:
       vmImage: 'ubuntu-latest'
@@ -36,6 +36,6 @@ stages:
     - task: GithubRelease@0
       displayName: 'Create GitHub Release'
       inputs:
-        gitHubConnection: ioc-hierarchy-service
+        gitHubConnection: 'GitHub connection 1'
         repositoryName: equinor/ioc-hierarchy-service
         assets: ./*.deb
