@@ -30,14 +30,14 @@ stages:
     - bash: docker build -t tag-hierarchy ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.1.4-x86-64.deb .
-    - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/Testing/ .
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name continuous tag-hierarchy bash -c 'make continuous'
+    - bash: docker cp continuous:/usr/src/app/ioc-hierarchy-service-docker-build/Testing/ .
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name nightly tag-hierarchy bash -c 'make nightly'
       condition: or(eq(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'cTest'
-        testResultsFiles: 'Testing/**/*.xml' 
+        testResultsFiles: 'Testing/**/Test.xml' 
     - task: GithubRelease@0
       displayName: 'Create GitHub Release'
       inputs:
