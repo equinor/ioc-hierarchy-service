@@ -2,11 +2,13 @@
 // Created by Petter Moe Kvalvaag on 2019-10-03.
 //
 
-#include <tag_hierarchy/filteredhierarchyvisitor.h>
+#include <tag_hierarchy/visitors/filteredhierarchyvisitor.h>
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/commands/nodes.h"
 
-REGISTER_COMMAND(Nodes, nodes)
+Nodes nodes(std::string("nodes"));
+
+Nodes::Nodes(std::string name) : Command(name) {}
 
 std::vector<NodeType>
 Nodes::ProcessRequest(std::vector<NodeType> &nodes)
@@ -58,7 +60,8 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
 
     auto valid_nodes = std::set<VertexT>();
     auto valid_models = std::map<VertexT, std::set<VertexT>>();
-    auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter);
+    auto suppressed_nodes = std::set<VertexT>();
+    auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter, suppressed_nodes);
 
     auto const termfunc = [l1filter, l2filter, modelownerfilter, modelclassfilter] (
             VertexT vertex, const TagHierarchyGraph& graph) {
@@ -112,8 +115,9 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         parent_vertex = vertices_[parent_id];
     }
 
-    std::vector<boost::default_color_type> colormap(num_vertices(graph_));
-    boost::depth_first_visit(graph_, parent_vertex, dfs_visitor, colormap.data(), termfunc);
+    auto index_map = VertexDescMap();
+    boost::associative_property_map<VertexDescMap> colormap(index_map);
+    boost::depth_first_visit(graph_, parent_vertex, dfs_visitor, colormap, termfunc);
 
     auto ei = TagHierarchyGraph::adjacency_iterator();
     auto ei_end = TagHierarchyGraph::adjacency_iterator();
@@ -130,6 +134,10 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         }
         auto props = graph_[*iter].properties;
         props["model_ids"] = valid_model_ids;
+
+        // Write suppression property to the nodes of the graph.
+        props["issuppressed"] = (suppressed_nodes.find(*iter) != suppressed_nodes.end());
+
         retval.push_back(props);
     }
     return retval;

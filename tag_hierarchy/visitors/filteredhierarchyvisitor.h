@@ -13,10 +13,11 @@ class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 {
 public:
     explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::map<VertexT, std::set<VertexT>>& valid_models,
-                                      const std::vector<std::string> &kpifilter) : valid_nodes_(valid_nodes),
-                                                                                   valid_models_(valid_models),
-                                                                                   kpifilter_(kpifilter),
-                                                                                   path_(std::deque<VertexT>()) {}
+                                      const std::vector<std::string> &kpifilter, std::set<VertexT>& suppressed_nodes) : valid_nodes_(valid_nodes),
+                                                                                                                        valid_models_(valid_models),
+                                                                                                                        kpifilter_(kpifilter),
+                                                                                                                        path_(std::deque<VertexT>()),
+                                                                                                                        suppressed_nodes_(suppressed_nodes) {}
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
@@ -61,8 +62,36 @@ public:
         path_.pop_front();
     }
 
+    void finish_edge(EdgeT e, const TagHierarchyGraph &g) {
+        auto target_vertex = boost::target(e, g);
+
+        // Is the target a model element node?
+        if (g[target_vertex].properties.count("is_modelelement")
+            && boost::get<bool>(g[target_vertex].properties.find("is_modelelement")->second)) {
+            // Yes, the target is a model element node.
+            // Is this model element suppressed?
+            if (g[target_vertex].properties.count("issuppressed")
+                && boost::get<bool>(g[target_vertex].properties.find("issuppressed")->second)) {
+                // Yes, it is suppressed. Then the source node should be suppressed as well.
+                auto source_vertex = boost::source(e, g);
+                suppressed_nodes_.insert(source_vertex);
+                suppressed_nodes_.insert(target_vertex);
+            }
+        }
+        else {
+            // No, this is not a model element node.
+            // Is the target node suppressed?
+            if (suppressed_nodes_.find(target_vertex) != suppressed_nodes_.end()) {
+                // Yes, then the suppression should propagate to the source node.
+                auto source_vertex = boost::source(e, g);
+                suppressed_nodes_.insert(source_vertex);
+            }
+        }
+    }
+
 private:
     std::set<VertexT> &valid_nodes_;
+    std::set<VertexT> &suppressed_nodes_;
     const std::vector<std::string> &kpifilter_;
     std::deque<VertexT> path_;
     std::map<VertexT, std::set<VertexT>>& valid_models_;

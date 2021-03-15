@@ -6,7 +6,9 @@
 
 #include "tag_hierarchy/visitors/filteroptionsvisitor.h"
 
-REGISTER_COMMAND(FilterOptions, filteroptions)
+FilterOptions filteroptions(std::string("filteroptions"));
+
+FilterOptions::FilterOptions(std::string name) : Command(name) {}
 
 std::vector<NodeType>
 FilterOptions::ProcessRequest(std::vector<NodeType> &nodes)
@@ -19,20 +21,12 @@ FilterOptions::ProcessRequest(std::vector<NodeType> &nodes)
         return {{{std::string("error"), std::string("empty")}}};
     }
 
+    auto index_map = VertexDescMap();
+    boost::associative_property_map<VertexDescMap> colormap(index_map);
     const auto filter_type = boost::get<std::string>(command_map.at("type"));
     auto valid_ids = std::set<std::string>();
-    std::vector<boost::default_color_type> colormap(num_vertices(graph_));
-    if (filter_type == "modelowner") {
-        const auto visitor = ModelOwnerFilterOptionsVisitor(valid_ids);
-        boost::depth_first_visit(graph_, root_, visitor, colormap.data());
-    }
-    else if (filter_type == "modelclass") {
-        const auto visitor = ModelClassFilterOptionsVisitor(valid_ids);
-        boost::depth_first_visit(graph_, root_, visitor, colormap.data());
-    }
-    else {
-        return {{{std::string("error"), std::string("unknown filter type")}}};
-    }
+    const auto visitor = FilterOptionsVisitor(valid_ids, filter_type);
+    boost::depth_first_visit(graph_, root_, visitor, colormap);
 
     std::string return_key = filter_type + "_ids";
     return {{{

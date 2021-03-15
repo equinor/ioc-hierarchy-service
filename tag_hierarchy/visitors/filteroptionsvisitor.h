@@ -10,44 +10,24 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
 
-class ModelOwnerFilterOptionsVisitor : public boost::default_dfs_visitor
+class FilterOptionsVisitor : public boost::default_dfs_visitor
 {
 public:
-    explicit ModelOwnerFilterOptionsVisitor(
-            std::set<std::string>& valid_modelowners
-    ) : valid_modelowners_(valid_modelowners) {}
-
+    explicit FilterOptionsVisitor(std::set<std::string>& valid_filter_options,
+                                  std::string filter_option)
+        : valid_filter_options_(valid_filter_options),
+          filter_option_(filter_option){
+    }
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
-        if (g[v].properties.count("modelowner") &&
-            g[v].properties.find("modelowner")->second.type() == typeid(std::string)) {
-            valid_modelowners_.insert(boost::get<std::string>(
-                    g[v].properties.at("modelowner")
-            ));
+        if (g[v].properties.count(filter_option_) &&
+            g[v].properties.find(filter_option_)->second.type() == typeid(std::string)) {
+            valid_filter_options_.insert(boost::get<std::string>(g[v].properties.at(filter_option_)));
         }
     }
 
 private:
-    std::set<std::string>& valid_modelowners_;
+    std::set<std::string>& valid_filter_options_;
+    std::string filter_option_;
 };
 
-class ModelClassFilterOptionsVisitor : public boost::default_dfs_visitor
-{
-public:
-    explicit ModelClassFilterOptionsVisitor(
-            std::set<std::string>& valid_modelclasses
-    ) : valid_modelclasses_(valid_modelclasses) {}
-
-    void discover_vertex(VertexT v, const TagHierarchyGraph &g)
-    {
-        if (g[v].properties.count("modelclass") &&
-            g[v].properties.find("modelclass")->second.type() == typeid(std::string)) {
-            valid_modelclasses_.insert(boost::get<std::string>(
-                    g[v].properties.at("modelclass")
-            ));
-        }
-    }
-
-private:
-    std::set<std::string>& valid_modelclasses_;
-};

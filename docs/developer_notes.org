@@ -1,0 +1,41 @@
+* Worklist
+** Finish PR for KPI tree
+
+* Future plans
+** GRPC
+The communication/RPC system is currently based on ZeroMQ request-reply pattern for messaging,
+while the C++ boost::serialization library handles the serialization of the payload. Further,
+RPC itself is handled dynamically by inspecting the payload and calling the relevant command
+based on the payload in the request. Finally, we use a simple ZMQ pattern that does not handle
+asynchronous call handling, so the application latency does suffer some times.
+
+The RPC model could be simplified using gRPC. gRPC is one package which takes care of RPC and
+serialization of the payload, and thus a lot of code in this repository could be taken away.
+
+An additional benefit is that the service can be taken out of the Almond backend and stand on
+its own. Particularly important if scaling should become necessary.
+
+Roadmap for this undertaking:
+
+*** TODO Understand authorization for gRPC
+    Hopefully we can wrap the server with easyauth. Client side maybe a python AD auth library.
+*** TODO Write integration tests for the store-restore procedure
+    This is a critical step to make sure the next refactoring goes well
+*** TODO Remove the messagehandler
+    The messagehandler pattern was clumsy in the first place. Composite actions should be handled
+    in a client library. This complicates the client library but makes clean RPC calls much easier
+*** TODO Change payload serialization method to protocol buffers
+*** TODO Make gRPC proof-of-concept
+    Presumably we could inject gRPC with minimal footprint, as we currently bind the ProcessRequest
+    method in runtime on starting the server for each command. Instead, we could hopefully bind that
+    method directly to the gRPC service.
+*** TODO Store sparklines as JSON and calculate them inside this application
+    If everything went well so far, we should try to get all the sparklines in a Redis pipeline
+    while we traverse the tree. After traversal, all sparklines that are stored with JSON are ready
+    for fetching from Redis and the aggregation of them can be done in this app in C++ instead of
+    the Almond API python code.
+
+At this point we have sped up sparkline calculations, taken away the Almond API as a relay, and
+made the tree service async and thus able to serve much more simultaneous users with an acceptable
+latency. Huzzah!
+    

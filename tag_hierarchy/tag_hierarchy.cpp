@@ -140,19 +140,30 @@ public:
     };
     TagHierarchyImpl(const TagHierarchyImpl& in) : command_func_dispatch_(in.command_func_dispatch_) {}
 
-    void Register(Command& in) {
-        auto command_name = in.CommandName();
+    void Register(Command& in, std::string name) {
         auto func = in.Function();
-        command_func_dispatch_[command_name] = func;
+        command_func_dispatch_[name] = func;
     }
 
     template<typename Archive>
-    void serialize(Archive& ar, const unsigned int version) {
+    void save(Archive& ar, const unsigned int version) const {
         ar & graph_;
-        ar & vertices_;
-        ar & root_;
         ar & edge_labels_;
     }
+
+    template<typename Archive>
+    void load(Archive& ar, const unsigned int version) {
+        ar & graph_;
+        ar & edge_labels_;
+        auto [start, end] = boost::vertices(graph_);
+        for (auto iter = start; iter != end; ++iter) {
+            if (graph_[*iter].id == "root") {
+                root_ = *iter;
+            }
+            vertices_[graph_[*iter].id] = *iter;
+        }
+    }
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
 
@@ -188,6 +199,6 @@ TagHierarchy::GetRoot() {
 }
 
 void
-TagHierarchy::Register(Command &in) {
-    GetTagHierarchy().Register(in);
+TagHierarchy::Register(Command &in, std::string name) {
+    GetTagHierarchy().Register(in, name);
 }

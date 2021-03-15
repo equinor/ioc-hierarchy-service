@@ -16,25 +16,25 @@ namespace config {
     const char* GetTagHierarchyServerAddress() {
         static const char* tag_hierarchy_server_address =
                 IsUseTcp() ?
-                "tcp://127.0.0.1:5556" : "ipc:///tag.hierarchy.server";
+                "tcp://127.0.0.1:5556" : "ipc:///tmp/tag.hierarchy.server";
         return tag_hierarchy_server_address;
     }
     const char* GetTagHierarchyStatemanagerAddress() {
         static const char* tag_hierarchy_server_address =
                 IsUseTcp() ?
-                "tcp://127.0.0.1:5557" : "ipc:///tag.hierarchy.statemanager";
+                "tcp://127.0.0.1:5557" : "ipc:///tmp/tag.hierarchy.statemanager";
         return tag_hierarchy_server_address;
     }
     const char* GetTagHierarchyBackupServiceAddress() {
         static const char* tag_hierarchy_server_address =
                 IsUseTcp() ?
-                "tcp://127.0.0.1:5555" : "ipc:///tag.hierarchy.backup";
+                "tcp://127.0.0.1:5555" : "ipc:///tmp/tag.hierarchy.backup";
         return tag_hierarchy_server_address;
     }
     const char* GetTagHierarchyStateChangeAddress() {
         static const char* tag_hierarchy_server_address =
                 IsUseTcp() ?
-                "tcp://127.0.0.1:5559" : "ipc:///tag.hierarchy.statechange";
+                "tcp://127.0.0.1:5559" : "ipc:///tmp/tag.hierarchy.statechange";
         return tag_hierarchy_server_address;
     }
 }

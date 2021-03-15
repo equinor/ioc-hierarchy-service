@@ -19,10 +19,17 @@ CMAKE_BUILD_TYPE=Release
 
 ctest_configure()
 ctest_build(FLAGS -j8)
-ctest_test(EXCLUDE ^opencensus)
+ctest_test(
+  EXCLUDE ^opencensus
+  RETURN_VALUE test_result
+)
 
 set(CTEST_DROP_METHOD "https")
-set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")
+set(CTEST_DROP_SITE "s039-ioc-cdash.azurewebsites.net")
 set(CTEST_DROP_LOCATION "/submit.php?project=ioc-hierarchy-service")
 set(CTEST_DROP_SITE_CDASH TRUE)
 ctest_submit()
+
+if (test_result)
+  message(FATAL_ERROR "Tests failed")
+endif ()

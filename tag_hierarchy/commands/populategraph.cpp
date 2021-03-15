@@ -5,7 +5,9 @@
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/commands/populategraph.h"
 
-REGISTER_COMMAND(PopulateGraph, populate_graph)
+PopulateGraph populategraph_(std::string("populate_graph"));
+
+PopulateGraph::PopulateGraph(std::string name) : Command(name) {}
 
 std::vector<NodeType>
 PopulateGraph::ProcessRequest(std::vector<NodeType> &nodes)

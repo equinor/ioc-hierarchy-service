@@ -14,23 +14,16 @@ std::function<std::vector<NodeType>(std::vector<NodeType>&)>;
 
 class Command {
 public:
-    Command();
+    explicit Command(std::string name);
     std::vector<NodeType> Process(std::vector<NodeType>& request);
-    virtual std::string CommandName() = 0;
-    virtual DispatchFunction Function() = 0;
+    DispatchFunction Function();
 
 protected:
     TagHierarchyGraph& GetGraph();
     std::map<std::string, VertexT>& GetVertices();
     VertexT& GetRoot();
-    void Register(Command& in);
 
 private:
     virtual std::vector<NodeType> ProcessRequest(std::vector<NodeType>&) = 0;
+    std::string name_;
 };
-
-#define REGISTER_COMMAND(Classname, CommandString) \
-    Classname Classname##_instance;            \
-    Classname::Classname() {Register(*this);} \
-    std::string Classname::CommandName() {return #CommandString;}\
-    DispatchFunction Classname::Function() {return [this](std::vector<NodeType>& in) {return this->Process(in);};}

@@ -17,16 +17,29 @@ ctest_start(Experimental)
 
 file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
 CMAKE_CXX_FLAGS=-g -O1 -fsanitize=thread -fno-omit-frame-pointer -fPIC
+CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=thread")
+CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -fsanitize=thread")
+CMAKE_STATIC_LINKER_FLAGS  "${CMAKE_STATIC_LINKER_FLAGS} -fsanitize=thread")
 CMAKE_GENERATOR=Unix Makefiles
 ")
 
 ctest_configure()
 ctest_build(FLAGS -j8)
-ctest_test(EXCLUDE ^opencensus)
-ctest_memcheck(EXCLUDE ^opencensus)
+ctest_test(
+  EXCLUDE ^opencensus
+  RETURN_VALUE test_result
+)
+ctest_memcheck(
+  EXCLUDE ^opencensus
+  RETURN_VALUE memcheck_result
+)
 
 set(CTEST_DROP_METHOD "https")
-set(CTEST_DROP_SITE "equinor-cdash.azurewebsites.net")
+set(CTEST_DROP_SITE "s039-ioc-cdash.azurewebsites.net")
 set(CTEST_DROP_LOCATION "/submit.php?project=ioc-hierarchy-service")
 set(CTEST_DROP_SITE_CDASH TRUE)
 ctest_submit()
+
+if (test_result OR memcheck_result)
+  message(FATAL_ERROR "Tests failed")
+endif ()
