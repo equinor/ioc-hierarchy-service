@@ -53,7 +53,9 @@ namespace {
     }
 }
 
-REGISTER_COMMAND(Search, search)
+Search search_(std::string("search"));
+
+Search::Search(std::string name) : Command(name) {}
 
 std::vector<NodeType>
 Search::ProcessRequest(std::vector<NodeType> &nodes)
@@ -77,7 +79,9 @@ Search::ProcessRequest(std::vector<NodeType> &nodes)
     result_map["modelElement"] = std::vector<VertexT>();
     auto visitor = SearchVisitor(searcher, result_map, max_results);
     try {
-        boost::depth_first_visit(graph_, root_, visitor, colormap.data());
+        auto index_map = VertexDescMap();
+        boost::associative_property_map<VertexDescMap> colormap(index_map);
+        boost::depth_first_visit(graph_, root_, visitor, colormap);
     }
     catch (TagHierarchyUtil::StopTraversing) {
         // It's fine, we throw to stop traversal

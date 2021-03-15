@@ -1,27 +1,11 @@
-#define BOOST_TEST_MODULE tag_hierarchy
-#define BOOST_TEST_DYN_LINK
-
 #include "models/models.h"
+
+#include "tag_hierarchy/tag_hierarchy.h"
+#include "tag_hierarchy/unittests/fixture.h"
 
 #include <boost/test/unit_test.hpp>
 
-#include "tag_hierarchy/tag_hierarchy.h"
-
-struct SearchFixture {
-  SearchFixture() {
-     BOOST_TEST_MESSAGE( "Constructing test fixture" );
-     auto modelhierarchy = std::vector<NodeType>(
-     #include "hierarchy_dump.cpp"
-     );
-     TagHierarchy::Handle(modelhierarchy);
-  }
-
-  ~SearchFixture() {
-      BOOST_TEST_MESSAGE( "teardown fixture" );
-  }
-};
-
-BOOST_FIXTURE_TEST_SUITE( SearchTest, SearchFixture );
+BOOST_FIXTURE_TEST_SUITE( SearchTest, Fixture );
     BOOST_AUTO_TEST_CASE( test_search_regex )
     {
         auto query = std::vector<NodeType>(
