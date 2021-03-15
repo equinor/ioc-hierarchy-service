@@ -7,11 +7,9 @@ add_library(tag_hierarchy_commands OBJECT
         commands/delete.cpp
         commands/delete.h
         commands/populategraph.cpp
-<<<<<<< HEAD
-        commands/search.cpp
-=======
         commands/populategraph.h
->>>>>>> master
+        commands/search.cpp
+        commands/search.h
         commands/nodes.cpp
         commands/nodes.h
         commands/filteroptions.cpp
