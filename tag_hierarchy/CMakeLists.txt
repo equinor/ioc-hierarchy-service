@@ -8,6 +8,8 @@ add_library(tag_hierarchy_commands OBJECT
         commands/delete.h
         commands/populategraph.cpp
         commands/populategraph.h
+        commands/search.cpp
+        commands/search.h
         commands/nodes.cpp
         commands/nodes.h
         commands/filteroptions.cpp
@@ -30,7 +32,7 @@ target_link_libraries(tag_hierarchy_commands
 add_library(tag_hierarchy STATIC
         tag_hierarchy.cpp
         tag_hierarchy.h
-        )
+        visitors/searchvisitor.h)
 # Compile with -fpic so we can link a shared library into it
 set_property(TARGET tag_hierarchy PROPERTY POSITION_INDEPENDENT_CODE ON)
 
@@ -54,6 +56,7 @@ set(UNIT_TEST_FILES
     unittests/test_filter_options.cpp
     unittests/test_delete_command.cpp
     unittests/test_load_save.cpp
+    unittests/test_search.cpp
     unittests/test_is_suppressed_field.cpp)
 add_executable(tag_hierarchy_test
     unittests/fixture.cpp

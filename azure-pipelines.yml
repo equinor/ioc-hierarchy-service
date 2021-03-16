@@ -29,7 +29,7 @@ stages:
     - bash: git submodule update --init --recursive
     - bash: docker build -t tag-hierarchy ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
-    - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.1.4-x86-64.deb .
+    - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.2.0-x86-64.deb .
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name continuous tag-hierarchy bash -c 'make continuous'
     - bash: docker cp continuous:/usr/src/app/ioc-hierarchy-service-docker-build/Testing/ .
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name nightly tag-hierarchy bash -c 'make nightly'
