@@ -50,7 +50,7 @@ namespace {
             const auto search_term = boost::get<std::string>(command_map.at("search_term"));
             const auto search_algorithm = command_map.count("search_algorithm") ?
                                           boost::get<std::string>(command_map.at("search_algorithm")) :
-                                          std::string("boyer-moore");
+                                          std::string("partial");
             if (search_algorithm == "partial") {
                 return std::make_shared<BoyerMooreSearcher>(search_term);
             }
@@ -60,6 +60,7 @@ namespace {
             if (search_algorithm == "exact") {
                 return std::make_shared<ExactSearcher>(search_term);
             }
+            throw std::runtime_error("Search algorithm must be one of partial, regex or exact");
         }
     }
 }
@@ -81,9 +82,9 @@ Search::ProcessRequest(std::vector<NodeType> &nodes)
 
     const auto max_results = boost::get<int>(command_map.at("max_results"));
     const auto search_keys = boost::get<std::vector<std::string>>(command_map.at("search_keys"));
+    const auto searcher = local::GetSearcher(command_map);
 
     auto results = std::vector<VertexT>();
-    const auto searcher = local::GetSearcher(command_map);
     auto visitor = SearchVisitor(searcher, results, search_keys, max_results);
     try {
         auto index_map = VertexDescMap();
