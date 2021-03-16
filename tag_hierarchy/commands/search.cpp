@@ -68,33 +68,23 @@ Search::ProcessRequest(std::vector<NodeType> &nodes)
         return {{{std::string("error"), std::string("empty")}}};
     }
 
-    const auto searcher = local::GetSearcher(command_map);
-
     const auto max_results = boost::get<int>(command_map.at("max_results"));
-    std::vector<boost::default_color_type> colormap(num_vertices(graph_));
+    const auto search_keys = boost::get<std::vector<std::string>>(command_map.at("search_keys"));
 
-    auto result_map = std::map<std::string, std::vector<VertexT>>();
-    result_map["folder"] = std::vector<VertexT>();
-    result_map["model"] = std::vector<VertexT>();
-    result_map["modelElement"] = std::vector<VertexT>();
-    auto visitor = SearchVisitor(searcher, result_map, max_results);
+    auto results = std::vector<VertexT>();
+    const auto searcher = local::GetSearcher(command_map);
+    auto visitor = SearchVisitor(searcher, results, search_keys, max_results);
     try {
         auto index_map = VertexDescMap();
         boost::associative_property_map<VertexDescMap> colormap(index_map);
         boost::depth_first_visit(graph_, root_, visitor, colormap);
     }
     catch (TagHierarchyUtil::StopTraversing) {
-        // It's fine, we throw to stop traversal
+        // It's fine, we throw to stop traversal if we are done searching
     }
 
     auto retval = std::vector<NodeType>();
-    for (auto v : result_map["folder"]) {
-        retval.push_back(graph_[v].properties);
-    }
-    for (auto v : result_map["model"]) {
-        retval.push_back(graph_[v].properties);
-    }
-    for (auto v : result_map["modelElement"]) {
+    for (auto v : results) {
         retval.push_back(graph_[v].properties);
     }
     return retval;
