@@ -28,7 +28,7 @@ BOOST_FIXTURE_TEST_SUITE( SearchTest, Fixture );
                 {{{std::string("command"), std::string("search")},
                          {std::string("search_term"), std::string("output")},
                          {std::string("search_keys"), search_keys},
-                         {std::string("search_algorithm"), std::string("boyer-moore")},
+                         {std::string("search_algorithm"), std::string("partial")},
                          {std::string("max_results"), 20000},
                  }}
         );

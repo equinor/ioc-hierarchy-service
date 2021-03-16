@@ -52,7 +52,7 @@ namespace {
             const auto search_algorithm = command_map.count("search_algorithm") ?
                                           boost::get<std::string>(command_map.at("search_algorithm")) :
                                           std::string("boyer-moore");
-            if (search_algorithm == "boyer-moore") {
+            if (search_algorithm == "partial") {
                 return std::make_shared<BoyerMooreSearcher>(search_term);
             }
             if (search_algorithm == "regex") {
