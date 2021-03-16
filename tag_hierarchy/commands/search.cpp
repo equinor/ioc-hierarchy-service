@@ -37,6 +37,15 @@ namespace {
             }
             std::regex searcher_;
         };
+        struct ExactSearcher : SearchUtils::Searcher {
+            ExactSearcher(const std::string& search_term) : Searcher(search_term),
+                                                            search_term_(search_term)
+            {}
+            bool HasTerm(std::string::const_iterator begin, std::string::const_iterator end) override {
+                return search_term_ == std::string(begin, end);
+            }
+            std::string search_term_;
+        };
         std::shared_ptr<SearchUtils::Searcher>
         GetSearcher(const NodeType& command_map) {
             const auto search_term = boost::get<std::string>(command_map.at("search_term"));
@@ -48,6 +57,9 @@ namespace {
             }
             if (search_algorithm == "regex") {
                 return std::make_shared<RegExSearcher>(search_term);
+            }
+            if (search_algorithm == "exact") {
+                return std::make_shared<ExactSearcher>(search_term);
             }
         }
     }
