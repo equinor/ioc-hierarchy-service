@@ -32,7 +32,6 @@ namespace {
             }
             bool HasTerm(std::string::const_iterator begin, std::string::const_iterator end) override {
                 auto result = std::regex_search(begin, end, searcher_);
-                std::cout << "Matching " << std::string(begin, end) << " against " << search_term_ << ": " << result << std::endl ;
                 return result;
             }
             std::regex searcher_;
