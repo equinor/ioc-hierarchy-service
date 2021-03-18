@@ -10,6 +10,8 @@ add_library(tag_hierarchy_commands OBJECT
         commands/populategraph.h
         commands/search.cpp
         commands/search.h
+        commands/update.cpp
+        commands/update.h
         commands/nodes.cpp
         commands/nodes.h
         commands/filteroptions.cpp
