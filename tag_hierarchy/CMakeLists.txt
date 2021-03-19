@@ -10,6 +10,8 @@ add_library(tag_hierarchy_commands OBJECT
         commands/populategraph.h
         commands/search.cpp
         commands/search.h
+        commands/update.cpp
+        commands/update.h
         commands/nodes.cpp
         commands/nodes.h
         commands/filteroptions.cpp
@@ -57,6 +59,7 @@ set(UNIT_TEST_FILES
     unittests/test_delete_command.cpp
     unittests/test_load_save.cpp
     unittests/test_search.cpp
+    unittests/test_update.cpp
     unittests/test_is_suppressed_field.cpp)
 add_executable(tag_hierarchy_test
     unittests/fixture.cpp
