@@ -41,6 +41,6 @@ stages:
     - task: GithubRelease@0
       displayName: 'Create GitHub Release'
       inputs:
-        gitHubConnection: 'GitHub connection 1'
+        gitHubConnection: 'IOC DPL Release'
         repositoryName: equinor/ioc-hierarchy-service
         assets: ./*.deb
