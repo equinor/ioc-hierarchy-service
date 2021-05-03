@@ -10,6 +10,3 @@
 [submodule "opencensus-cpp"]
 	path = opencensus-cpp
 	url = https://github.com/census-instrumentation/opencensus-cpp.git
-[submodule "rocksdb"]
-	path = rocksdb
-	url = git@github.com:facebook/rocksdb.git
