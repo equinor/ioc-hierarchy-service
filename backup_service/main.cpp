@@ -7,7 +7,7 @@
 #include "config/config.h"
 #include <zmq.hpp>
 
-#include <cpp_redis/cpp_redis>
+#include <redis++.h>
 
 #include <iostream>
 #include <sstream>
@@ -38,52 +38,37 @@ namespace {
             }
         }
 
-        std::shared_ptr<cpp_redis::client>
+        std::shared_ptr<sw::redis::Redis>
         GetRedisClient(const std::string& redis_url,
                        int redis_port,
                        const std::string& redis_password,
                        int redis_db) {
-            auto client = std::make_shared<cpp_redis::client>();
-            client->connect(redis_url, redis_port,
-                            [](const std::string& host, size_t port, cpp_redis::connect_state status) {
-                                if (status == cpp_redis::connect_state::dropped) {
-                                    std::cout << "Client disconnected from host " << host << std::endl;
-                                }
-                                else if (status == cpp_redis::connect_state::failed) {
-                                    std::cout << "Client failed to connect to " << host << std::endl;
-                                }
-                                else if (status == cpp_redis::connect_state::ok) {
-                                    std::cout << "Client connected successfully to " << host << std::endl;
-                                }
-                            });
-            if (redis_password != "") {
-                client->auth(redis_password);
-            }
-            client->select(redis_db);
+            sw::redis::ConnectionOptions connection_options;
+            connection_options.host = redis_url;
+            connection_options.port = redis_port;
+            connection_options.password = redis_password;
+            connection_options.db = redis_db;
+            auto client = std::make_shared<sw::redis::Redis>(connection_options);
             return client;
         }
 
         void
         SetHierarchy(const std::string &message,
                      std::string &reply_string,
-                     std::shared_ptr<cpp_redis::client> &client) {
-            client->set(CACHE_KEY, message, [](const cpp_redis::reply &reply) {
-                std::cout << "Set the cache" << std::endl;
-            });
-            client->sync_commit();
+                     std::shared_ptr<sw::redis::Redis> &client) {
+            client->set(CACHE_KEY, message);
             reply_string = "Success";
         }
 
         void
         GetHierarchy(std::string &reply_string,
-                     std::shared_ptr<cpp_redis::client> &client) {
+                     std::shared_ptr<sw::redis::Redis> &client) {
             std::cout << "Getting the cache key" << std::endl;
-            auto reply_string_future = client->get(CACHE_KEY);
-            client->sync_commit();
-            try {
-                reply_string = reply_string_future.get().as_string();
+            auto optional_reply_string = client->get(CACHE_KEY);
+            if (optional_reply_string) {
+                reply_string = *optional_reply_string;
             }
-            catch (cpp_redis::redis_error) { // Hierarchy is not cached
+            else {
                 reply_string = "ERROR";
             }
         }
@@ -114,7 +99,6 @@ namespace {
                 memcpy(pub.data(), pub_message.c_str(), pub_message.size());
                 pub_socket.send(pub);
             }
-            client->disconnect();
             zmq::message_t reply(reply_string.size());
             memcpy(reply.data(), reply_string.c_str(), reply_string.size());
             socket.send(reply);
@@ -137,7 +121,6 @@ int main ()
     int redis_db;
     std::string redis_password;
     local::GetRedisConnectionParams(redis_url, redis_port, redis_db, redis_password);
-    cpp_redis::active_logger = std::unique_ptr<cpp_redis::logger>(new cpp_redis::logger);
 
     zmq::socket_t pub_socket (context, ZMQ_PUB);
     pub_socket.bind(config::GetTagHierarchyStateChangeAddress());
