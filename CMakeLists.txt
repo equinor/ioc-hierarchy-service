@@ -1,6 +1,16 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(tag-hierarchy)
+include(FetchContent)
+FetchContent_Declare(
+  redis-plus-plus
+  GIT_REPOSITORY https://github.com/sewenew/redis-plus-plus.git
+  GIT_TAG 1.2.3
+  )
+set(REDIS_PLUS_PLUS_BUILD_TEST OFF)
+set(REDIS_PLUS_PLUS_CXX_STANDARD 17)
+FetchContent_MakeAvailable(redis-plus-plus)
+
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -10,7 +20,6 @@ find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework 
 find_package(ZeroMQ REQUIRED)
 find_package(Python COMPONENTS Interpreter Development)
 
-add_subdirectory(cpp_redis)
 add_subdirectory(pybind11)
 set(BUILD_TESTING OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
