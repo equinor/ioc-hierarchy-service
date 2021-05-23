@@ -3,7 +3,7 @@ FROM gcc:8 as cppbuild
 RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/local/bin/gfortran 999 \
       && apt-get update && apt-get install -y zlib1g-dev libgflags-dev libboost-graph-dev libtsan0 \
       libboost-serialization-dev libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev \
-      libhiredis-dev
+      libhiredis-dev libssl-dev
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.20.2-Linux-x86_64.sh \
       -q -O /tmp/cmake-install.sh \
       && chmod u+x /tmp/cmake-install.sh \

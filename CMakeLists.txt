@@ -1,13 +1,33 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(tag-hierarchy)
+
 include(FetchContent)
+
 FetchContent_Declare(
-  redis-plus-plus
-  GIT_REPOSITORY https://github.com/sewenew/redis-plus-plus.git
-  GIT_TAG 1.2.3
+  hiredis
+  GIT_REPOSITORY https://github.com/redis/hiredis
+  GIT_TAG v1.0.0
   )
-set(REDIS_PLUS_PLUS_BUILD_TEST OFF)
+set(ENABLE_SSL ON CACHE BOOL "test")
+set(DISABLE_TESTS ON CACHE BOOL "test")
+FetchContent_MakeAvailable(hiredis)
+file(COPY ${hiredis_SOURCE_DIR}/
+  DESTINATION ${hiredis_BINARY_DIR}/include/hiredis/
+  FILES_MATCHING PATTERN "*.h"
+)
+
+FetchContent_Declare(
+   redis-plus-plus
+   GIT_REPOSITORY https://github.com/sewenew/redis-plus-plus.git
+   GIT_TAG 1.2.3
+   )
+set(REDIS_PLUS_PLUS_USE_TLS ON CACHE BOOL "test")
+set(REDIS_PLUS_PLUS_BUILD_TEST OFF CACHE BOOL "test")
+set(HIREDIS_HEADER ${hiredis_BINARY_DIR}/include)
+set(HIREDIS_LIB ${hiredis_BINARY_DIR}/libhiredis.so)
+set(HIREDIS_TLS_LIB ${hiredis_BINARY_DIR}/libhiredis_ssl.so)
+
 set(REDIS_PLUS_PLUS_CXX_STANDARD 17)
 FetchContent_MakeAvailable(redis-plus-plus)
 
