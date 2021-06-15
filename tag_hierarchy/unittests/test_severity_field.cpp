@@ -8,7 +8,6 @@
 
 #include "tag_hierarchy/tag_hierarchy.h"
 #include "tag_hierarchy/unittests/fixture.h"
-#include "tag_hierarchy/utils/severity_states.h"
 
 // Used for verifying that the values of field for severity level of nodes
 // is propagated to through the hierarchy as expected.
@@ -39,8 +38,7 @@ void verify_correct_node_severity_level(int parent_severity_level,
     for (auto const& node: children_query_response) {
         int child_severity_level = -1;
         if (node.count("severity") > 0) {
-            auto child_severity_state = boost::get<std::string>(node.find("severity")->second);
-            child_severity_level = get_severity_level(child_severity_state);
+            child_severity_level = boost::get<int>(node.find("severity")->second);
         }
         expected_parent_severity_level = std::max(expected_parent_severity_level, child_severity_level);
 
@@ -86,8 +84,7 @@ void verify_correct_severity_level_with_filter(const std::vector<NodeType>& filt
         std::string node_id = boost::get<std::string>(props.find("id")->second);
         int severity_level = -1;
         if (node.count("severity") > 0) {
-            auto severity_state = boost::get<std::string>(node.find("severity")->second);
-            severity_level = get_severity_level(severity_state);
+            severity_level = boost::get<int>(node.find("severity")->second);
         }
         verify_correct_node_severity_level(
                 severity_level,

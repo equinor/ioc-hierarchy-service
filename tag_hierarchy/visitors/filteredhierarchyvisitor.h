@@ -5,7 +5,6 @@
 #pragma once
 
 #include "models/models.h"
-#include "tag_hierarchy/utils/severity_states.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/depth_first_search.hpp>
@@ -15,7 +14,7 @@ class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 public:
     explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::map<VertexT, std::set<VertexT>>& valid_models,
                                       const std::vector<std::string> &kpifilter, std::set<VertexT>& suppressed_nodes,
-                                      std::map<VertexT, std::string> node_severity) : valid_nodes_(valid_nodes),
+                                      std::map<VertexT, int> node_severity) : valid_nodes_(valid_nodes),
                                                                                   valid_models_(valid_models),
                                                                                   kpifilter_(kpifilter),
                                                                                   path_(std::deque<VertexT>()),
@@ -83,7 +82,7 @@ public:
             // Does this model element have a annotation severity level?
             if (g[target_vertex].properties.count("severity")) {
                 // Yes, then remember this.
-                node_severity_[target_vertex] = boost::get<std::string>(g[target_vertex].properties.find("severity")->second);
+                node_severity_[target_vertex] = boost::get<int>(g[target_vertex].properties.find("severity")->second);
             }
         }
         else {
@@ -103,15 +102,12 @@ public:
 
             for (auto iterator = ei; iterator != ei_end; iterator++) {
                 if (g[*iterator].properties.count("severity")) {
-                    auto child_severity_state = boost::get<std::string>(g[target_vertex].properties.find("severity")->second);
-                    auto child_severity_level = get_severity_level(child_severity_state);
+                    auto child_severity_level = boost::get<int>(g[target_vertex].properties.find("severity")->second);
                     severity_level = std::max(severity_level, child_severity_level);
                 }
             }
 
-            if (severity_level > -1) {
-                node_severity_[source_vertex] = get_state(severity_level);
-            }
+            node_severity_[source_vertex] = severity_level;
         }
     }
 
@@ -121,5 +117,5 @@ private:
     const std::vector<std::string> &kpifilter_;
     std::deque<VertexT> path_;
     std::map<VertexT, std::set<VertexT>>& valid_models_;
-    std::map<VertexT, std::string>& node_severity_;
+    std::map<VertexT, int>& node_severity_;
 };
