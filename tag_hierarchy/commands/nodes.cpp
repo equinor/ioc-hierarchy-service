@@ -140,7 +140,7 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
         props["issuppressed"] = (suppressed_nodes.find(*iter) != suppressed_nodes.end());
 
         if (node_severity.find(*iter) != node_severity.end()) {
-            props['severity'] = node_severity[*iter];
+            props["severity"] = node_severity[*iter];
         }
 
         retval.push_back(props);

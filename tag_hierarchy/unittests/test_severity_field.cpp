@@ -83,8 +83,8 @@ void verify_correct_severity_level_with_filter(const std::vector<NodeType>& filt
     for (const auto& props : response) {
         std::string node_id = boost::get<std::string>(props.find("id")->second);
         int severity_level = -1;
-        if (node.count("severity") > 0) {
-            severity_level = boost::get<int>(node.find("severity")->second);
+        if (props.count("severity") > 0) {
+            severity_level = boost::get<int>(props.find("severity")->second);
         }
         verify_correct_node_severity_level(
                 severity_level,
