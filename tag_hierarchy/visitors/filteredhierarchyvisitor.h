@@ -14,7 +14,7 @@ class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 public:
     explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::map<VertexT, std::set<VertexT>>& valid_models,
                                       const std::vector<std::string> &kpifilter, std::set<VertexT>& suppressed_nodes,
-                                      std::map<VertexT, int> node_severity) : valid_nodes_(valid_nodes),
+                                      std::map<VertexT, int>& node_severity) : valid_nodes_(valid_nodes),
                                                                                   valid_models_(valid_models),
                                                                                   kpifilter_(kpifilter),
                                                                                   path_(std::deque<VertexT>()),
