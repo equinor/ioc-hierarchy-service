@@ -55,6 +55,62 @@ void verify_correct_node_severity_level(int parent_severity_level,
 }
 
 void verify_correct_severity_level_with_filter(const std::vector<NodeType>& filter) {
+
+    // Update the tag hierarchy with nodes that have severity level set.
+    auto updateQuery = std::vector<NodeType>(
+            {
+                    {{std::string("command"), std::string("update")},
+                    },
+                    {
+                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-2->L4Model-1-input1-element-1")},
+                        {std::string("description"),std::string("Description")},
+                        {std::string("id"),std::string("a8127a40-2a28-2ed1-83e9-442ada88c496")},
+                        {std::string("parent_id"),std::string("b26b3f36-ade0-a404-681f-1d50020d64eb")},
+                        {std::string("levelno"), 4 },
+                        {std::string("is_modelelement"), true },
+                        {std::string("elementtype"),std::string("Database")},
+                        {std::string("type"),std::string("modelElement")},
+                        {std::string("isrunningtag"), false },
+                        {std::string("kpigroup"),std::string("Temporib")},
+                        {std::string("kpigroup_id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
+                        {std::string("issuppressed"), true },
+                        {std::string("severity"), 3 }
+                    },
+                    {
+                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-3->L4Model-1-output0-element-1")},
+                        {std::string("description"),std::string("Description")},
+                        {std::string("id"),std::string("693c72c3-e791-72dc-6c46-443ef2f64402")},
+                        {std::string("parent_id"),std::string("98af222c-e4de-9183-3761-c5c0a19dff1c")},
+                        {std::string("levelno"), 4 },
+                        {std::string("is_modelelement"), true },
+                        {std::string("elementtype"),std::string("Calculated")},
+                        {std::string("type"),std::string("modelElement")},
+                        {std::string("isrunningtag"), false },
+                        {std::string("kpigroup"),std::string("Temporib")},
+                        {std::string("kpigroup_id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
+                        {std::string("issuppressed"), true },
+                        {std::string("severity"), 2 }
+                    },
+                    {
+                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-1->L4Model-1-input0-element-1")},
+                        {std::string("description"),std::string("Description")},
+                        {std::string("id"),std::string("bbd988cd-ed4c-9238-81f9-8133b278bdcb")},
+                        {std::string("parent_id"),std::string("4857959b-f460-76b9-dda6-6113203b69ab")},
+                        {std::string("levelno"), 4 },
+                        {std::string("is_modelelement"), true },
+                        {std::string("elementtype"),std::string("Database")},
+                        {std::string("type"),std::string("modelElement")},
+                        {std::string("isrunningtag"), false },
+                        {std::string("kpigroup"),std::string("Temporib")},
+                        {std::string("kpigroup_id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
+                        {std::string("issuppressed"), false },
+                        {std::string("severity"), 1 }
+                    },
+            }
+    );
+
+    TagHierarchy::Handle(updateQuery);
+
     // Construct the query for the top nodes.
     auto query = std::vector<NodeType>(
             {{

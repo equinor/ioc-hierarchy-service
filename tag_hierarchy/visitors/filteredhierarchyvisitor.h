@@ -72,17 +72,26 @@ public:
             && boost::get<bool>(g[target_vertex].properties.find("is_modelelement")->second)) {
             // Yes, the target is a model element node.
             // Is this model element suppressed?
+            auto source_vertex = boost::source(e, g);
             if (g[target_vertex].properties.count("issuppressed")
                 && boost::get<bool>(g[target_vertex].properties.find("issuppressed")->second)) {
                 // Yes, it is suppressed. Then the source node should be suppressed as well.
-                auto source_vertex = boost::source(e, g);
                 suppressed_nodes_.insert(source_vertex);
                 suppressed_nodes_.insert(target_vertex);
             }
-            // Does this model element have a annotation severity level?
+            // Does this model element have an annotation severity level?
             if (g[target_vertex].properties.count("severity")) {
-                // Yes, then remember this.
+                // Yes, then set this and propagate to source vertex.
                 node_severity_[target_vertex] = boost::get<int>(g[target_vertex].properties.find("severity")->second);
+                // Does the source vertex have an annotation severity level?
+                if (node_severity_.find(source_vertex) != node_severity_.end()) {
+                    // No, then let the severity level of the target node propagate.
+                    node_severity_[source_vertex] = node_severity_[target_vertex];
+                }
+                else {
+                    // Yes, then propagate the highest severity level.
+                    node_severity_[source_vertex] = std::max(node_severity_[source_vertex], node_severity_[target_vertex]);
+                }
             }
         }
         else {
@@ -93,21 +102,19 @@ public:
                 // Yes, then the suppression should propagate to the source node.
                 suppressed_nodes_.insert(source_vertex);
             }
-
-            // Find and set the severity level of the node.
-            auto ei = TagHierarchyGraph::adjacency_iterator();
-            auto ei_end = TagHierarchyGraph::adjacency_iterator();
-            boost::tie(ei, ei_end) = boost::adjacent_vertices(source_vertex, g);
-            auto severity_level = -1;
-
-            for (auto iterator = ei; iterator != ei_end; iterator++) {
-                if (g[*iterator].properties.count("severity")) {
-                    auto child_severity_level = boost::get<int>(g[target_vertex].properties.find("severity")->second);
-                    severity_level = std::max(severity_level, child_severity_level);
+            // Does the target node have a set severity?
+            if (node_severity_.find(target_vertex) != node_severity_.end()) {
+                // Yes, then the severity should propagate to the source node.
+                // Does the source have a set severity?
+                if (node_severity_.find(source_vertex) != node_severity_.end()) {
+                    // No, then let the severity level of the target node propagate.
+                    node_severity_[source_vertex] = node_severity_[target_vertex];
+                }
+                else {
+                    // Yes, then propagate the highest severity level.
+                    node_severity_[source_vertex] = std::max(node_severity_[source_vertex], node_severity_[target_vertex]);
                 }
             }
-
-            node_severity_[source_vertex] = severity_level;
         }
     }
 

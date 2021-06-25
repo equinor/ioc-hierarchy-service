@@ -141,6 +141,8 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
 
         if (node_severity.find(*iter) != node_severity.end()) {
             props["severity"] = node_severity[*iter];
+            std::cout << "ID " << "\n";
+            // std::cout << "SUPPRESSION " << node_severity[*iter] << "\n";
         }
 
         retval.push_back(props);
