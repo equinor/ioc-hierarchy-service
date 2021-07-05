@@ -152,38 +152,37 @@ void verify_correct_severity_level_with_filter(const std::vector<NodeType>& filt
 
 BOOST_FIXTURE_TEST_SUITE( FieldSeverityTest, Fixture );
 
-// Tests that the field for severity is propagated from
-// model element nodes all the way up to the root node.
-BOOST_AUTO_TEST_CASE( test_severity_propagation )
-        {
-                verify_correct_severity_level_with_filter(std::vector<NodeType>());
-        }
+    // Tests that the field for severity is propagated from
+    // model element nodes all the way up to the root node.
+    BOOST_AUTO_TEST_CASE( test_severity_propagation )
+    {
+        verify_correct_severity_level_with_filter(std::vector<NodeType>());
+    }
 
-// Tests that the field for severity is propagated from model element nodes
-// all the way up to the root node, when the query contains a model owner filter.
-BOOST_AUTO_TEST_CASE( test_severity_propagation_with_model_owner_filter )
-        {
-                verify_correct_severity_level_with_filter(std::vector<NodeType>(
-                        {{
-                                 {
-                                         std::string("modelownerfilter"), std::vector<std::string>{"8eb4a1e1-1316-bcef-b20f-bbbaed2a4e95"}
-                                 }
-                         }}
+    // Tests that the field for severity is propagated from model element nodes
+    // all the way up to the root node, when the query contains a model owner filter.
+    BOOST_AUTO_TEST_CASE( test_severity_propagation_with_model_owner_filter )
+    {
+        verify_correct_severity_level_with_filter(std::vector<NodeType>(
+                {{
+                    {
+                        std::string("modelownerfilter"), std::vector<std::string>{"8eb4a1e1-1316-bcef-b20f-bbbaed2a4e95"}
+                    }
+                }}
                 ));
-        }
+    }
 
-// Tests that the field for severity is propagated from model element nodes
-// all the way up to the root node, when the query contains a model class filter.
-BOOST_AUTO_TEST_CASE( test_severity_propagation_with_model_class_filter )
-        {
-                verify_correct_severity_level_with_filter(std::vector<NodeType>(
-                        {{
-                                 {
-                                         std::string("modelclassfilter"), std::vector<std::string>{"44380be8-76d2-a1fd-dc50-0ad8f4c151e4"}
-                                 }
-                         }}
-                ));
-        }
+    // Tests that the field for severity is propagated from model element nodes
+    // all the way up to the root node, when the query contains a model class filter.
+    BOOST_AUTO_TEST_CASE( test_severity_propagation_with_model_class_filter )
+    {
+        verify_correct_severity_level_with_filter(std::vector<NodeType>({{
+                    {
+                    std::string("modelclassfilter"), std::vector<std::string>{"44380be8-76d2-a1fd-dc50-0ad8f4c151e4"}
+                    }
+            }}
+            ));
+    }
 
 BOOST_AUTO_TEST_SUITE_END()
 

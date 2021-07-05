@@ -84,7 +84,7 @@ public:
                 // Yes, then set this and propagate to source vertex.
                 node_severity_[target_vertex] = boost::get<int>(g[target_vertex].properties.find("severity")->second);
                 // Does the source vertex have an annotation severity level?
-                if (node_severity_.find(source_vertex) != node_severity_.end()) {
+                if (node_severity_.count(source_vertex)) {
                     // No, then let the severity level of the target node propagate.
                     node_severity_[source_vertex] = node_severity_[target_vertex];
                 }
@@ -97,16 +97,17 @@ public:
         else {
             // No, this is not a model element node.
             auto source_vertex = boost::source(e, g);
+            auto source_vertex_has_severity = node_severity_.count(source_vertex) > 0;
             // Is the target node suppressed?
             if (suppressed_nodes_.find(target_vertex) != suppressed_nodes_.end()) {
                 // Yes, then the suppression should propagate to the source node.
                 suppressed_nodes_.insert(source_vertex);
             }
             // Does the target node have a set severity?
-            if (node_severity_.find(target_vertex) != node_severity_.end()) {
+            if (node_severity_.count(target_vertex)) {
                 // Yes, then the severity should propagate to the source node.
                 // Does the source have a set severity?
-                if (node_severity_.find(source_vertex) != node_severity_.end()) {
+                if (source_vertex_has_severity) {
                     // No, then let the severity level of the target node propagate.
                     node_severity_[source_vertex] = node_severity_[target_vertex];
                 }
