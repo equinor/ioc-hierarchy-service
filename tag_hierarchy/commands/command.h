@@ -20,7 +20,7 @@ public:
 
 protected:
     TagHierarchyGraph& GetGraph();
-    std::map<std::string, VertexT>& GetVertices();
+    std::unordered_map<std::string, VertexT>& GetVertices();
     VertexT& GetRoot();
 
 private:

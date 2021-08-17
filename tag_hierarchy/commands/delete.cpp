@@ -5,7 +5,7 @@ namespace {
         std::string
         DeleteVertexRecursiveImpl(TagHierarchyGraph& graph,
                 VertexT vertex,
-                std::map<std::string, VertexT>& vertices,
+                std::unordered_map<std::string, VertexT>& vertices,
                 std::vector<VertexT>& vertices_to_delete,
                 int depth) {
             depth++;
@@ -28,7 +28,7 @@ namespace {
         /* Recursively delete all children and all connecting edges from \param vertex
          * Updates \param vertices which maps IDs to vertex descriptors to reflect changes */
         std::string
-        DeleteVertex(TagHierarchyGraph& graph, VertexT vertex, std::map<std::string, VertexT>& vertices) {
+        DeleteVertex(TagHierarchyGraph& graph, VertexT vertex, std::unordered_map<std::string, VertexT>& vertices) {
             auto vertices_to_delete = std::vector<VertexT>();
             auto ids_to_delete = std::vector<std::string>();
             auto depth = 0;

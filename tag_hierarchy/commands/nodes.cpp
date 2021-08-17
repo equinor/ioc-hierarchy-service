@@ -59,9 +59,9 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     }
 
     auto valid_nodes = std::set<VertexT>();
-    auto valid_models = std::map<VertexT, std::set<VertexT>>();
+    auto valid_models = std::unordered_map<VertexT, std::set<VertexT>>();
     auto suppressed_nodes = std::set<VertexT>();
-    auto node_severity = std::map<VertexT, int>();
+    auto node_severity = std::unordered_map<VertexT, int>();
     auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter, suppressed_nodes, node_severity);
 
     auto const termfunc = [l1filter, l2filter, modelownerfilter, modelclassfilter] (

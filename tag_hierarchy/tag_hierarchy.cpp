@@ -32,7 +32,7 @@ using DispatchFunction =
 class TagHierarchyImpl {
 private:
     TagHierarchyGraph graph_;
-    std::map<std::string, VertexT> vertices_;
+    std::unordered_map<std::string, VertexT> vertices_;
     std::map<std::string, DispatchFunction> command_func_dispatch_;
     EdgeLabelMap edge_labels_;
     VertexT root_;
@@ -43,7 +43,7 @@ public:
         return graph_;
     }
 
-    std::map<std::string, VertexT>& GetVertices() {
+    std::unordered_map<std::string, VertexT>& GetVertices() {
         return vertices_;
     }
 
@@ -183,7 +183,7 @@ TagHierarchy::GetGraph() {
     return GetTagHierarchy().GetGraph();
 }
 
-std::map<std::string, VertexT>&
+std::unordered_map<std::string, VertexT>&
 TagHierarchy::GetVertices() {
     return GetTagHierarchy().GetVertices();
 }
