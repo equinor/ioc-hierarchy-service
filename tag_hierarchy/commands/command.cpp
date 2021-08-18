@@ -49,7 +49,7 @@ TagHierarchyGraph &Command::GetGraph() {
     return TagHierarchy::GetGraph();
 }
 
-std::map<std::string, VertexT> &Command::GetVertices() {
+std::unordered_map<std::string, VertexT> &Command::GetVertices() {
     return TagHierarchy::GetVertices();
 }
 

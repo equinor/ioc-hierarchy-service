@@ -12,12 +12,14 @@
 class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 {
 public:
-    explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::map<VertexT, std::set<VertexT>>& valid_models,
-                                      const std::vector<std::string> &kpifilter, std::set<VertexT>& suppressed_nodes) : valid_nodes_(valid_nodes),
-                                                                                                                        valid_models_(valid_models),
-                                                                                                                        kpifilter_(kpifilter),
-                                                                                                                        path_(std::deque<VertexT>()),
-                                                                                                                        suppressed_nodes_(suppressed_nodes) {}
+    explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::unordered_map<VertexT, std::set<VertexT>>& valid_models,
+                                      const std::vector<std::string> &kpifilter, std::set<VertexT>& suppressed_nodes,
+                                      std::unordered_map<VertexT, int>& node_severity) : valid_nodes_(valid_nodes),
+                                                                                  valid_models_(valid_models),
+                                                                                  kpifilter_(kpifilter),
+                                                                                  path_(std::deque<VertexT>()),
+                                                                                  suppressed_nodes_(suppressed_nodes),
+                                                                                  node_severity_(node_severity) {}
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
@@ -70,21 +72,49 @@ public:
             && boost::get<bool>(g[target_vertex].properties.find("is_modelelement")->second)) {
             // Yes, the target is a model element node.
             // Is this model element suppressed?
+            auto source_vertex = boost::source(e, g);
             if (g[target_vertex].properties.count("issuppressed")
                 && boost::get<bool>(g[target_vertex].properties.find("issuppressed")->second)) {
                 // Yes, it is suppressed. Then the source node should be suppressed as well.
-                auto source_vertex = boost::source(e, g);
                 suppressed_nodes_.insert(source_vertex);
                 suppressed_nodes_.insert(target_vertex);
+            }
+            // Does this model element have an annotation severity level?
+            if (g[target_vertex].properties.count("severity")) {
+                // Yes, then set this and propagate to source vertex.
+                node_severity_[target_vertex] = boost::get<int>(g[target_vertex].properties.find("severity")->second);
+                // Does the source vertex have an annotation severity level?
+                if (node_severity_.count(source_vertex)) {
+                    // No, then let the severity level of the target node propagate.
+                    node_severity_[source_vertex] = node_severity_[target_vertex];
+                }
+                else {
+                    // Yes, then propagate the highest severity level.
+                    node_severity_[source_vertex] = std::max(node_severity_[source_vertex], node_severity_[target_vertex]);
+                }
             }
         }
         else {
             // No, this is not a model element node.
+            auto source_vertex = boost::source(e, g);
+            auto source_vertex_has_severity = node_severity_.count(source_vertex) > 0;
             // Is the target node suppressed?
             if (suppressed_nodes_.find(target_vertex) != suppressed_nodes_.end()) {
                 // Yes, then the suppression should propagate to the source node.
-                auto source_vertex = boost::source(e, g);
                 suppressed_nodes_.insert(source_vertex);
+            }
+            // Does the target node have a set severity?
+            if (node_severity_.count(target_vertex)) {
+                // Yes, then the severity should propagate to the source node.
+                // Does the source have a set severity?
+                if (source_vertex_has_severity) {
+                    // No, then let the severity level of the target node propagate.
+                    node_severity_[source_vertex] = node_severity_[target_vertex];
+                }
+                else {
+                    // Yes, then propagate the highest severity level.
+                    node_severity_[source_vertex] = std::max(node_severity_[source_vertex], node_severity_[target_vertex]);
+                }
             }
         }
     }
@@ -94,5 +124,6 @@ private:
     std::set<VertexT> &suppressed_nodes_;
     const std::vector<std::string> &kpifilter_;
     std::deque<VertexT> path_;
-    std::map<VertexT, std::set<VertexT>>& valid_models_;
+    std::unordered_map<VertexT, std::set<VertexT>>& valid_models_;
+    std::unordered_map<VertexT, int>& node_severity_;
 };

@@ -15,7 +15,7 @@ public:
 
 private:
     static TagHierarchyGraph& GetGraph();
-    static std::map<std::string, VertexT>& GetVertices();
+    static std::unordered_map<std::string, VertexT>& GetVertices();
     static EdgeLabelMap & GetEdgeLabels();
     static VertexT& GetRoot();
     static void Register(Command& in, std::string name);
