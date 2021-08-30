@@ -98,7 +98,7 @@ The project has a few other dependencies
 * ZeroMQ - This library handles the interprocess communication between
 the python client and the servers
 * cppzmq - Provides c++ bindings to libzmq
-* cpp_redis - Provides functionality for storing strings in Redis cache
+* redis-plus-plus - Provides functionality for storing strings in Redis cache
 * opencensus_cpp - Provides logging functionality
 * pybind11 - Seamless integration of call interfaces between Python
 and C++
