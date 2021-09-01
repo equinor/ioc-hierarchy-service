@@ -98,7 +98,7 @@ The project has a few other dependencies
 * ZeroMQ - This library handles the interprocess communication between
 the python client and the servers
 * cppzmq - Provides c++ bindings to libzmq
-* cpp_redis - Provides functionality for storing strings in Redis cache
+* redis-plus-plus - Provides functionality for storing strings in Redis cache
 * opencensus_cpp - Provides logging functionality
 * pybind11 - Seamless integration of call interfaces between Python
 and C++
@@ -115,6 +115,16 @@ between the application and the library to mitigate future risks of
 rewriting.
 
 # Development
+## Release cycle
+When new functionality has been developed, it should be released via the
+following procedure;
+* Decide a new version number. This will usually be a patch release. Larger changes
+that e.g. add a command constitutes a minor version bump, and large architectural
+or API changes may warrant a major version bump.
+* Make a PR that bumps version numbers found in `CMakeLists.txt`, `Makefile`and 
+`azure-pipelines.yml`
+* When PR has been merged, tag the master branch with the new version. 
+
 ## Getting started running CLion with Docker
 Preconditions: Docker and CLion must be installed on your local computer
 
