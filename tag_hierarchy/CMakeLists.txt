@@ -78,7 +78,14 @@ target_link_libraries(tag_hierarchy_test
     PUBLIC opencensus-cpp::trace
     PUBLIC opencensus-cpp::exporters_trace_stdout
     PRIVATE Boost::unit_test_framework
+    PRIVATE Boost::json
+    PRIVATE Boost::boost
     PUBLIC ${PYTHON_LIBRARIES}
+)
+
+file(
+    COPY unittests/hierarchy_dump.json
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 foreach(UNIT_TEST_FILE ${UNIT_TEST_FILES})
