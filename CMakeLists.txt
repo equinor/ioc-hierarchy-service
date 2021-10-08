@@ -19,8 +19,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework json REQUIRED)
 find_package(ZeroMQ REQUIRED)
 find_package(Python COMPONENTS Interpreter Development)
+find_package(pybind11)
 
-add_subdirectory(pybind11)
 set(BUILD_TESTING OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(opencensus-cpp)
@@ -34,7 +34,8 @@ pybind11_add_module(tag_hierarchy_client python/cpp/client.cpp)
 target_link_libraries(tag_hierarchy_client
     PRIVATE Boost::serialization
     PRIVATE libzmq
-    PUBLIC pybind11
+    PRIVATE Python::Module
+    PUBLIC pybind11::pybind11_headers
 )
 target_include_directories(tag_hierarchy_client
     PRIVATE cppzmq
@@ -69,7 +70,7 @@ target_link_libraries(tag-hierarchy
     PRIVATE Boost::serialization
     PUBLIC opencensus-cpp::trace
     PUBLIC opencensus-cpp::exporters_trace_stdout
-    PUBLIC pybind11
+    PUBLIC pybind11::pybind11_headers
     PUBLIC ${PYTHON_LIBRARIES}
 )
 
