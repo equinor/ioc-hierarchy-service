@@ -1,9 +1,8 @@
 # This builds the a debian package of the project
-FROM gcc:11.2-bullseye as cppbuild
-RUN update-alternatives --install /usr/bin/gfortran gfortran /usr/local/bin/gfortran 999 \
-      && apt-get update && apt-get install -y zlib1g-dev libgflags-dev libboost-graph-dev libtsan0 \
+FROM debian:bullseye as cppbuild
+RUN apt-get update && apt-get install -y zlib1g-dev libgflags-dev libboost-graph-dev libtsan0 \
       libboost-serialization-dev libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev \
-      libhiredis-dev pybind11-dev
+      libhiredis-dev pybind11-dev wget build-essential git python3 python3-distutils file 
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-Linux-x86_64.sh \
       -q -O /tmp/cmake-install.sh \
       && chmod u+x /tmp/cmake-install.sh \
