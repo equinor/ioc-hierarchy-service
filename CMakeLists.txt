@@ -11,19 +11,30 @@ set(REDIS_PLUS_PLUS_BUILD_TEST OFF)
 set(REDIS_PLUS_PLUS_CXX_STANDARD 17)
 FetchContent_MakeAvailable(redis-plus-plus)
 
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/nlohmann/json
+  GIT_TAG v3.10.4)
+
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+  FetchContent_Populate(json)
+endif()
+
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 
-find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework json REQUIRED)
+find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework REQUIRED)
 find_package(ZeroMQ REQUIRED)
 find_package(Python COMPONENTS Interpreter Development)
 find_package(pybind11)
 
 set(BUILD_TESTING OFF)
+set(JSON_BuildTests OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(opencensus-cpp)
+add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 set(BUILD_TESTING ON)
 set(CMAKE_DIRECTORY_LABELS tag_hierarchy)
 add_subdirectory(tag_hierarchy)

@@ -2,7 +2,7 @@
 #include "tag_hierarchy/unittests/fixture.h"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "models/models.h"
 #include "tag_hierarchy/tag_hierarchy.h"
@@ -11,30 +11,30 @@
 Fixture::Fixture() {
     BOOST_TEST_MESSAGE( "Constructing test fixture" );
     std::ifstream ifs("hierarchy_dump.json");
-    std::string content((std::istreambuf_iterator<char>(ifs)),
-                        (std::istreambuf_iterator<char>()));
-    boost::json::array modelhierarchy_json = boost::json::parse(content).as_array();
-    auto modelhierarchy = std::vector<NodeType>{};
-    for (const auto& value : modelhierarchy_json) {
-        auto temp = NodeType{};
-        const auto object = boost::json::value_to<boost::json::object>(value);
+    nlohmann::json modelhierarchy_json;
+    ifs >> modelhierarchy_json;
 
-        for (auto iter = object.cbegin(); iter != object.cend(); ++iter) {
-            auto value = iter->value();
+    auto modelhierarchy = std::vector<NodeType>{};
+    for (const auto value : modelhierarchy_json) {
+        auto temp = NodeType{};
+        const auto object = value;
+
+        for (auto& element : value.items()) {
+            auto value = element.value();
             if (value.is_null()) {
-                temp.insert({std::string(iter->key()), pybind11::none()});
+                temp.insert({std::string(element.key()), pybind11::none()});
             }
             else if (value.is_string()) {
-                temp.insert({std::string(iter->key()), boost::json::value_to<std::string>(iter->value())});
+                temp.insert({std::string(element.key()), value.get<std::string>()});
             }
-            else if (value.is_double()) {
-                temp.insert({std::string(iter->key()), boost::json::value_to<double>(iter->value())});
+            else if (value.is_number_float()) {
+                temp.insert({std::string(element.key()), value.get<double>()});
             }
-            else if (value.is_bool()) {
-                temp.insert({std::string(iter->key()), boost::json::value_to<bool>(iter->value())});
+            else if (value.is_boolean()) {
+                temp.insert({std::string(element.key()), value.get<bool>()});
             }
-            else if (value.is_int64()) {
-                temp.insert({std::string(iter->key()), boost::json::value_to<int>(iter->value())});
+            else if (value.is_number_integer()) {
+                temp.insert({std::string(element.key()), value.get<int>()});
             }
         }
         modelhierarchy.push_back(temp);

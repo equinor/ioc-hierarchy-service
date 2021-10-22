@@ -80,8 +80,8 @@ target_link_libraries(tag_hierarchy_test
     PUBLIC opencensus-cpp::trace
     PUBLIC opencensus-cpp::exporters_trace_stdout
     PRIVATE Boost::unit_test_framework
-    PRIVATE Boost::json
     PRIVATE Boost::boost
+    PRIVATE nlohmann_json::nlohmann_json
     PUBLIC ${PYTHON_LIBRARIES}
 )
 
