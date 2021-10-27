@@ -18,6 +18,7 @@ ctest_start(Experimental)
 file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
 CMAKE_CXX_COMPILER=g++
 CMAKE_CXX_FLAGS=-g -O1 -fsanitize=address -fno-omit-frame-pointer
+CMAKE_LDFLAGS= -fsanitize=address
 ")
 
 ctest_configure()

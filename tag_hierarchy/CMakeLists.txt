@@ -28,7 +28,8 @@ target_link_libraries(tag_hierarchy_commands
         PRIVATE ${PYTHON_LIBRARIES}
         PRIVATE Boost::graph
         PUBLIC Boost::serialization
-        PRIVATE pybind11
+        PUBLIC Python::Module
+        PUBLIC pybind11::pybind11_headers
         )
 
 add_library(tag_hierarchy STATIC
@@ -50,7 +51,8 @@ target_link_libraries(tag_hierarchy
     PUBLIC ${PYTHON_LIBRARIES}
     PRIVATE Boost::iostreams
     PUBLIC Boost::serialization
-    PUBLIC pybind11
+    PUBLIC Python::Module
+    PUBLIC pybind11::pybind11_headers
     PUBLIC libzmq)
 
 set(UNIT_TEST_FILES
@@ -78,7 +80,14 @@ target_link_libraries(tag_hierarchy_test
     PUBLIC opencensus-cpp::trace
     PUBLIC opencensus-cpp::exporters_trace_stdout
     PRIVATE Boost::unit_test_framework
+    PRIVATE Boost::boost
+    PRIVATE nlohmann_json::nlohmann_json
     PUBLIC ${PYTHON_LIBRARIES}
+)
+
+file(
+    COPY unittests/hierarchy_dump.json
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 foreach(UNIT_TEST_FILE ${UNIT_TEST_FILES})

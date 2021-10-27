@@ -18,7 +18,7 @@ BOOST_FIXTURE_TEST_SUITE( SearchTest, Fixture );
                  }}
         );
         auto response = TagHierarchy::Handle(query);
-        BOOST_TEST(response.size() == 22);
+        BOOST_TEST(response.size() == 24);
     };
 
     BOOST_AUTO_TEST_CASE( test_search_boyer_moore )
@@ -33,7 +33,7 @@ BOOST_FIXTURE_TEST_SUITE( SearchTest, Fixture );
                  }}
         );
         auto response = TagHierarchy::Handle(query);
-        BOOST_TEST(response.size() == 34);
+        BOOST_TEST(response.size() == 36);
     }
     BOOST_AUTO_TEST_CASE( test_search_exact )
     {

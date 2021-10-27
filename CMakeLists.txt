@@ -11,6 +11,15 @@ set(REDIS_PLUS_PLUS_BUILD_TEST OFF)
 set(REDIS_PLUS_PLUS_CXX_STANDARD 17)
 FetchContent_MakeAvailable(redis-plus-plus)
 
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/nlohmann/json
+  GIT_TAG v3.10.4)
+
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+  FetchContent_Populate(json)
+endif()
+
 enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -19,11 +28,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework REQUIRED)
 find_package(ZeroMQ REQUIRED)
 find_package(Python COMPONENTS Interpreter Development)
+find_package(pybind11)
 
-add_subdirectory(pybind11)
 set(BUILD_TESTING OFF)
+set(JSON_BuildTests OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_subdirectory(opencensus-cpp)
+add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 set(BUILD_TESTING ON)
 set(CMAKE_DIRECTORY_LABELS tag_hierarchy)
 add_subdirectory(tag_hierarchy)
@@ -34,7 +45,8 @@ pybind11_add_module(tag_hierarchy_client python/cpp/client.cpp)
 target_link_libraries(tag_hierarchy_client
     PRIVATE Boost::serialization
     PRIVATE libzmq
-    PUBLIC pybind11
+    PRIVATE Python::Module
+    PUBLIC pybind11::pybind11_headers
 )
 target_include_directories(tag_hierarchy_client
     PRIVATE cppzmq
@@ -69,7 +81,7 @@ target_link_libraries(tag-hierarchy
     PRIVATE Boost::serialization
     PUBLIC opencensus-cpp::trace
     PUBLIC opencensus-cpp::exporters_trace_stdout
-    PUBLIC pybind11
+    PUBLIC pybind11::pybind11_headers
     PUBLIC ${PYTHON_LIBRARIES}
 )
 
@@ -82,10 +94,10 @@ set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
 set(CPACK_PACKAGE_NAME "tag-hierarchy")
 set(CPACK_PACKAGE_VENDOR "Equinor")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "tag-hierarchy - handling tag hierarchies since 2019")
-set(CPACK_PACKAGE_VERSION "1.3.1")
+set(CPACK_PACKAGE_VERSION "1.4.0")
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "3")
-set(CPACK_PACKAGE_VERSION_PATCH "1")
+set(CPACK_PACKAGE_VERSION_MINOR "4")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
 set(CPACK_SYSTEM_NAME "x86-64")
 set(CPACK_INSTALL_PREFIX /usr)
 set(CPACK_SET_DESTDIR "ON")
