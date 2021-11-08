@@ -16,6 +16,10 @@ add_library(tag_hierarchy_commands OBJECT
         commands/nodes.h
         commands/filteroptions.cpp
         commands/filteroptions.h
+        utils/exceptions.h
+        utils/filters.cpp
+        utils/filters.h
+        utils/search.h
         visitors/filteredhierarchyvisitor.h
         visitors/filteroptionsvisitor.h
         )
