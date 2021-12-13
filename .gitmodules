@@ -1,6 +1,3 @@
 [submodule "cppzmq"]
 	path = cppzmq
 	url = https://github.com/zeromq/cppzmq.git
-[submodule "opencensus-cpp"]
-	path = opencensus-cpp
-	url = https://github.com/census-instrumentation/opencensus-cpp.git

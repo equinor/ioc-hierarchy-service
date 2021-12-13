@@ -33,7 +33,6 @@ find_package(pybind11)
 set(BUILD_TESTING OFF)
 set(JSON_BuildTests OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_subdirectory(opencensus-cpp)
 add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 set(BUILD_TESTING ON)
 set(CMAKE_DIRECTORY_LABELS tag_hierarchy)
@@ -79,8 +78,6 @@ target_link_libraries(tag-hierarchy
     PRIVATE tag_hierarchy_commands
     PUBLIC tag_hierarchy
     PRIVATE Boost::serialization
-    PUBLIC opencensus-cpp::trace
-    PUBLIC opencensus-cpp::exporters_trace_stdout
     PUBLIC pybind11::pybind11_headers
     PUBLIC ${PYTHON_LIBRARIES}
 )
