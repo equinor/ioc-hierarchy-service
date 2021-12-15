@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(tag-hierarchy)
+
+set(CMAKE_CXX_STANDARD 17)
+
 include(FetchContent)
 FetchContent_Declare(
   redis-plus-plus
@@ -20,9 +23,25 @@ if(NOT json_POPULATED)
   FetchContent_Populate(json)
 endif()
 
+find_package(Protobuf REQUIRED)
+find_package(gRPC)
+
+if(NOT gRPC_FOUND)
+  FetchContent_Declare(
+    gRPC-local
+    GIT_REPOSITORY https://github.com/grpc/grpc
+    GIT_TAG        v1.41.0
+    )
+  set(FETCHCONTENT_QUIET OFF)
+
+  if(NOT gRPC-local_POPULATED)
+    FetchContent_MakeAvailable(gRPC-local)
+  endif()
+endif()
+
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 17)
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 
 find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework REQUIRED)
@@ -38,6 +57,7 @@ set(BUILD_TESTING ON)
 set(CMAKE_DIRECTORY_LABELS tag_hierarchy)
 add_subdirectory(tag_hierarchy)
 add_subdirectory(backup_service)
+add_subdirectory(grpc)
 
 pybind11_add_module(tag_hierarchy_client python/cpp/client.cpp)
 
