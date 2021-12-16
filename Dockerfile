@@ -10,11 +10,11 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3
       && rm /tmp/cmake-install.sh
 WORKDIR /usr/src/app/
 COPY . ioc-hierarchy-service
-RUN mkdir ioc-hierarchy-service-docker-build
-WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
-ARG CMAKE_BUILD_TYPE=Release
-RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
-RUN make -j6 && make install
-RUN cpack -G DEB .
-WORKDIR /usr/src/app/ioc-hierarchy-service
+# RUN mkdir ioc-hierarchy-service-docker-build
+# WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
+# ARG CMAKE_BUILD_TYPE=Release
+# RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
+# RUN make -j6 && make install
+# RUN cpack -G DEB .
+# WORKDIR /usr/src/app/ioc-hierarchy-service
 
