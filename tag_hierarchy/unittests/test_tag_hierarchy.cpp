@@ -17,14 +17,14 @@ BOOST_AUTO_TEST_CASE( test_nodes )
           {std::string("parentId"), pybind11::none()}}}
     );
     auto response = TagHierarchy::Handle(query);
-    BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-2");
-    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-1");
+    BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-1");
+    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2");
     BOOST_TEST(boost::get<int>(response[1].at("levelno")) == 1);
     BOOST_TEST(boost::get<pybind11::none>(response[1].at("parent_id")) == pybind11::none());
 }
 
 BOOST_AUTO_TEST_CASE( test_l2_nodes ) {
-    const auto parent_id = std::string("33382bc4-249b-a646-ef2b-14033605bae0");
+    const auto parent_id = std::string("2a346481-f5a7-48c4-8ccd-c3685a68189e");
     auto query = std::vector<NodeType>(
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}
@@ -36,20 +36,20 @@ BOOST_AUTO_TEST_CASE( test_l2_nodes ) {
 }
 
 BOOST_AUTO_TEST_CASE( test_l3_nodes ) {
-    const auto parent_id = std::string("0979534e-9dc1-bf0e-208a-d508862888fe");
+    const auto parent_id = std::string("dc9a72d9-50c6-463c-823b-d707abb321da");
     auto query = std::vector<NodeType>(
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}
     );
     auto response = TagHierarchy::Handle(query);
-    BOOST_TEST(boost::get<std::string>(response[1].at("name")) == "Level1-2->Level2-1->Level3-1");
+    BOOST_TEST(boost::get<std::string>(response[0].at("name")) == "Level1-2->Level2-1->Level3-1");
     BOOST_TEST(boost::get<int>(response[0].at("levelno")) == 3);
-    BOOST_TEST(boost::get<std::string>(response[1].at("parent_id")) == parent_id);
-    std::cout << boost::get<std::string>(response[1].at("id"));
+    BOOST_TEST(boost::get<std::string>(response[0].at("parent_id")) == parent_id);
+    std::cout << boost::get<std::string>(response[0].at("id"));
 }
 
 BOOST_AUTO_TEST_CASE( test_l4_nodes ) {
-    const auto parent_id = std::string("cfc07435-e890-9bf7-b4c8-645dced9ab73");
+    const auto parent_id = std::string("446ae21e-f27a-4578-8022-3e9f5a01108c");
     auto query = std::vector<NodeType>(
         {{{std::string("command"), std::string("nodes")},
           {std::string("parentId"), parent_id}}}
