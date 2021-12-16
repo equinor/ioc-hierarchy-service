@@ -1,43 +1,19 @@
 cmake_minimum_required(VERSION 3.7)
 
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
+  CACHE STRING "Vcpkg toolchain file")
+
 project(tag-hierarchy)
 
 set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
-FetchContent_Declare(
-  redis-plus-plus
-  GIT_REPOSITORY https://github.com/sewenew/redis-plus-plus.git
-  GIT_TAG 1.2.3
-  )
-set(REDIS_PLUS_PLUS_BUILD_TEST OFF)
-set(REDIS_PLUS_PLUS_CXX_STANDARD 17)
-FetchContent_MakeAvailable(redis-plus-plus)
 
-FetchContent_Declare(json
-  GIT_REPOSITORY https://github.com/nlohmann/json
-  GIT_TAG v3.10.4)
 
-FetchContent_GetProperties(json)
-if(NOT json_POPULATED)
-  FetchContent_Populate(json)
-endif()
-
-find_package(Protobuf REQUIRED)
-find_package(gRPC)
-
-if(NOT gRPC_FOUND)
-  FetchContent_Declare(
-    gRPC-local
-    GIT_REPOSITORY https://github.com/grpc/grpc
-    GIT_TAG        v1.41.0
-    )
-  set(FETCHCONTENT_QUIET OFF)
-
-  if(NOT gRPC-local_POPULATED)
-    FetchContent_MakeAvailable(gRPC-local)
-  endif()
-endif()
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(redis++ CONFIG REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
 
 enable_testing()
 
@@ -52,7 +28,6 @@ find_package(pybind11)
 set(BUILD_TESTING OFF)
 set(JSON_BuildTests OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 set(BUILD_TESTING ON)
 set(CMAKE_DIRECTORY_LABELS tag_hierarchy)
 add_subdirectory(tag_hierarchy)

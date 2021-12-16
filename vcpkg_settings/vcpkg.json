@@ -1,0 +1,11 @@
+{
+    "name": "ioc-hierarchy-service",
+    "version": "1.5.0",
+    "dependencies": [
+        {
+            "name": "grpc",
+            "version==": "1.33.1"
+        }
+    ],
+    "builtin-baseline": "977c4b612d72b02eda9693d9207a5007f055d721"
+}
