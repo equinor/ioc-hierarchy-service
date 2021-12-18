@@ -65,7 +65,11 @@ FILE(
 add_custom_command(
   TARGET grpc_server PRE_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_SOURCE_DIR}/grpc/client $<TARGET_FILE_DIR:grpc_server>
+  ${CMAKE_SOURCE_DIR}/grpc/client/ $<TARGET_FILE_DIR:grpc_server>/client
+  COMMAND ${CMAKE_COMMAND} -E copy 
+  ${CMAKE_SOURCE_DIR}/grpc/hierarchy_service.proto $<TARGET_FILE_DIR:grpc_server>
+  COMMAND make -C $<TARGET_FILE_DIR:grpc_server>/client proto_python
+  WORKING_DIRECTORY $<TARGET_FILE_DIR:grpc_server>/client
 )
 
 add_test(
