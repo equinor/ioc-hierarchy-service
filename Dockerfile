@@ -3,7 +3,8 @@ FROM debian:bullseye as cppbuild
 RUN apt-get update && apt-get install -y zlib1g-dev libgflags-dev libboost-graph-dev libtsan0 \
       libboost-serialization-dev libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev \
       libhiredis-dev pybind11-dev wget build-essential git python3 python3-distutils file \
-      apt-transport-https gnupg python autoconf libtool pkg-config python3-venv curl zip unzip tar
+      apt-transport-https gnupg python autoconf libtool pkg-config python3-venv curl zip unzip tar \
+      python3-pip
 WORKDIR /usr/src/app/
 RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
@@ -11,6 +12,7 @@ RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
 
 FROM cppbuild as generate_package
 COPY . ioc-hierarchy-service
+RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
 WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
 ARG CMAKE_BUILD_TYPE=Release
