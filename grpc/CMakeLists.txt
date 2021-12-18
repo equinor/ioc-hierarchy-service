@@ -52,3 +52,24 @@ target_link_libraries(grpc_server
 install(TARGETS grpc_server
     RUNTIME DESTINATION bin
 )
+
+# Setup tests
+FILE(
+  COPY client/
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/client
+)
+FILE(
+  COPY_FILE ../tag_hierarchy/unittests/hierarchy_dump.json ${CMAKE_CURRENT_BINARY_DIR}/client/hierarchy_dump.json
+)
+
+add_custom_command(
+  TARGET grpc_server PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+  ${CMAKE_SOURCE_DIR}/grpc/client $<TARGET_FILE_DIR:grpc_server>
+)
+
+add_test(
+  NAME grpc_integration
+  COMMAND ${Python_EXECUTABLE} -m unittest
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/client
+)

@@ -14,20 +14,15 @@ from utils.types import protobuf_to_dict, convert_dict_to_proto
 
 class TestServer(unittest.TestCase):
     def setUp(self) -> None:
-        self._server = Popen(['../../build/grpc/server'])
-        sleep(0.5)
+        self._server = Popen(['../grpc_server'])
         channel = grpc.insecure_channel('127.0.0.1:50051')
 
         stub = HierarchyServiceStub(channel)
-        with open('../../tag_hierarchy/unittests/hierarchy_dump.json', 'r') as data:
+        with open('hierarchy_dump.json', 'r') as data:
             hierarchy: List[Dict] = json.load(data)
 
-        command = {
-            'command': 'populate_graph',
-            'add_root': True,
-        }
         query = NodeList()
-        [query.node.append(convert_dict_to_proto(d)) for d in [command] + hierarchy]
+        [query.node.append(convert_dict_to_proto(d)) for d in hierarchy]
         stub.Query(query)
         
         return super().setUp()
