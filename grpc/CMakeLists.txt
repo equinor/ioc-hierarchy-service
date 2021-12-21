@@ -88,32 +88,6 @@ add_test(
   --catch_system_error=yes
 )
 
-# Test requirements installable and make part of integration test fixture
-add_test(
-  NAME pip_install_requirements
-  COMMAND pip3 install -r requirements.txt 
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/client
-)
-
-set_tests_properties(
-  pip_install_requirements
-  PROPERTIES
-  FIXTURES_SETUP grpc_client_install
-)
-
-# Generate python client proto files
-add_test(
-  NAME make_python_proto
-  COMMAND make proto_python 
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/client
-)
-
-set_tests_properties(
-  make_python_proto
-  PROPERTIES
-  FIXTURES_SETUP grpc_client_install
-)
-
 # Build python client distributable wheel
 file(
   GLOB client_sources
@@ -122,8 +96,11 @@ file(
 
 add_custom_target(
   grpc_python_client
+  ALL
+  COMMAND pip3 install -r requirements.txt 
+  COMMAND make proto_python
   COMMAND ${Python_EXECUTABLE} setup.py bdist_wheel
-  WORKING_DIRECTORY $<TARGET_FILE_DIR:grpc_server>/client
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/client
   SOURCES ${client_sources}
 )
 
