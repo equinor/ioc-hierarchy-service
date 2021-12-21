@@ -4,4 +4,4 @@ cpp:
 	protoc -I . --cpp_out=./build hierarchy_service.proto
 proto_python:
 	mkdir -p proto_build
-	python -m grpc_tools.protoc -I.. --python_out=proto_build/ --grpc_python_out=proto_build/ hierarchy_service.proto
+	python3 -m grpc_tools.protoc -I.. --python_out=tag_hierarchy_grpc_client/ --grpc_python_out=tag_hierarchy_grpc_client/ ../hierarchy_service.proto

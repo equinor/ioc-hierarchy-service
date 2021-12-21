@@ -6,10 +6,10 @@ from time import sleep
 
 import grpc
 
-from proto_build.hierarchy_service_pb2 import NodeList 
-from proto_build.hierarchy_service_pb2_grpc import HierarchyServiceStub
+from hierarchy_service_pb2 import NodeList 
+from hierarchy_service_pb2_grpc import HierarchyServiceStub
 
-from utils.types import protobuf_to_dict, convert_dict_to_proto
+from tag_hierarchy_types import protobuf_to_dict, convert_dict_to_proto
 
 
 class TestServer(unittest.TestCase):
