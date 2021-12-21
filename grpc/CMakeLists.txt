@@ -127,15 +127,10 @@ add_custom_target(
   SOURCES ${client_sources}
 )
 
-# Test wheel installable
-file(
-  GLOB generated_wheel
-  ${CMAKE_CURRENT_SOURCE_DIR}/client/dist/*.whl
-)
-
 add_test(
   NAME grpc_wheel
-  COMMAND pip3 install ${generated_wheel} 
+  COMMAND make install_wheel
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/client
 )
 
 set_tests_properties(
