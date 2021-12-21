@@ -1,5 +1,6 @@
 import unittest
 import json
+import os, sys
 from typing import List, Dict
 from subprocess import Popen
 from time import sleep
@@ -9,16 +10,17 @@ import grpc
 from hierarchy_service_pb2 import NodeList 
 from hierarchy_service_pb2_grpc import HierarchyServiceStub
 
-from tag_hierarchy_types import protobuf_to_dict, convert_dict_to_proto
+from tag_hierarchy_types import convert_proto_to_dict, convert_dict_to_proto
 
 
 class TestServer(unittest.TestCase):
     def setUp(self) -> None:
-        self._server = Popen(['../grpc_server'])
+        binary_dir = os.getenv('CMAKE_BINARY_DIR', '../../../build')
+        self._server = Popen([os.path.join(binary_dir, 'grpc/grpc_server')])
         channel = grpc.insecure_channel('127.0.0.1:50051')
 
         stub = HierarchyServiceStub(channel)
-        with open('hierarchy_dump.json', 'r') as data:
+        with open('../../../tag_hierarchy/unittests/hierarchy_dump.json', 'r') as data:
             hierarchy: List[Dict] = json.load(data)
 
         query = NodeList()
@@ -39,7 +41,7 @@ class TestServer(unittest.TestCase):
         query.node.append(convert_dict_to_proto(command))
         grpc_response = stub.Query(query)
         response = sorted(
-            [protobuf_to_dict(a) for a in grpc_response.node],
+            [convert_proto_to_dict(a) for a in grpc_response.node],
             key=lambda x: x['name']
         )
         
@@ -58,7 +60,7 @@ class TestServer(unittest.TestCase):
         query.node.append(convert_dict_to_proto(command))
         grpc_response = stub.Query(query)
         response_l2 = sorted(
-            [protobuf_to_dict(a) for a in grpc_response.node],
+            [convert_proto_to_dict(a) for a in grpc_response.node],
             key=lambda x: x['name']
         )
 
@@ -74,7 +76,7 @@ class TestServer(unittest.TestCase):
         query.node.append(convert_dict_to_proto(command))
         grpc_response = stub.Query(query)
         response_l3 = sorted(
-            [protobuf_to_dict(a) for a in grpc_response.node],
+            [convert_proto_to_dict(a) for a in grpc_response.node],
             key=lambda x: x['name']
         )
 
@@ -92,7 +94,7 @@ class TestServer(unittest.TestCase):
         query.node.append(convert_dict_to_proto(command))
         grpc_response = stub.Query(query)
         response_l4 = sorted(
-            [protobuf_to_dict(a) for a in grpc_response.node],
+            [convert_proto_to_dict(a) for a in grpc_response.node],
             key=lambda x: x['name']
         )
 

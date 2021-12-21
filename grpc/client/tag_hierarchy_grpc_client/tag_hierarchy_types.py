@@ -1,6 +1,6 @@
 from hierarchy_service_pb2 import Node, Property, IntList, StringList
 
-def protobuf_to_dict(proto_node: Node):
+def convert_proto_to_dict(proto_node: Node):
     retval = {}
     for key in proto_node.map:
         value = proto_node.map[key]
@@ -44,5 +44,5 @@ def convert_dict_to_proto(dict: dict):
                 string_list = StringList()
                 string_list.values.extend(item)
                 proto_node.map[key].CopyFrom(Property(stringlist=string_list))
-    
+
     return proto_node

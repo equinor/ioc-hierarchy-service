@@ -1,7 +1,16 @@
-build/
+**/build/
 .vscode/
 .idea/
 cmake-build-*/
 *.deb
 **/env/
 **/__pycache__/
+
+# Python packages
+**/dist/
+**egg-info/
+
+#Protobuf compiled
+*pb2.py
+*pb2_grpc.py
+

@@ -26,15 +26,25 @@ add_library(hierarchy_service_grpc_proto
   ${hierarchy_service_grpc_srcs}
   ${hierarchy_service_grpc_hdrs}
   ${hierarchy_service_proto_srcs}
-  ${hierarchy_service_proto_hdrs})
-
-target_link_libraries(hierarchy_service_grpc_proto
-    gRPC::grpc++_reflection
-    gRPC::grpc++
-    protobuf::libprotobuf
+  ${hierarchy_service_proto_hdrs}
+  "type_conversion.cpp"
 )
 
-add_executable(grpc_server "grpc_server.cpp")
+target_include_directories(hierarchy_service_grpc_proto
+    PRIVATE ${CMAKE_SOURCE_DIR}
+)
+
+target_link_libraries(hierarchy_service_grpc_proto
+    PUBLIC gRPC::grpc++_reflection
+    PUBLIC gRPC::grpc++
+    PUBLIC protobuf::libprotobuf
+    tag_hierarchy
+)
+
+add_executable(
+  grpc_server "grpc_server.cpp" 
+)
+
 target_include_directories(grpc_server
     PRIVATE ${CMAKE_SOURCE_DIR}
 )
@@ -54,26 +64,68 @@ install(TARGETS grpc_server
 )
 
 # Setup tests
-FILE(
-  COPY client/
-  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/client
-)
-FILE(
-  COPY_FILE ../tag_hierarchy/unittests/hierarchy_dump.json ${CMAKE_CURRENT_BINARY_DIR}/client/hierarchy_dump.json
+# Unittest
+add_executable(tag_hierarchy_types_test
+    test_type_conversion.cpp
 )
 
-add_custom_command(
-  TARGET grpc_server PRE_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_SOURCE_DIR}/grpc/client/ $<TARGET_FILE_DIR:grpc_server>/client
-  COMMAND ${CMAKE_COMMAND} -E copy 
-  ${CMAKE_SOURCE_DIR}/grpc/hierarchy_service.proto $<TARGET_FILE_DIR:grpc_server>
-  COMMAND make -C $<TARGET_FILE_DIR:grpc_server>/client proto_python
-  WORKING_DIRECTORY $<TARGET_FILE_DIR:grpc_server>/client
+target_include_directories(tag_hierarchy_types_test
+    PRIVATE ${CMAKE_SOURCE_DIR}
+)
+target_compile_definitions(tag_hierarchy_types_test PRIVATE BOOST_TEST_DYN_LINK)
+
+target_link_libraries(tag_hierarchy_types_test
+    PRIVATE tag_hierarchy
+    PRIVATE tag_hierarchy_commands
+    PRIVATE hierarchy_service_grpc_proto
+    PRIVATE Boost::unit_test_framework
+    PRIVATE Boost::boost
 )
 
 add_test(
-  NAME grpc_integration
-  COMMAND ${Python_EXECUTABLE} -m unittest
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/client
+  NAME "tag_hierarchy_types_test" 
+  COMMAND tag_hierarchy_types_test
+  --catch_system_error=yes
+)
+
+file(
+  GLOB client_sources
+  ${CMAKE_CURRENT_SOURCE_DIR}/client/tag_hierarchy_grpc_client/*.py
+)
+
+add_custom_target(
+  grpc_python_client
+  COMMAND ${Python_EXECUTABLE} setup.py bdist_wheel
+  WORKING_DIRECTORY $<TARGET_FILE_DIR:grpc_server>/client
+  SOURCES ${client_sources}
+)
+
+file(
+  GLOB generated_wheel
+  ${CMAKE_CURRENT_SOURCE_DIR}/client/dist/*.whl
+)
+
+add_test(
+  NAME grpc_wheel
+  COMMAND pip3 install ${generated_wheel} 
+)
+
+set_tests_properties(
+  grpc_wheel
+  PROPERTIES
+  FIXTURES_SETUP grpc_client_install
+)
+
+add_test(
+  NAME grpc_integration_test
+  COMMAND ${CMAKE_COMMAND} -E env
+    CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}
+    ${Python_EXECUTABLE} -m unittest
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/client/tag_hierarchy_grpc_client
+)
+
+set_tests_properties(
+  grpc_integration_test
+  PROPERTIES
+  FIXTURES_REQUIRED grpc_client_install
 )
