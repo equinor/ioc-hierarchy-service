@@ -24,11 +24,11 @@ CMAKE_LDFLAGS= -fsanitize=address
 ctest_configure()
 ctest_build(FLAGS -j8)
 ctest_test(
-  EXCLUDE ^opencensus
+  EXCLUDE integration
   RETURN_VALUE test_result
 )
 ctest_memcheck(
-  EXCLUDE ^opencensus
+  EXCLUDE integration
   RETURN_VALUE memcheck_result
 )
 
