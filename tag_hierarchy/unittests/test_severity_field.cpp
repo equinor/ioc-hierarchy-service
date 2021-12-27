@@ -62,49 +62,49 @@ void verify_correct_severity_level_with_filter(const std::vector<NodeType>& filt
                     {{std::string("command"), std::string("update")},
                     },
                     {
-                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-2->L4Model-1-input1-element-1")},
+                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-1->L4Model-1-input0-element-1")},
                         {std::string("description"),std::string("Description")},
-                        {std::string("id"),std::string("a8127a40-2a28-2ed1-83e9-442ada88c496")},
-                        {std::string("parent_id"),std::string("b26b3f36-ade0-a404-681f-1d50020d64eb")},
+                        {std::string("id"),std::string("37eb955a-5866-4757-b5b1-497497c74325")},
+                        {std::string("parent_id"),std::string("a725ab7c-c4c3-47e4-81af-526bf50b8e05")},
                         {std::string("levelno"), 4 },
                         {std::string("is_modelelement"), true },
                         {std::string("elementtype"),std::string("Database")},
                         {std::string("type"),std::string("modelElement")},
                         {std::string("isrunningtag"), false },
                         {std::string("kpigroup"),std::string("Temporib")},
-                        {std::string("kpigroup_id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
+                        {std::string("kpigroup_id"),std::string("f9479292-b852-401f-9e34-33cc2a7decb6")},
+                        {std::string("issuppressed"), false },
+                        {std::string("severity"), 1 }
+                    },
+                    {
+                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-2->L4Model-1-input1-element-1")},
+                        {std::string("description"),std::string("Description")},
+                        {std::string("id"),std::string("51f71096-62b5-4e08-a250-d7214feef245")},
+                        {std::string("parent_id"),std::string("4a265338-a12b-4736-97ad-88e4cc3308ed")},
+                        {std::string("levelno"), 4 },
+                        {std::string("is_modelelement"), true },
+                        {std::string("elementtype"),std::string("Database")},
+                        {std::string("type"),std::string("modelElement")},
+                        {std::string("isrunningtag"), false },
+                        {std::string("kpigroup"),std::string("Temporib")},
+                        {std::string("kpigroup_id"),std::string("f9479292-b852-401f-9e34-33cc2a7decb6")},
                         {std::string("issuppressed"), true },
-                        {std::string("severity"), 3 }
+                        {std::string("severity"), 2 }
                     },
                     {
                         {std::string("name"),std::string("Level1-2->Level2-3->Level3-3->L4Model-1-output0-element-1")},
                         {std::string("description"),std::string("Description")},
-                        {std::string("id"),std::string("693c72c3-e791-72dc-6c46-443ef2f64402")},
-                        {std::string("parent_id"),std::string("98af222c-e4de-9183-3761-c5c0a19dff1c")},
+                        {std::string("id"),std::string("8639784c-7bd3-488f-9a17-5c6f0dbaec32")},
+                        {std::string("parent_id"),std::string("1ee52fee-07bc-4bdb-88ac-711708c2f5fc")},
                         {std::string("levelno"), 4 },
                         {std::string("is_modelelement"), true },
                         {std::string("elementtype"),std::string("Calculated")},
                         {std::string("type"),std::string("modelElement")},
                         {std::string("isrunningtag"), false },
                         {std::string("kpigroup"),std::string("Temporib")},
-                        {std::string("kpigroup_id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
+                        {std::string("kpigroup_id"),std::string("f9479292-b852-401f-9e34-33cc2a7decb6")},
                         {std::string("issuppressed"), true },
-                        {std::string("severity"), 2 }
-                    },
-                    {
-                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-1->L4Model-1-input0-element-1")},
-                        {std::string("description"),std::string("Description")},
-                        {std::string("id"),std::string("bbd988cd-ed4c-9238-81f9-8133b278bdcb")},
-                        {std::string("parent_id"),std::string("4857959b-f460-76b9-dda6-6113203b69ab")},
-                        {std::string("levelno"), 4 },
-                        {std::string("is_modelelement"), true },
-                        {std::string("elementtype"),std::string("Database")},
-                        {std::string("type"),std::string("modelElement")},
-                        {std::string("isrunningtag"), false },
-                        {std::string("kpigroup"),std::string("Temporib")},
-                        {std::string("kpigroup_id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
-                        {std::string("issuppressed"), false },
-                        {std::string("severity"), 1 }
+                        {std::string("severity"), 3 }
                     },
             }
     );
@@ -166,7 +166,7 @@ BOOST_FIXTURE_TEST_SUITE( FieldSeverityTest, Fixture );
         verify_correct_severity_level_with_filter(std::vector<NodeType>(
                 {{
                     {
-                        std::string("modelownerfilter"), std::vector<std::string>{"8eb4a1e1-1316-bcef-b20f-bbbaed2a4e95"}
+                        std::string("modelownerfilter"), std::vector<std::string>{"3627b2f8-050b-43ec-8d3f-cadfb652880b"}
                     }
                 }}
                 ));
@@ -178,7 +178,7 @@ BOOST_FIXTURE_TEST_SUITE( FieldSeverityTest, Fixture );
     {
         verify_correct_severity_level_with_filter(std::vector<NodeType>({{
                     {
-                    std::string("modelclassfilter"), std::vector<std::string>{"44380be8-76d2-a1fd-dc50-0ad8f4c151e4"}
+                    std::string("modelclassfilter"), std::vector<std::string>{"56ce0ce9-596e-43d2-8e6c-4ece3e81b20a"}
                     }
             }}
             ));

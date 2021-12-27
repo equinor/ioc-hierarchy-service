@@ -26,7 +26,8 @@ stages:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-    - bash: git submodule update --init --recursive
+    - checkout: self
+      submodules: true
     - bash: docker build -t tag-hierarchy ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-1.4.0-x86-64.deb .

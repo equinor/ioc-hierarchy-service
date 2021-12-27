@@ -12,13 +12,14 @@ BOOST_FIXTURE_TEST_SUITE( DeleteCommandTest, Fixture );
     BOOST_AUTO_TEST_CASE( test_delete_top_level_node )
     {
         // Make a command that deletes the node named Level1-2
+        const auto node_id = std::string("2a346481-f5a7-48c4-8ccd-c3685a68189e");
         auto query = std::vector<NodeType>(
                 {{{std::string("command"), std::string("delete")},
-                         {std::string("nodes"), std::vector<std::string>({"33382bc4-249b-a646-ef2b-14033605bae0"})}}}
+                         {std::string("nodes"), std::vector<std::string>({node_id})}}}
         );
         auto response = TagHierarchy::Handle(query);
         // Ensure status is success
-        BOOST_TEST(boost::get<std::string>(response[0].at("33382bc4-249b-a646-ef2b-14033605bae0")) == "Success");
+        BOOST_TEST(boost::get<std::string>(response[0].at(node_id)) == "Success");
 
         // Get all the top level nodes
         auto query2 = std::vector<NodeType>(
@@ -34,19 +35,21 @@ BOOST_FIXTURE_TEST_SUITE( DeleteCommandTest, Fixture );
     BOOST_AUTO_TEST_CASE( test_delete_model_and_verify_it_is_missing )
     {
         // Make a command that deletes the node named Level1-1->Level2-1->Level3-1 (it has the guid below)
+        const auto node_id = std::string("23dce722-9aac-489a-9222-aae2c51f91c8");
+        const auto parent_node_id = std::string("55b7d593-d163-4649-84ee-afb193045aa0");
         auto query = std::vector<NodeType>(
                 {{{std::string("command"), std::string("delete")},
-                      {std::string("nodes"), std::vector<std::string>({"4857959b-f460-76b9-dda6-6113203b69ab"})}}}
+                      {std::string("nodes"), std::vector<std::string>({node_id})}}}
         );
         auto response = TagHierarchy::Handle(query);
 
         // Verify that job is reported successful
-        BOOST_TEST(boost::get<std::string>(response[0].at("4857959b-f460-76b9-dda6-6113203b69ab")) == "Success");
+        BOOST_TEST(boost::get<std::string>(response[0].at(node_id)) == "Success");
 
         // Get the children of the parent of that model
         auto query2 = std::vector<NodeType>(
                 {{{std::string("command"), std::string("nodes")},
-                  {std::string("parentId"), std::string("12271045-9ba8-0fa4-5de7-5761b071573e")}}}
+                  {std::string("parentId"), std::string(parent_node_id)}}}
         );
         response = TagHierarchy::Handle(query2);
 
@@ -61,17 +64,18 @@ BOOST_FIXTURE_TEST_SUITE( DeleteCommandTest, Fixture );
     }
 
     BOOST_AUTO_TEST_CASE( test_delete_model_twice_is_ok ) {
-        // Delete a node in the tree
+        // Delete a node in the tree (Level1-2->Level2-3)
+        const auto node_id = std::string("14ab5d20-db2e-4391-ab46-250e194b3eb0");
         auto query = std::vector<NodeType>(
                 {{{std::string("command"), std::string("delete")},
-                         {std::string("nodes"), std::vector<std::string>({"cae8efee-f222-78c1-7480-86cd49b7dc3f"})}}}
+                         {std::string("nodes"), std::vector<std::string>({node_id})}}}
         );
         // Call the command twice
         auto response = TagHierarchy::Handle(query);
         response = TagHierarchy::Handle(query);
         // We should not crash, we should just get a response that the node is now "Not found" since
         // it has already been deleted
-        BOOST_TEST(boost::get<std::string>(response[0].at("cae8efee-f222-78c1-7480-86cd49b7dc3f")) == "Not found");
+        BOOST_TEST(boost::get<std::string>(response[0].at(node_id)) == "Not found");
     }
 
 BOOST_AUTO_TEST_SUITE_END()
