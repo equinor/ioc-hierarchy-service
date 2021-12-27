@@ -18,11 +18,6 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/variant.hpp>
 
-#include <opencensus/trace/span.h>
-#include <opencensus/trace/with_span.h>
-#include <opencensus/context/with_context.h>
-#include <opencensus/exporters/trace/stdout/stdout_exporter.h>
-
 #include <iostream>
 
 #include <zmq.hpp>
@@ -137,7 +132,7 @@ namespace {
         }
 
         std::vector<NodeType>
-        HandleRequest(zmq::socket_t& socket, zmq::message_t& request, opencensus::trace::Span& span) {
+        HandleRequest(zmq::socket_t& socket, zmq::message_t& request) {
             socket.recv(&request, ZMQ_DONTWAIT);
             // Convert the message to a vector of maps
             std::vector<NodeType> message;
@@ -150,7 +145,6 @@ namespace {
             catch (const std::exception &exc)
             {
                 const auto log_string = std::string("Command threw exception: ") + exc.what();
-                span.AddAnnotation(log_string);
                 std::ostringstream out_buffer;
                 const auto reply_map =
                         std::vector<NodeType>({{{std::string("error"), std::string("deserializing stream failed")},
@@ -168,7 +162,7 @@ namespace {
 
         void
         HandleReply(zmq::socket_t& socket, std::vector<NodeType>& message,
-                    MessageHandler& messagehandler, opencensus::trace::Span& span) {
+                    MessageHandler& messagehandler) {
             try
             {
                 const auto reply_list = messagehandler.HandleRequest(message);
@@ -186,7 +180,6 @@ namespace {
             catch (const std::exception &exc)
             {
                 const auto log_string = std::string("An error occurred while replying to command: ") + exc.what();
-                span.AddAnnotation(log_string);
                 std::ostringstream out_buffer;
                 const auto reply_map =
                         std::vector<NodeType>({{{std::string("error"), std::string("command failed")},
@@ -205,16 +198,16 @@ namespace {
 
         void
         HandleReqRep(zmq::socket_t& socket, zmq::message_t& request,
-                     opencensus::trace::Span& span, MessageHandler& messagehandler) {
+                     MessageHandler& messagehandler) {
             auto message = std::vector<NodeType>();
             try {
-                message = HandleRequest(socket, request, span);
+                message = HandleRequest(socket, request);
             }
             catch (std::exception) {
                 // Getting the message failed, nothing more to do
                 return;
             }
-            HandleReply(socket, message, messagehandler, span);
+            HandleReply(socket, message, messagehandler);
         }
 
         void HandleSubscribe(zmq::socket_t& sub_socket,
@@ -238,8 +231,6 @@ namespace {
  */
 int main (int argc, char* argv[])
 {
-    // Initialize stdout exporter for opencensus
-    opencensus::exporters::trace::StdoutExporter::Register();
     auto mode = local::GetMode(argc, argv);
 
     //  Prepare our context and sockets
@@ -257,24 +248,19 @@ int main (int argc, char* argv[])
     // Initialize the messagehandler which will handle messages for us
     auto messagehandler = MessageHandler(context);
 
-    static opencensus::trace::AlwaysSampler sampler;
     while (true) {
-        const auto span_title = std::string("Receiving message for ") + AppModeName[mode];
-        auto span = opencensus::trace::Span::StartSpan(span_title, nullptr, &sampler);
         zmq::message_t request;
 
         //  Wait for next request from client
         zmq::poll(&items[0], 2, -1);
 
-        opencensus::trace::WithSpan ws(span);
         if (items[0].revents & ZMQ_POLLIN)
         {
-            local::HandleReqRep(socket, request, span, messagehandler);
+            local::HandleReqRep(socket, request, messagehandler);
         }
         if (items[1].revents & ZMQ_POLLIN) {
             local::HandleSubscribe(sub_socket, request, messagehandler);
         }
-        span.End();
     }
 
     return 0;

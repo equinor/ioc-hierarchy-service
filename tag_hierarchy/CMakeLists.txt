@@ -16,6 +16,10 @@ add_library(tag_hierarchy_commands OBJECT
         commands/nodes.h
         commands/filteroptions.cpp
         commands/filteroptions.h
+        utils/exceptions.h
+        utils/filters.cpp
+        utils/filters.h
+        utils/search.h
         visitors/filteredhierarchyvisitor.h
         visitors/filteroptionsvisitor.h
         )
@@ -23,8 +27,6 @@ target_include_directories(tag_hierarchy_commands
         PRIVATE ${CMAKE_SOURCE_DIR}
         )
 target_link_libraries(tag_hierarchy_commands
-        PUBLIC opencensus-cpp::trace
-        PUBLIC opencensus-cpp::context
         PRIVATE ${PYTHON_LIBRARIES}
         PRIVATE Boost::graph
         PUBLIC Boost::serialization
@@ -77,8 +79,6 @@ target_compile_definitions(tag_hierarchy_test PRIVATE BOOST_TEST_DYN_LINK)
 target_link_libraries(tag_hierarchy_test
     PRIVATE tag_hierarchy
     PRIVATE tag_hierarchy_commands
-    PUBLIC opencensus-cpp::trace
-    PUBLIC opencensus-cpp::exporters_trace_stdout
     PRIVATE Boost::unit_test_framework
     PRIVATE Boost::boost
     PRIVATE nlohmann_json::nlohmann_json

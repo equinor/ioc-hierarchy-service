@@ -16,8 +16,8 @@ BOOST_AUTO_TEST_CASE( test_modelowner_filter )
     auto response = TagHierarchy::Handle(query);
     const auto response_map = boost::get<NodeType>(response[0]);
     const auto compare = boost::get<std::vector<std::string>>(response_map.at("modelowner_ids"));
-    const auto baseline = std::vector<std::string>{"8eb4a1e1-1316-bcef-b20f-bbbaed2a4e95",
-                                                   "ff1b9df9-60ae-7825-89e6-36998289d1fa"};
+    const auto baseline = std::vector<std::string>{"3627b2f8-050b-43ec-8d3f-cadfb652880b",
+                                                   "f0424bb3-ed3a-4f3a-ae60-1250d4b74a60"};
     BOOST_TEST(baseline == compare, boost::test_tools::per_element());
 
 }
@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE( test_modelclass_filter )
   auto response = TagHierarchy::Handle(query);
   const auto response_map = boost::get<NodeType>(response[0]);
   const auto compare = boost::get<std::vector<std::string>>(response_map.at("modelclass_ids"));
-  const auto baseline = std::vector<std::string>{"44380be8-76d2-a1fd-dc50-0ad8f4c151e4",
-                                                 "ff1cc41e-a134-2426-600d-7199bcb509c5"};
+  const auto baseline = std::vector<std::string>{"13c3727d-b8af-4dc9-95a1-c9cc3de5b9af",
+                                                 "56ce0ce9-596e-43d2-8e6c-4ece3e81b20a"};
   BOOST_TEST(baseline == compare, boost::test_tools::per_element());
 
 }
