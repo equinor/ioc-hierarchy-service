@@ -89,7 +89,22 @@ void verify_correct_severity_level_with_filter(const std::vector<NodeType>& filt
                         {std::string("kpigroup"),std::string("Temporib")},
                         {std::string("kpigroup_id"),std::string("f9479292-b852-401f-9e34-33cc2a7decb6")},
                         {std::string("issuppressed"), true },
-                        {std::string("severity"), 2 }
+                        {std::string("severity"), 1 }
+                    },
+                    {
+                        {std::string("name"),std::string("Level1-2->Level2-3->Level3-2->L4Model-1-input1-element-2")},
+                        {std::string("description"),std::string("Description")},
+                        {std::string("id"),std::string("a8127a40-2a28-2ed1-83e9-442ada88c496")},
+                        {std::string("parent_id"),std::string("b26b3f36-ade0-a404-681f-1d50020d64eb")},
+                        {std::string("levelno"), 4 },
+                        {std::string("is_modelelement"), true },
+                        {std::string("elementtype"),std::string("Database")},
+                        {std::string("type"),std::string("modelElement")},
+                        {std::string("isrunningtag"), false },
+                        {std::string("kpigroup"),std::string("Temporib")},
+                        {std::string("kpigroup_id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
+                        {std::string("issuppressed"), true },
+                        {std::string("severity"), 0 }
                     },
                     {
                         {std::string("name"),std::string("Level1-2->Level2-3->Level3-3->L4Model-1-output0-element-1")},
