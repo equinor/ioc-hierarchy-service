@@ -18,16 +18,21 @@ class TestServer(unittest.TestCase):
         binary_dir = os.getenv('CMAKE_BINARY_DIR', '../../../build')
         self._server = Popen([os.path.join(binary_dir, 'grpc/grpc_server')])
         sleep(0.5)
-        channel = grpc.insecure_channel('127.0.0.1:50051')
+        try:
+            channel = grpc.insecure_channel('127.0.0.1:50051')
 
-        stub = HierarchyServiceStub(channel)
-        with open('../../../tag_hierarchy/unittests/hierarchy_dump.json', 'r') as data:
-            hierarchy: List[Dict] = json.load(data)
+            stub = HierarchyServiceStub(channel)
+            with open('../../../tag_hierarchy/unittests/hierarchy_dump.json', 'r') as data:
+                hierarchy: List[Dict] = json.load(data)
 
-        query = NodeList()
-        [query.node.append(convert_dict_to_proto(d)) for d in hierarchy]
-        stub.Query(query)
-        
+            query = NodeList()
+            [query.node.append(convert_dict_to_proto(d)) for d in hierarchy]
+            stub.Query(query)
+        except Exception as e:
+            self._server.terminate()
+            self._server.wait()
+            raise e
+
         return super().setUp()
 
     def test_nodes(self):
