@@ -17,6 +17,7 @@ class TestServer(unittest.TestCase):
     def setUp(self) -> None:
         binary_dir = os.getenv('CMAKE_BINARY_DIR', '../../../build')
         self._server = Popen([os.path.join(binary_dir, 'grpc/grpc_server')])
+        sleep(0.5)
         channel = grpc.insecure_channel('127.0.0.1:50051')
 
         stub = HierarchyServiceStub(channel)
