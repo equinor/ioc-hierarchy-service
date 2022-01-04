@@ -38,7 +38,8 @@ BOOST_FIXTURE_TEST_SUITE( SearchTest, Fixture );
     BOOST_AUTO_TEST_CASE( test_search_exact )
     {
         const auto search_keys = std::vector<std::string>{"parent_id"};
-        const auto search_term = std::string("d9174b0d-2519-423f-c933-7491cce63858");
+        // Level1-1
+        const auto search_term = std::string("eba77720-4ba5-4803-9834-ef0faf40f057");
         auto query = std::vector<NodeType>(
                 {{{std::string("command"), std::string("search")},
                          {std::string("search_term"), search_term},

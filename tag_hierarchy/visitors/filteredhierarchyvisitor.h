@@ -85,12 +85,12 @@ public:
                 node_severity_[target_vertex] = boost::get<int>(g[target_vertex].properties.find("severity")->second);
                 // Does the source vertex have an annotation severity level?
                 if (node_severity_.count(source_vertex)) {
-                    // No, then let the severity level of the target node propagate.
-                    node_severity_[source_vertex] = node_severity_[target_vertex];
-                }
-                else {
                     // Yes, then propagate the highest severity level.
                     node_severity_[source_vertex] = std::max(node_severity_[source_vertex], node_severity_[target_vertex]);
+                }
+                else {
+                    // No, then let the severity level of the target node propagate.
+                    node_severity_[source_vertex] = node_severity_[target_vertex];
                 }
             }
         }
@@ -108,12 +108,12 @@ public:
                 // Yes, then the severity should propagate to the source node.
                 // Does the source have a set severity?
                 if (source_vertex_has_severity) {
-                    // No, then let the severity level of the target node propagate.
-                    node_severity_[source_vertex] = node_severity_[target_vertex];
-                }
-                else {
                     // Yes, then propagate the highest severity level.
                     node_severity_[source_vertex] = std::max(node_severity_[source_vertex], node_severity_[target_vertex]);
+                }
+                else {
+                    // No, then let the severity level of the target node propagate.
+                    node_severity_[source_vertex] = node_severity_[target_vertex];  
                 }
             }
         }

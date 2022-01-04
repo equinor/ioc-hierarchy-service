@@ -8,12 +8,13 @@
 BOOST_FIXTURE_TEST_SUITE( UpdateTest, Fixture );
     BOOST_AUTO_TEST_CASE( test_update_node )
     {
+        const auto node_id = std::string("eba77720-4ba5-4803-9834-ef0faf40f057");
         auto query = std::vector<NodeType>(
                 {
                     {{std::string("command"), std::string("update")},
                  },
                     {{std::string("name"),std::string("Level1-1-newname")},
-                    {std::string("id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
+                    {std::string("id"),std::string(node_id)},
                     {std::string("parent_id"), pybind11::none()},
                     {std::string("levelno"), 1 },
                     {std::string("is_modelelement"), false },
@@ -36,7 +37,7 @@ BOOST_FIXTURE_TEST_SUITE( UpdateTest, Fixture );
         // Find the node which was attempted to be modified
         auto found_node = bool{false};
         for (auto node: response) {
-            if(node.at("id") == Variants(std::string("d9174b0d-2519-423f-c933-7491cce63858"))) {
+            if(node.at("id") == Variants(std::string(node_id))) {
                 // Assert that it has got the new name
                 BOOST_ASSERT(node["name"] == Variants{std::string("Level1-1-newname")});
                 found_node = true;
@@ -48,13 +49,14 @@ BOOST_FIXTURE_TEST_SUITE( UpdateTest, Fixture );
 
     BOOST_AUTO_TEST_CASE( test_update_node_cannot_change_parent_id )
     {
+        const auto node_id = std::string("eba77720-4ba5-4803-9834-ef0faf40f057");
         const auto search_keys = std::vector<std::string>{"name", "tag"};
         auto query = std::vector<NodeType>(
                 {
                         {{std::string("command"), std::string("update")},
                         },
-                        {{std::string("id"),std::string("d9174b0d-2519-423f-c933-7491cce63858")},
-                                {std::string("parent_id"), std::string("d9174b0e-2519-423f-c933-7491cce63858")},
+                        {{std::string("id"),std::string(node_id)},
+                                {std::string("parent_id"), std::string(node_id)},
                                 {std::string("levelno"), 1 },
                                 {std::string("is_modelelement"), false },
                                 {std::string("type"),std::string("folder")},
@@ -76,7 +78,7 @@ BOOST_FIXTURE_TEST_SUITE( UpdateTest, Fixture );
         // Find the node which was attempted to be modified
         auto found_node = bool{false};
         for (auto node: response) {
-            if(node.at("id") == Variants(std::string("d9174b0d-2519-423f-c933-7491cce63858"))) {
+            if(node.at("id") == Variants(std::string(node_id))) {
                 // Assert that it still has parent id none, as before modification
                 BOOST_ASSERT(node["parent_id"] == Variants{pybind11::none()});
                 found_node = true;
