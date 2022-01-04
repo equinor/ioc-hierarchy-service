@@ -29,6 +29,13 @@ add_library(hierarchy_service_grpc_proto
   ${hierarchy_service_proto_hdrs}
   "type_conversion.cpp"
 )
+set_target_properties(hierarchy_service_grpc_proto PROPERTIES 
+    LABELS "generated"
+)
+set_source_files_properties(
+  "type_conversion.cpp"    
+  PROPERTIES LABELS "coverage"
+)
 
 target_include_directories(hierarchy_service_grpc_proto
     PRIVATE ${CMAKE_SOURCE_DIR}
@@ -48,6 +55,10 @@ add_executable(
 target_include_directories(grpc_server
     PRIVATE ${CMAKE_SOURCE_DIR}
 )
+set_target_properties(grpc_server PROPERTIES 
+    LABELS coverage
+)
+
 target_link_libraries(grpc_server 
     hierarchy_service_grpc_proto
     tag_hierarchy_commands
