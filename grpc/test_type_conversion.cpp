@@ -29,9 +29,4 @@ BOOST_AUTO_TEST_SUITE( GrpcUnitTest );
         BOOST_TEST(roundtripped_local == local);
     };
 
-    BOOST_AUTO_TEST_CASE( test_convert_to_remote_node )
-    {
-
-    };
-
 BOOST_AUTO_TEST_SUITE_END()
