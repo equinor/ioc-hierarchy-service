@@ -22,5 +22,9 @@ WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
 ARG CMAKE_BUILD_TYPE=Release
 RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
 RUN make -j6 && make install
+# Build debian package
 RUN cpack -G DEB .
+# Build python wheel
+RUN make -C /usr/src/app/ioc-hierarchy-service/grpc/client proto_python
+RUN make -C /usr/src/app/ioc-hierarchy-service/grpc/client build_wheel
 WORKDIR /usr/src/app/ioc-hierarchy-service

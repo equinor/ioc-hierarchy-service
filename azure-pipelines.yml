@@ -31,6 +31,7 @@ stages:
     - bash: docker build -t tag-hierarchy ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-2.0.0-alpha1-x86-64.deb .
+    - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service/grpc/client/dist/tag_hierarchy_grpc_client-2.0.0a1-py3-none-any.whl .
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name continuous tag-hierarchy bash -c 'make continuous'
     - bash: docker cp continuous:/usr/src/app/ioc-hierarchy-service-docker-build/Testing/ .
     - bash: docker run -w /usr/src/app/ioc-hierarchy-service --name nightly tag-hierarchy bash -c 'make nightly'
@@ -42,6 +43,8 @@ stages:
     - task: GithubRelease@0
       displayName: 'Create GitHub Release'
       inputs:
-        gitHubConnection: 'GitHub connection 1'
+        gitHubConnection: 'IOC DPL Release'
         repositoryName: equinor/ioc-hierarchy-service
-        assets: ./*.deb
+        assets: |
+          ./*.deb
+          ./*.whl
