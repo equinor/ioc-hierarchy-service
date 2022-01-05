@@ -1,3 +1,5 @@
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 add_executable(backup_service
     main.cpp
  )
@@ -7,7 +9,8 @@ target_include_directories(backup_service
     PUBLIC ${CMAKE_SOURCE_DIR}/cppzmq
 )
 target_link_libraries(backup_service
-    PUBLIC redis++
+    PRIVATE redis++::redis++_static
+    PRIVATE Threads::Threads
     PUBLIC libzmq)
 
 if (APPLE)

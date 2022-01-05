@@ -7,7 +7,7 @@
 #include "config/config.h"
 #include <zmq.hpp>
 
-#include <redis++.h>
+#include <sw/redis++/redis++.h>
 
 #include <iostream>
 #include <sstream>
