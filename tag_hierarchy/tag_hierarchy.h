@@ -13,6 +13,8 @@ public:
     static TagHierarchyImpl& GetTagHierarchy();
     static std::vector<NodeType> Handle(std::vector<NodeType>& message);
     static std::string Store(const std::string& path);
+    static std::string Restore(const std::string& path);
+    static std::string Clear();
 
 private:
     static TagHierarchyGraph& GetGraph();

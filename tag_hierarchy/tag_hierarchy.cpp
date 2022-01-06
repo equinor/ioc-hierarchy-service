@@ -106,6 +106,25 @@ public:
         return retval;
     }
 
+    std::string
+    Restore(const std::string& path) {
+        ClearGraph();
+        auto filestream = std::fstream();
+        filestream.open(path, std::fstream::in);
+        boost::iostreams::filtering_stream<boost::iostreams::input> f;
+        f.push(boost::iostreams::gzip_decompressor());
+        f.push(filestream);
+        boost::archive::binary_iarchive archive(f);
+        archive >> *this;
+        return {"ok"};
+    }
+
+    std::string
+    Clear() {
+        ClearGraph();
+        return {"ok"};
+    }
+
     std::vector<NodeType>
     HealthCheck(std::vector<NodeType>& message) {
         auto retval = std::vector<NodeType>();
@@ -222,4 +241,14 @@ TagHierarchy::Register(Command &in, std::string name) {
 std::string
 TagHierarchy::Store(const std::string& path) {
     return GetTagHierarchy().Store(path);
+}
+
+std::string
+TagHierarchy::Restore(const std::string& path) {
+    return GetTagHierarchy().Restore(path);
+}
+
+std::string
+TagHierarchy::Clear() {
+    return GetTagHierarchy().Clear();
 }

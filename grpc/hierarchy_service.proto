@@ -1,13 +1,19 @@
 syntax = "proto3";
+
 // The greeting service definition.
 service HierarchyService {
   // Sends a greeting
   rpc Query (NodeList) returns (NodeList) {}
   rpc Store (String) returns (String) {}
+  rpc Restore (String) returns (String) {}
+  rpc Clear (Empty) returns (String) {}
 }
 
 message String {
   string value = 1;
+}
+
+message Empty {
 }
 
 message Node{
