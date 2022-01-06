@@ -53,6 +53,13 @@ class HierarchyServiceImpl final : public HierarchyService::Service
     response->set_value(result);
     return Status::OK;
   }
+
+  Status HealthCheck(ServerContext *context, const Empty* request, Health* response) {
+    auto result = TagHierarchy::HealthCheck();
+    response->set_status(std::get<0>(result));
+    response->set_detail(std::get<1>(result));
+    return Status::OK;
+  }
 };
 
 void RunServer() {

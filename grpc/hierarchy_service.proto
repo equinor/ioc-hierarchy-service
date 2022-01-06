@@ -7,6 +7,7 @@ service HierarchyService {
   rpc Store (String) returns (String) {}
   rpc Restore (String) returns (String) {}
   rpc Clear (Empty) returns (String) {}
+  rpc HealthCheck (Empty) returns (Health) {}
 }
 
 message String {
@@ -14,6 +15,11 @@ message String {
 }
 
 message Empty {
+}
+
+message Health {
+  string status = 1;
+  string detail = 2;
 }
 
 message Node{

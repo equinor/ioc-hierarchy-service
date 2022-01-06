@@ -137,6 +137,20 @@ public:
         return retval;
     }
 
+    std::pair<std::string, std::string>
+    HealthCheck() {
+        if (root_ == std::numeric_limits<VertexT>::max()) {
+            return {
+                "error",
+                "Cache not populated"
+            };
+        }
+        return {
+            "ok",
+            "Cache is populated"
+        };
+    }
+
     void
     ClearGraph() {
         graph_.clear();
@@ -251,4 +265,9 @@ TagHierarchy::Restore(const std::string& path) {
 std::string
 TagHierarchy::Clear() {
     return GetTagHierarchy().Clear();
+}
+
+std::pair<std::string, std::string>
+TagHierarchy::HealthCheck() {
+    return GetTagHierarchy().HealthCheck();
 }

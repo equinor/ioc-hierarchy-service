@@ -45,6 +45,20 @@ class TestServer(unittest.TestCase):
         grpc_response = stub.Store(path)
         assert os.path.isfile(filename)
 
+    def test_clear(self):
+        channel = grpc.insecure_channel('127.0.0.1:50051')
+        stub = HierarchyServiceStub(channel)
+    
+        response = stub.HealthCheck(Empty())
+        assert response.status == 'ok'
+        assert response.detail == 'Cache is populated'
+
+        stub.Clear(Empty())
+        response = stub.HealthCheck(Empty())
+        assert response.status == 'error'
+        assert response.detail == 'Cache not populated'
+
+
     def test_restore_hierarchy(self):
         channel = grpc.insecure_channel('127.0.0.1:50051')
         stub = HierarchyServiceStub(channel)
