@@ -7,7 +7,7 @@ from time import sleep
 
 import grpc
 
-from hierarchy_service_pb2 import NodeList 
+from hierarchy_service_pb2 import NodeList, String
 from hierarchy_service_pb2_grpc import HierarchyServiceStub
 
 from tag_hierarchy_types import convert_proto_to_dict, convert_dict_to_proto
@@ -34,6 +34,16 @@ class TestServer(unittest.TestCase):
             raise e
 
         return super().setUp()
+
+    def test_store_hierarchy(self):
+        channel = grpc.insecure_channel('127.0.0.1:50051')
+        stub = HierarchyServiceStub(channel)
+
+        filename = os.path.join(os.getcwd(), 'hierarchy_snapshot.data')
+        path = String(value=filename)
+    
+        grpc_response = stub.Store(path)
+        assert os.path.isfile(filename)
 
     def test_nodes(self):
         channel = grpc.insecure_channel('127.0.0.1:50051')

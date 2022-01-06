@@ -35,6 +35,11 @@ class HierarchyServiceImpl final : public HierarchyService::Service
     }
     return Status::OK;
   }
+  Status Store(ServerContext *context, const String *path, String* response) {
+    auto result = TagHierarchy::Store(path->value());
+    response->set_value(result);
+    return Status::OK;
+  }
 };
 
 void RunServer() {

@@ -18,6 +18,8 @@
 
 
 #include <functional>
+#include <fstream>
+
 #include <tag_hierarchy/commands/command.h>
 
 using VertexIterator = boost::graph_traits<TagHierarchyGraph>::vertex_iterator;
@@ -72,6 +74,20 @@ public:
         }
         retval.push_back({{"serialized_graph", stream.str()}});
         return retval;
+    }
+
+    std::string
+    Store(const std::string& path) {
+        auto filestream = std::fstream();
+        filestream.open(path, std::fstream::out);
+        {
+            boost::iostreams::filtering_stream<boost::iostreams::output> f;
+            f.push(boost::iostreams::gzip_compressor());
+            f.push(filestream);
+            boost::archive::binary_oarchive archive(f);
+            archive << *this;
+        }
+        return {"ok"};
     }
 
     std::vector<NodeType>
@@ -201,4 +217,9 @@ TagHierarchy::GetRoot() {
 void
 TagHierarchy::Register(Command &in, std::string name) {
     GetTagHierarchy().Register(in, name);
+}
+
+std::string
+TagHierarchy::Store(const std::string& path) {
+    return GetTagHierarchy().Store(path);
 }

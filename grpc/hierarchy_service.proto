@@ -3,6 +3,11 @@ syntax = "proto3";
 service HierarchyService {
   // Sends a greeting
   rpc Query (NodeList) returns (NodeList) {}
+  rpc Store (String) returns (String) {}
+}
+
+message String {
+  string value = 1;
 }
 
 message Node{
