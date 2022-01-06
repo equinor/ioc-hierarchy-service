@@ -35,6 +35,31 @@ class HierarchyServiceImpl final : public HierarchyService::Service
     }
     return Status::OK;
   }
+
+  Status Store(ServerContext *context, const String *path, String* response) {
+    auto result = TagHierarchy::Store(path->value());
+    response->set_value(result);
+    return Status::OK;
+  }
+
+  Status Restore(ServerContext *context, const String *path, String* response) {
+    auto result = TagHierarchy::Restore(path->value());
+    response->set_value(result);
+    return Status::OK;
+  }
+
+  Status Clear(ServerContext *context, const Empty* request, String* response) {
+    auto result = TagHierarchy::Clear();
+    response->set_value(result);
+    return Status::OK;
+  }
+
+  Status HealthCheck(ServerContext *context, const Empty* request, Health* response) {
+    auto result = TagHierarchy::HealthCheck();
+    response->set_status(std::get<0>(result));
+    response->set_detail(std::get<1>(result));
+    return Status::OK;
+  }
 };
 
 void RunServer() {
