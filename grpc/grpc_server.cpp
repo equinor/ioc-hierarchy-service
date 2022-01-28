@@ -17,6 +17,7 @@ using grpc::ServerReader;
 using grpc::ServerReaderWriter;
 using grpc::ServerWriter;
 using grpc::Status;
+using grpc::StatusCode;
 
 
 class HierarchyServiceImpl final : public HierarchyService::Service
@@ -58,6 +59,9 @@ class HierarchyServiceImpl final : public HierarchyService::Service
     auto result = TagHierarchy::HealthCheck();
     response->set_status(std::get<0>(result));
     response->set_detail(std::get<1>(result));
+    if (std::get<0>(result) != "ok") {
+      return {StatusCode::NOT_FOUND, "Hierarchy not populated"};
+    }
     return Status::OK;
   }
 };
