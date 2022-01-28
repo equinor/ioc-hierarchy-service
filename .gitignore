@@ -15,3 +15,6 @@ cmake-build-*/
 *pb2.py
 *pb2_grpc.py
 
+#Generated makefile
+grpc/client/Makefile
+
