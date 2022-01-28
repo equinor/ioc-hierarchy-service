@@ -11,9 +11,11 @@ get_target_property(gRPC_CPP_PLUGIN_EXECUTABLE gRPC::grpc_cpp_plugin IMPORTED_LO
 add_custom_command(
       OUTPUT "${hierarchy_service_proto_srcs}" "${hierarchy_service_proto_hdrs}" "${hierarchy_service_grpc_srcs}" "${hierarchy_service_grpc_hdrs}"
       COMMAND ${Protobuf_PROTOC_EXECUTABLE}
-      ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
-        --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
+      ARGS 
         -I "${hierarchy_service_proto_path}"
+        -I "${VCPKG_INSTALLED_DIR}/x64-linux/include"
+        --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
+        --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
         --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}"
         "${hierarchy_service_proto}"
       DEPENDS "${hierarchy_service_proto}")
@@ -101,6 +103,12 @@ add_test(
 )
 
 # Build python client distributable wheel
+
+configure_file(
+  client/Makefile.in 
+  ${CMAKE_CURRENT_SOURCE_DIR}/client/Makefile
+)
+
 file(
   GLOB client_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/client/tag_hierarchy_grpc_client/*.py
@@ -150,6 +158,8 @@ add_custom_command(
       COMMAND ${Protobuf_PROTOC_EXECUTABLE}
       ARGS 
         -I "${hierarchy_service_proto_path}"
+        -I "${VCPKG_INSTALLED_DIR}/x64-linux/include"
+        --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
         --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}"
         --include_imports
         --include_source_info
