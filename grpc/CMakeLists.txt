@@ -142,3 +142,22 @@ set_tests_properties(
   PROPERTIES
   FIXTURES_REQUIRED grpc_client_install
 )
+
+# Create proto descriptor
+set(proto_descriptor "${CMAKE_CURRENT_BINARY_DIR}/grpc_proto.pb")
+add_custom_command(
+      OUTPUT "${proto_descriptor}"
+      COMMAND ${Protobuf_PROTOC_EXECUTABLE}
+      ARGS 
+        -I "${hierarchy_service_proto_path}"
+        --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}"
+        --include_imports
+        --include_source_info
+        --descriptor_set_out=${proto_descriptor}
+        "${hierarchy_service_proto}"
+      DEPENDS "${hierarchy_service_proto}")
+
+add_custom_target(
+  generate_proto_descriptor ALL
+  DEPENDS ${proto_descriptor}
+)
