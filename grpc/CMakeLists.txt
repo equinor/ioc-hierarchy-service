@@ -45,6 +45,7 @@ target_link_libraries(hierarchy_service_grpc_proto
     PUBLIC gRPC::grpc++_reflection
     PUBLIC gRPC::grpc++
     PUBLIC protobuf::libprotobuf
+    PUBLIC google-cloud-cpp::api_annotations_protos
     tag_hierarchy
 )
 

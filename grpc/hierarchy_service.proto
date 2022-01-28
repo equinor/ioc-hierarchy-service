@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/api/annotations.proto";
+
 // The greeting service definition.
 service HierarchyService {
   // Sends a greeting
@@ -7,7 +9,11 @@ service HierarchyService {
   rpc Store (String) returns (String) {}
   rpc Restore (String) returns (String) {}
   rpc Clear (Empty) returns (String) {}
-  rpc HealthCheck (Empty) returns (Health) {}
+  rpc HealthCheck (Empty) returns (Health) {
+    option (google.api.http) = {
+      get: "/healthcheck"
+    };
+  }
 }
 
 message String {
