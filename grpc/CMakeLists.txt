@@ -29,14 +29,9 @@ add_library(hierarchy_service_grpc_proto
   ${hierarchy_service_grpc_hdrs}
   ${hierarchy_service_proto_srcs}
   ${hierarchy_service_proto_hdrs}
-  "type_conversion.cpp"
 )
 set_target_properties(hierarchy_service_grpc_proto PROPERTIES 
     LABELS "generated"
-)
-set_source_files_properties(
-  "type_conversion.cpp"    
-  PROPERTIES LABELS "coverage"
 )
 
 target_include_directories(hierarchy_service_grpc_proto
@@ -51,8 +46,27 @@ target_link_libraries(hierarchy_service_grpc_proto
     tag_hierarchy
 )
 
+add_library(
+  grpc_utils
+  "type_conversion.cpp"
+)
+
+target_include_directories(grpc_utils
+    PRIVATE ${CMAKE_SOURCE_DIR}
+)
+
+target_link_libraries(
+  grpc_utils
+  hierarchy_service_grpc_proto
+)
+
+set_target_properties(grpc_utils PROPERTIES 
+    LABELS coverage
+)
+
 add_executable(
-  grpc_server "grpc_server.cpp" 
+  grpc_server
+  "grpc_server.cpp" 
 )
 
 target_include_directories(grpc_server
@@ -64,6 +78,7 @@ set_target_properties(grpc_server PROPERTIES
 
 target_link_libraries(grpc_server 
     hierarchy_service_grpc_proto
+    grpc_utils
     tag_hierarchy_commands
     tag_hierarchy
     pybind11::pybind11_headers
@@ -91,6 +106,7 @@ target_compile_definitions(tag_hierarchy_types_test PRIVATE BOOST_TEST_DYN_LINK)
 target_link_libraries(tag_hierarchy_types_test
     PRIVATE tag_hierarchy
     PRIVATE tag_hierarchy_commands
+    PRIVATE grpc_utils
     PRIVATE hierarchy_service_grpc_proto
     PRIVATE Boost::unit_test_framework
     PRIVATE Boost::boost
