@@ -54,9 +54,8 @@ class TestServer(unittest.TestCase):
         assert response.detail == 'Cache is populated'
 
         stub.Clear(Empty())
-        response = stub.HealthCheck(Empty())
-        assert response.status == 'error'
-        assert response.detail == 'Cache not populated'
+        with self.assertRaises(grpc.RpcError):
+            response = stub.HealthCheck(Empty())
 
 
     def test_restore_hierarchy(self):
