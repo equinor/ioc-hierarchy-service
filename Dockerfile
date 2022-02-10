@@ -21,7 +21,7 @@ ARG FEED_ACCESSTOKEN
 ARG FEED_URL
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json,readwrite'
+ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json,readwrite'
 ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS '{"endpointCredentials":[{"endpoint":"'${FEED_URL}'","username":"docker","password":"'${FEED_ACCESSTOKEN}'"}]}'
 RUN echo $FEED_URL
 RUN echo $VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
