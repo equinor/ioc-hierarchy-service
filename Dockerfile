@@ -29,7 +29,8 @@ RUN echo $FEED_ACCESSTOKEN
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
-COPY ./nuget.config ioc-hierarchy-service-docker-build/
+COPY ./nuget.config .
+RUN cat nuget.config
 WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
 ARG CMAKE_BUILD_TYPE=Release
 RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
