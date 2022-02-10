@@ -27,7 +27,7 @@ ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 RUN mono /usr/local/bin/nuget.exe sources add -name "ADO" -Source "https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json" -Username "docker" -Password "'${FEED_ACCESSTOKEN}'"
 # TODO: do a "mono sources add -Name <somename> -Source <our package> -Username <username> -Password <access token>" 
 #     Then: sett <somename> as the uri for VCPKG_BINARY_SOURCES
-ENV VCPKG_BINARY_SOURCES 'clear;nuget,{"endpointCredentials":[{"endpoint":"https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json","username":"docker","password":"'${FEED_ACCESSTOKEN}'"}]},readwrite'
+ENV VCPKG_BINARY_SOURCES 'clear;nuget,ADO,readwrite'
 ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS '{"endpointCredentials":[{"endpoint":"https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json","username":"docker","password":"'${FEED_ACCESSTOKEN}'"}]}'
 RUN echo $FEED_URL
 RUN echo $VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
