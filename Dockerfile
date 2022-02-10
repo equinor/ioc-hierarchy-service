@@ -25,7 +25,7 @@ ARG FEED_URL
 RUN ls /usr/local/bin
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-RUN mono /usr/local/bin/nuget.exe sources add -name "ADO" -Source "https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json" -Username "docker" -Password "'${FEED_ACCESSTOKEN}'"
+RUN mono /usr/local/bin/nuget.exe sources add -name "ADO" -Source "https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json" -Username "docker" -Password ${FEED_ACCESSTOKEN}
 # TODO: do a "mono sources add -Name <somename> -Source <our package> -Username <username> -Password <access token>" 
 #     Then: sett <somename> as the uri for VCPKG_BINARY_SOURCES
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,ADO,readwrite'
