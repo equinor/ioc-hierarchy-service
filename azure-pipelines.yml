@@ -35,7 +35,7 @@ stages:
       inputs:
         command: restore
         feedsToUse: 'config'
-        nugetConfigPath: '.'
+        nugetConfigPath: './nuget.config'
         includeNuGetOrg: false
     - bash: docker build -t tag-hierarchy --build-arg FEED_ACCESSTOKEN=$(VSS_NUGET_ACCESSTOKEN) ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
