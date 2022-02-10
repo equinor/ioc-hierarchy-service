@@ -12,7 +12,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3
 WORKDIR /usr/src/app/
 RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
-RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
+RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 
 
 
@@ -22,7 +22,7 @@ ARG FEED_URL
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json,readwrite'
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS '{"endpointCredentials":[{"endpoint":"'${FEED_URL}'","username":"docker","password":"'${FEED_ACCESSTOKEN}'"}]}'
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS '{"endpointCredentials":[{"endpoint":"https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json","username":"docker","password":"'${FEED_ACCESSTOKEN}'"}]}'
 RUN echo $FEED_URL
 RUN echo $VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
 RUN echo $FEED_ACCESSTOKEN
