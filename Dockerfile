@@ -17,10 +17,11 @@ RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
 RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
 
-ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"ArtifactsDocker\", \"password\":\"${PAT}\"}]}
 
 FROM cppbuild as generate_package
+ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"ArtifactsDocker\", \"password\":\"${PAT}\"}]}
+ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json,readwrite'
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
