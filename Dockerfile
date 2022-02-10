@@ -28,7 +28,7 @@ RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
 WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
 ARG CMAKE_BUILD_TYPE=Release
-RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE --debug
+RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
 RUN make -j6 && make install
 # Build debian package
 RUN cpack -G DEB .
