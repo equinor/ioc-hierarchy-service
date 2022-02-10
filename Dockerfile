@@ -10,7 +10,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3
       && /tmp/cmake-install.sh --skip-license --prefix=/usr/local \
       && rm /tmp/cmake-install.sh
 # Download the latest stable `nuget.exe` to `/usr/local/bin`
-RUN wget /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+RUN wget -O /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 WORKDIR /usr/src/app/
 RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
