@@ -1,4 +1,7 @@
 # This builds the a debian package of the project
+ARG FEED_URL
+ARG TOKEN
+
 FROM debian:bullseye as cppbuild
 RUN apt-get update && apt-get install -y zlib1g-dev libgflags-dev libboost-graph-dev libtsan0 \
       libboost-serialization-dev libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev \
@@ -13,6 +16,9 @@ WORKDIR /usr/src/app/
 RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
 RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
+
+ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"ArtifactsDocker\", \"password\":\"${PAT}\"}]}
 
 FROM cppbuild as generate_package
 COPY . ioc-hierarchy-service
