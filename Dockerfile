@@ -18,10 +18,13 @@ RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
 
 FROM cppbuild as generate_package
 ARG FEED_ACCESSTOKEN
+ARG FEED_URL
+ARG ENDPOINT
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json,readwrite'
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json\", \"username\":\"docker\", \"password\":\"${FEED_ACCESSTOKEN}\"}]}
-RUN echo $VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTSssss {\"endpointCredentials\": [{\"endpoint\":${FEED_URL}\", \"username\":\"docker\", \"password\":\"${FEED_ACCESSTOKEN}\"}]}
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS $(ENDPOINT)
+RUN echo $ENDPOINT
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
