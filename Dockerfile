@@ -19,7 +19,6 @@ RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
 FROM cppbuild as generate_package
 ARG FEED_ACCESSTOKEN
 ARG FEED_URL
-ARG ENDPOINT
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json,readwrite'
