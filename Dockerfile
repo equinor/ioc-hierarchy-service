@@ -32,7 +32,7 @@ RUN mkdir ioc-hierarchy-service-docker-build
 COPY ./nuget.config .
 RUN cat nuget.config
 WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
-ARG CMAKE_BUILD_TYPE=Release
+ARG CMAKE_BUILD_TYPE=Debug
 RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
 RUN make -j6 && make install
 # Build debian package
