@@ -18,7 +18,7 @@ COPY vcpkg/ ioc-hierarchy-service/vcpkg/
 RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
 
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"ArtifactsDocker\", \"password\":\"${PAT}\"}]}
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"ArtifactsDocker\", \"password\":\"${TOKEN}\"}]}
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json,readwrite'
 
 
@@ -28,7 +28,7 @@ RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
 WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
 ARG CMAKE_BUILD_TYPE=Release
-RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
+RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE --debug
 RUN make -j6 && make install
 # Build debian package
 RUN cpack -G DEB .
