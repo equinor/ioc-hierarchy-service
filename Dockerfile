@@ -1,7 +1,4 @@
 # This builds the a debian package of the project
-ARG FEED_URL
-ARG TOKEN
-
 FROM debian:bullseye as cppbuild
 RUN apt-get update && apt-get install -y zlib1g-dev libgflags-dev libboost-graph-dev libtsan0 \
       libboost-serialization-dev libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev \
@@ -20,13 +17,16 @@ RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh
 
 
 FROM cppbuild as generate_package
+ARG FEED_ACCESSTOKEN
+RUN echo FEED_ACCESSTOKEN
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"ArtifactsDocker\", \"password\":\"${TOKEN}\"}]}
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json\", \"password\":\"${FEED_ACCESSTOKEN}\"}]}
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/microsoft-vcpkg/nuget/v3/index.json,readwrite'
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
 WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
+COPY nuget.config .
 ARG CMAKE_BUILD_TYPE=Release
 RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
 RUN make -j6 && make install
