@@ -22,14 +22,13 @@ ARG FEED_ACCESSTOKEN
 ARG FEED_URL
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-RUN mono /usr/local/bin/nuget.exe sources add -name "ADO" -Source "https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json" -Username "docker" -Password ${FEED_ACCESSTOKEN}
+RUN mono /usr/local/bin/nuget.exe sources add -name "ADO" -Source ${FEED_URL} -Username "docker" -Password ${FEED_ACCESSTOKEN}
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,ADO,readwrite'
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
-# COPY ./nuget.config .
 WORKDIR /usr/src/app/ioc-hierarchy-service-docker-build
-ARG CMAKE_BUILD_TYPE=Debug
+ARG CMAKE_BUILD_TYPE=Release
 RUN cmake ../ioc-hierarchy-service -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE
 RUN make -j6 && make install
 # Build debian package
