@@ -22,8 +22,8 @@ ARG FEED_ACCESSTOKEN
 ARG FEED_URL
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-RUN mono /usr/local/bin/nuget.exe sources add -name "ADO" -Source ${FEED_URL} -Username "docker" -Password ${FEED_ACCESSTOKEN}
-ENV VCPKG_BINARY_SOURCES 'clear;nuget,ADO,readwrite'
+RUN mono /usr/local/bin/nuget.exe sources add -name "ioc-cpp-packages" -Source ${FEED_URL} -Username "docker" -Password ${FEED_ACCESSTOKEN}
+ENV VCPKG_BINARY_SOURCES 'clear;nuget,ioc-cpp-packages,readwrite'
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
