@@ -31,13 +31,6 @@ stages:
     - checkout: self
       submodules: true
     - task: NuGetAuthenticate@0
-    - task: Docker@2
-      displayName: Build Docker image
-      inputs:
-        command: 'build'
-        Dockerfile: './Dockerfile'
-        tags: 'tag-hierarchy'
-        arguments: '--build-arg FEED_URL=$(feed-url) --build-arg FEED_ACCESSTOKEN=$(RUAJ-PAT)'
     - bash: docker build -t tag-hierarchy --build-arg FEED_URL=$(feed-url) --build-arg FEED_ACCESSTOKEN=$(RUAJ-PAT) ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-2.0.0-alpha1-x86-64.deb .

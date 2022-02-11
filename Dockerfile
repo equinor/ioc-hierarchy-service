@@ -9,8 +9,6 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3
       && chmod u+x /tmp/cmake-install.sh \
       && /tmp/cmake-install.sh --skip-license --prefix=/usr/local \
       && rm /tmp/cmake-install.sh
-# Download the latest stable `nuget.exe` to `/usr/local/bin`
-#TODO: need to chmod?
 RUN wget -O /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 WORKDIR /usr/src/app/
 RUN mkdir ioc-hierarchy-service
@@ -22,17 +20,11 @@ RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 FROM cppbuild as generate_package
 ARG FEED_ACCESSTOKEN
 ARG FEED_URL
-RUN ls /usr/local/bin
 RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 RUN mono /usr/local/bin/nuget.exe sources add -name "ADO" -Source "https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json" -Username "docker" -Password ${FEED_ACCESSTOKEN}
-# TODO: do a "mono sources add -Name <somename> -Source <our package> -Username <username> -Password <access token>" 
-#     Then: sett <somename> as the uri for VCPKG_BINARY_SOURCES
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,ADO,readwrite'
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS '{"endpointCredentials":[{"endpoint":"https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json","username":"docker","password":"'${FEED_ACCESSTOKEN}'"}]}'
-RUN echo $FEED_URL
-RUN echo $VSS_NUGET_EXTERNAL_FEED_ENDPOINTS
-RUN echo $FEED_ACCESSTOKEN
+# ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS '{"endpointCredentials":[{"endpoint":"https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json","username":"docker","password":"'${FEED_ACCESSTOKEN}'"}]}'
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
 RUN mkdir ioc-hierarchy-service-docker-build
