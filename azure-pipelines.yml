@@ -16,7 +16,7 @@ resources:
 variables:
   tag: '$(Build.BuildId)'
   feed-url: 'https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json'
-  VCPKG_BINARY_SOURCES: 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json,readwrite'
+  # VCPKG_BINARY_SOURCES: 'clear;nuget,https://pkgs.dev.azure.com/equinorioc/_packaging/ioc-vcpkg/nuget/v3/index.json,readwrite'
 
 stages:
 - stage: Build_and_test
@@ -31,7 +31,7 @@ stages:
     - checkout: self
       submodules: true
     - task: NuGetAuthenticate@0
-    - bash: docker build -t tag-hierarchy --build-arg FEED_URL=$(feed-url) --build-arg FEED_ACCESSTOKEN=$(RUAJ-PAT) ./
+    - bash: docker build -t tag-hierarchy --build-arg FEED_URL=$(feed-url) --build-arg FEED_ACCESSTOKEN=$(System.AccessToken) ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-2.0.0-alpha1-x86-64.deb .
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service/grpc/client/dist/tag_hierarchy_grpc_client-2.0.0a1-py3-none-any.whl .
