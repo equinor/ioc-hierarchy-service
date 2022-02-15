@@ -9,7 +9,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3
       && chmod u+x /tmp/cmake-install.sh \
       && /tmp/cmake-install.sh --skip-license --prefix=/usr/local \
       && rm /tmp/cmake-install.sh
-RUN wget -O /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+RUN wget -q -O /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 WORKDIR /usr/src/app/
 RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
@@ -20,7 +20,12 @@ RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 FROM cppbuild as generate_package
 ARG FEED_ACCESSTOKEN
 ARG FEED_URL
-RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
+# RUN curl -L https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh  | sh
+RUN wget https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/master/helpers/installcredprovider.sh \
+      -q -O /tmp/installcredprovider.sh \
+      && chmod u+x /tmp/installcredprovider.sh \
+      && /tmp/installcredprovider.sh \
+      && rm /tmp/installcredprovider.sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 RUN mono /usr/local/bin/nuget.exe sources add -name "ioc-cpp-packages" -Source ${FEED_URL} -Username "docker" -Password ${FEED_ACCESSTOKEN}
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,ioc-cpp-packages,readwrite'
