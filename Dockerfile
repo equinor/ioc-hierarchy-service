@@ -14,8 +14,6 @@ RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
 RUN ioc-hierarchy-service/vcpkg/bootstrap-vcpkg.sh -disableMetrics
 
-
-
 FROM cppbuild as generate_package
 ARG FEED_ACCESSTOKEN
 ARG FEED_URL='https://pkgs.dev.azure.com/equinorioc/0adf653c-0d86-488b-bc00-d51fbe6e753d/_packaging/ioc-cpp-packages/nuget/v3/index.json'
