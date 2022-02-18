@@ -9,7 +9,6 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3
       && chmod u+x /tmp/cmake-install.sh \
       && /tmp/cmake-install.sh --skip-license --prefix=/usr/local \
       && rm /tmp/cmake-install.sh
-# RUN wget -q -O /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 WORKDIR /usr/src/app/
 RUN mkdir ioc-hierarchy-service
 COPY vcpkg/ ioc-hierarchy-service/vcpkg/
@@ -27,7 +26,8 @@ RUN wget https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/mast
       && rm /tmp/installcredprovider.sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 RUN if [ -n "$FEED_ACCESSTOKEN" ]; then \
-      apt-get update && apt-get install -y mono-complete \
+      wget -q -O /usr/local/bin/nuget.exe https://dist.nuget.org/win-x86-commandline/latest/nuget.exe \
+      && apt-get update && apt-get install -y mono-complete \
       && mono /usr/local/bin/nuget.exe sources add -name "ioc-cpp-packages" -Source ${FEED_URL} -Username "docker" -Password ${FEED_ACCESSTOKEN}; fi
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,ioc-cpp-packages,readwrite'
 COPY . ioc-hierarchy-service
