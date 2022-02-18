@@ -26,7 +26,8 @@ RUN wget https://raw.githubusercontent.com/Microsoft/artifacts-credprovider/mast
       && /tmp/installcredprovider.sh \
       && rm /tmp/installcredprovider.sh
 ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
-RUN  if [${FEED_ACCESSTOKEN}]; then mono /usr/local/bin/nuget.exe sources add -name "ioc-cpp-packages" -Source ${FEED_URL} -Username "docker" -Password ${FEED_ACCESSTOKEN}; fi
+# RUN if [ -n "$FEED_ACCESSTOKEN" ]; then echo "Token set to ${FEED_ACCESSTOKEN}"; else echo "Token not set"; fi
+RUN if [ -n "$FEED_ACCESSTOKEN"]; then mono /usr/local/bin/nuget.exe sources add -name "ioc-cpp-packages" -Source ${FEED_URL} -Username "docker" -Password ${FEED_ACCESSTOKEN}; fi
 ENV VCPKG_BINARY_SOURCES 'clear;nuget,ioc-cpp-packages,readwrite'
 COPY . ioc-hierarchy-service
 RUN pip install -r ioc-hierarchy-service/grpc/client/requirements.txt
