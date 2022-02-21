@@ -28,7 +28,8 @@ stages:
     steps:
     - checkout: self
       submodules: true
-    - bash: docker build -t tag-hierarchy ./
+    - task: NuGetAuthenticate@0
+    - bash: docker build -t tag-hierarchy --build-arg FEED_ACCESSTOKEN=$(System.AccessToken) ./
     - bash: docker create --name tag-hierarchy-service tag-hierarchy
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service-docker-build/tag-hierarchy-2.0.0-alpha1-x86-64.deb .
     - bash: docker cp tag-hierarchy-service:/usr/src/app/ioc-hierarchy-service/grpc/client/dist/tag_hierarchy_grpc_client-2.0.0a1-py3-none-any.whl .
