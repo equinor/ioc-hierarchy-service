@@ -11,11 +11,9 @@ get_target_property(gRPC_CPP_PLUGIN_EXECUTABLE gRPC::grpc_cpp_plugin IMPORTED_LO
 add_custom_command(
       OUTPUT "${hierarchy_service_proto_srcs}" "${hierarchy_service_proto_hdrs}" "${hierarchy_service_grpc_srcs}" "${hierarchy_service_grpc_hdrs}"
       COMMAND ${Protobuf_PROTOC_EXECUTABLE}
-      ARGS 
-        -I "${hierarchy_service_proto_path}"
-        -I "${VCPKG_INSTALLED_DIR}/x64-linux/include"
-        --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
+      ARGS --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
         --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
+        -I "${hierarchy_service_proto_path}"
         --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}"
         "${hierarchy_service_proto}"
       DEPENDS "${hierarchy_service_proto}")
@@ -29,9 +27,14 @@ add_library(hierarchy_service_grpc_proto
   ${hierarchy_service_grpc_hdrs}
   ${hierarchy_service_proto_srcs}
   ${hierarchy_service_proto_hdrs}
+  "type_conversion.cpp"
 )
 set_target_properties(hierarchy_service_grpc_proto PROPERTIES 
     LABELS "generated"
+)
+set_source_files_properties(
+  "type_conversion.cpp"    
+  PROPERTIES LABELS "coverage"
 )
 
 target_include_directories(hierarchy_service_grpc_proto
@@ -42,31 +45,11 @@ target_link_libraries(hierarchy_service_grpc_proto
     PUBLIC gRPC::grpc++_reflection
     PUBLIC gRPC::grpc++
     PUBLIC protobuf::libprotobuf
-    PUBLIC google-cloud-cpp::api_annotations_protos
     tag_hierarchy
 )
 
-add_library(
-  grpc_utils
-  "type_conversion.cpp"
-)
-
-target_include_directories(grpc_utils
-    PRIVATE ${CMAKE_SOURCE_DIR}
-)
-
-target_link_libraries(
-  grpc_utils
-  hierarchy_service_grpc_proto
-)
-
-set_target_properties(grpc_utils PROPERTIES 
-    LABELS coverage
-)
-
 add_executable(
-  grpc_server
-  "grpc_server.cpp" 
+  grpc_server "grpc_server.cpp" 
 )
 
 target_include_directories(grpc_server
@@ -78,7 +61,6 @@ set_target_properties(grpc_server PROPERTIES
 
 target_link_libraries(grpc_server 
     hierarchy_service_grpc_proto
-    grpc_utils
     tag_hierarchy_commands
     tag_hierarchy
     pybind11::pybind11_headers
@@ -106,7 +88,6 @@ target_compile_definitions(tag_hierarchy_types_test PRIVATE BOOST_TEST_DYN_LINK)
 target_link_libraries(tag_hierarchy_types_test
     PRIVATE tag_hierarchy
     PRIVATE tag_hierarchy_commands
-    PRIVATE grpc_utils
     PRIVATE hierarchy_service_grpc_proto
     PRIVATE Boost::unit_test_framework
     PRIVATE Boost::boost
@@ -119,12 +100,6 @@ add_test(
 )
 
 # Build python client distributable wheel
-
-configure_file(
-  client/Makefile.in 
-  ${CMAKE_CURRENT_SOURCE_DIR}/client/Makefile
-)
-
 file(
   GLOB client_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/client/tag_hierarchy_grpc_client/*.py
@@ -165,25 +140,4 @@ set_tests_properties(
   grpc_integration_test
   PROPERTIES
   FIXTURES_REQUIRED grpc_client_install
-)
-
-# Create proto descriptor
-set(proto_descriptor "${CMAKE_CURRENT_BINARY_DIR}/grpc_proto.pb")
-add_custom_command(
-      OUTPUT "${proto_descriptor}"
-      COMMAND ${Protobuf_PROTOC_EXECUTABLE}
-      ARGS 
-        -I "${hierarchy_service_proto_path}"
-        -I "${VCPKG_INSTALLED_DIR}/x64-linux/include"
-        --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-        --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}"
-        --include_imports
-        --include_source_info
-        --descriptor_set_out=${proto_descriptor}
-        "${hierarchy_service_proto}"
-      DEPENDS "${hierarchy_service_proto}")
-
-add_custom_target(
-  generate_proto_descriptor ALL
-  DEPENDS ${proto_descriptor}
 )
