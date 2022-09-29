@@ -9,7 +9,6 @@ cmake-build-*/
 # Python packages
 **/dist/
 **egg-info/
-*.whl
 
 #Protobuf compiled
 *pb2.py

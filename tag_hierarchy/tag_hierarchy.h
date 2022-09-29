@@ -12,10 +12,6 @@ class TagHierarchy {
 public:
     static TagHierarchyImpl& GetTagHierarchy();
     static std::vector<NodeType> Handle(std::vector<NodeType>& message);
-    static std::string Store(const std::string& path);
-    static std::string Restore(const std::string& path);
-    static std::string Clear();
-    static std::pair<std::string, std::string> HealthCheck();
 
 private:
     static TagHierarchyGraph& GetGraph();
