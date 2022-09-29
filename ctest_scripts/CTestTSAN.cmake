@@ -26,9 +26,11 @@ CMAKE_GENERATOR=Unix Makefiles
 ctest_configure()
 ctest_build(FLAGS -j8)
 ctest_test(
+  EXCLUDE ^opencensus
   RETURN_VALUE test_result
 )
 ctest_memcheck(
+  EXCLUDE ^opencensus
   RETURN_VALUE memcheck_result
 )
 
