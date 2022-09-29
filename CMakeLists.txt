@@ -1,23 +1,28 @@
 cmake_minimum_required(VERSION 3.7)
 
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
-  CACHE STRING "Vcpkg toolchain file")
-
 project(tag-hierarchy)
-
-set(CMAKE_CXX_STANDARD 17)
-
 include(FetchContent)
+FetchContent_Declare(
+  redis-plus-plus
+  GIT_REPOSITORY https://github.com/sewenew/redis-plus-plus.git
+  GIT_TAG 1.2.3
+  )
+set(REDIS_PLUS_PLUS_BUILD_TEST OFF)
+set(REDIS_PLUS_PLUS_CXX_STANDARD 17)
+FetchContent_MakeAvailable(redis-plus-plus)
 
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/nlohmann/json
+  GIT_TAG v3.10.4)
 
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(redis++ CONFIG REQUIRED)
-find_package(Protobuf CONFIG REQUIRED)
-find_package(gRPC CONFIG REQUIRED)
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+  FetchContent_Populate(json)
+endif()
 
 enable_testing()
 
-
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cppzmq/libzmq-pkg-config)
 
 find_package(Boost COMPONENTS serialization graph iostreams unit_test_framework REQUIRED)
@@ -28,12 +33,11 @@ find_package(pybind11)
 set(BUILD_TESTING OFF)
 set(JSON_BuildTests OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 set(BUILD_TESTING ON)
 set(CMAKE_DIRECTORY_LABELS tag_hierarchy)
-
 add_subdirectory(tag_hierarchy)
 add_subdirectory(backup_service)
-add_subdirectory(grpc)
 
 pybind11_add_module(tag_hierarchy_client python/cpp/client.cpp)
 
@@ -87,10 +91,10 @@ set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
 set(CPACK_PACKAGE_NAME "tag-hierarchy")
 set(CPACK_PACKAGE_VENDOR "Equinor")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "tag-hierarchy - handling tag hierarchies since 2019")
-set(CPACK_PACKAGE_VERSION "2.0.0-alpha1")
-set(CPACK_PACKAGE_VERSION_MAJOR "2")
-set(CPACK_PACKAGE_VERSION_MINOR "0")
-set(CPACK_PACKAGE_VERSION_PATCH "0-alpha1")
+set(CPACK_PACKAGE_VERSION "1.4.1")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "4")
+set(CPACK_PACKAGE_VERSION_PATCH "1")
 set(CPACK_SYSTEM_NAME "x86-64")
 set(CPACK_INSTALL_PREFIX /usr)
 set(CPACK_SET_DESTDIR "ON")

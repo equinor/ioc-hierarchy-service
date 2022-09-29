@@ -26,9 +26,6 @@ add_library(tag_hierarchy_commands OBJECT
 target_include_directories(tag_hierarchy_commands
         PRIVATE ${CMAKE_SOURCE_DIR}
         )
-set_target_properties(tag_hierarchy_commands PROPERTIES 
-    LABELS "coverage"
-)
 target_link_libraries(tag_hierarchy_commands
         PRIVATE ${PYTHON_LIBRARIES}
         PRIVATE Boost::graph
@@ -43,10 +40,6 @@ add_library(tag_hierarchy STATIC
         visitors/searchvisitor.h)
 # Compile with -fpic so we can link a shared library into it
 set_property(TARGET tag_hierarchy PROPERTY POSITION_INDEPENDENT_CODE ON)
-set_target_properties(tag_hierarchy PROPERTIES 
-    POSITION_INDEPENDENT_CODE ON
-    LABELS "coverage"
-)
 
 target_include_directories(tag_hierarchy
     PRIVATE ${CMAKE_SOURCE_DIR}
