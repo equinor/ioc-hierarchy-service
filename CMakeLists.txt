@@ -14,7 +14,6 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(redis++ CONFIG REQUIRED)
 find_package(Protobuf CONFIG REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
-find_package(googleapis CONFIG REQUIRED)
 
 enable_testing()
 
