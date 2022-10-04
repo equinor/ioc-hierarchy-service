@@ -14,12 +14,13 @@ class FilteredHierarchyVisitor : public boost::default_dfs_visitor
 public:
     explicit FilteredHierarchyVisitor(std::set<VertexT> &valid_nodes, std::unordered_map<VertexT, std::set<VertexT>>& valid_models,
                                       const std::vector<std::string> &kpifilter, std::set<VertexT>& suppressed_nodes,
-                                      std::unordered_map<VertexT, int>& node_severity) : valid_nodes_(valid_nodes),
+                                      std::unordered_map<VertexT, int>& node_severity, std::unordered_map<VertexT, std::string>& data_access_level) : valid_nodes_(valid_nodes),
                                                                                   valid_models_(valid_models),
                                                                                   kpifilter_(kpifilter),
                                                                                   path_(std::deque<VertexT>()),
                                                                                   suppressed_nodes_(suppressed_nodes),
-                                                                                  node_severity_(node_severity) {}
+                                                                                  node_severity_(node_severity),
+                                                                                  data_access_level_(data_access_level) {}
 
     void discover_vertex(VertexT v, const TagHierarchyGraph &g)
     {
@@ -65,14 +66,28 @@ public:
     }
 
     void finish_edge(EdgeT e, const TagHierarchyGraph &g) {
+        auto source_vertex = boost::source(e, g);
         auto target_vertex = boost::target(e, g);
+
+        // The data access level field field should propagate down towards the leaf nodes.
+        // Does the source node have data access level field set?
+        if (g[target_vertex].properties.count("dataaccesslevel")) {
+            // Yes, then let it propagate to the target node.
+            std::string vertex_data_access_level = boost::get<std::string>(g[target_vertex].properties.find("dataaccesslevel")->second);
+            data_access_level_[target_vertex] = vertex_data_access_level;
+        }
+        // The source does not have data access level field set. Have we set this earlier in the traversal?
+        else if (data_access_level_.count(source_vertex)) {
+            // Yes, then let it propagate to the target node.
+            std::string vertex_data_access_level = data_access_level_[source_vertex];
+            data_access_level_[target_vertex] = vertex_data_access_level;
+        }
 
         // Is the target a model element node?
         if (g[target_vertex].properties.count("is_modelelement")
             && boost::get<bool>(g[target_vertex].properties.find("is_modelelement")->second)) {
             // Yes, the target is a model element node.
             // Is this model element suppressed?
-            auto source_vertex = boost::source(e, g);
             if (g[target_vertex].properties.count("issuppressed")
                 && boost::get<bool>(g[target_vertex].properties.find("issuppressed")->second)) {
                 // Yes, it is suppressed. Then the source node should be suppressed as well.
@@ -96,7 +111,6 @@ public:
         }
         else {
             // No, this is not a model element node.
-            auto source_vertex = boost::source(e, g);
             auto source_vertex_has_severity = node_severity_.count(source_vertex) > 0;
             // Is the target node suppressed?
             if (suppressed_nodes_.find(target_vertex) != suppressed_nodes_.end()) {
@@ -126,4 +140,5 @@ private:
     std::deque<VertexT> path_;
     std::unordered_map<VertexT, std::set<VertexT>>& valid_models_;
     std::unordered_map<VertexT, int>& node_severity_;
+    std::unordered_map<VertexT, std::string>& data_access_level_;
 };

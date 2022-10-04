@@ -35,7 +35,8 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     auto valid_models = std::unordered_map<VertexT, std::set<VertexT>>();
     auto suppressed_nodes = std::set<VertexT>();
     auto node_severity = std::unordered_map<VertexT, int>();
-    auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter, suppressed_nodes, node_severity);
+    auto data_access_level = std::unordered_map<VertexT, std::string>();
+    auto dfs_visitor = FilteredHierarchyVisitor(valid_nodes, valid_models, kpifilter, suppressed_nodes, node_severity, data_access_level);
 
     const auto termfunc = TagHierarchyUtils::Filters::GetTermfunc<TagHierarchyGraph>(command_map);
 
@@ -75,6 +76,10 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
 
         if (node_severity.find(*iter) != node_severity.end()) {
             props["severity"] = node_severity[*iter];
+        }
+
+        if (data_access_level.find(*iter) != data_access_level.end()) {
+            props["dataaccesslevel"] = data_access_level[*iter];
         }
 
         retval.push_back(props);
