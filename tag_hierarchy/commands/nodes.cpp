@@ -41,6 +41,15 @@ Nodes::ProcessRequest(std::vector<NodeType> &nodes)
     const auto termfunc = TagHierarchyUtils::Filters::GetTermfunc<TagHierarchyGraph>(command_map);
 
     auto parent_vertex = VertexT();
+    // Are we looking for a node with a specific ID?
+    if (command_map["id"].type() != typeid(pybind11::none))
+    {
+        // Yes, then return straight away.
+        std::string id = boost::get<std::string>(command_map["id"]);
+        auto vertex = vertices_[id];
+        retval.push_back(graph_[vertex].properties);
+        return retval;
+    }
     if (command_map["parentId"].type() == typeid(pybind11::none))
     {
         parent_vertex = root_;
