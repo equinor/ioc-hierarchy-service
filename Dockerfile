@@ -1,5 +1,5 @@
 # This builds the a debian package of the project
-FROM debian:bullseye as cppbuild
+FROM debian:11.5 as cppbuild
 RUN apt-get update && apt-get install -y zlib1g-dev libgflags-dev libboost-graph-dev libtsan0 \
       libboost-serialization-dev libboost-test-dev libboost-iostreams-dev libpython3-dev libzmq3-dev \
       libhiredis-dev pybind11-dev wget build-essential git python3 python3-distutils file 
